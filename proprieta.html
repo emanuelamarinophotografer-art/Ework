@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ework — Proprietà</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* TOOLBAR */
+    .toolbar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+    .search-input { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; font-family: inherit; font-weight: 500; color: var(--text); outline: none; }
+    .search-input:focus { border-color: var(--accent); }
+    .btn-nuovo { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 10px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .btn-nuovo:hover { opacity: 0.85; }
+
+    /* FILTRO STATO */
+    .filtri-stato { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filtro-btn { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 0.78rem; font-family: inherit; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .filtro-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+    /* GRIGLIA */
+    .prop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+    /* CARD PROPRIETÀ */
+    .prop-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; transition: border-color 0.2s, box-shadow 0.2s; position: relative; }
+    .prop-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .prop-ref { font-size: 0.65rem; color: var(--text-faint); margin-bottom: 4px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .prop-titolo { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .prop-zona { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px; }
+    .prop-stato { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.05em; margin-bottom: 10px; }
+    .prop-numeri { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.78rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+    .prop-numeri span { display: flex; flex-direction: column; gap: 1px; }
+    .prop-numeri strong { font-size: 0.92rem; font-weight: 600; color: var(--text); }
+    .prop-proprietario { font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+    .prop-actions { display: flex; gap: 6px; margin-top: 10px; }
+    .btn-card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 0.75rem; font-family: inherit; font-weight: 500; cursor: pointer; color: var(--text-muted); transition: all 0.15s; }
+    .btn-card:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-card-del:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* STATI COLORI */
+    .stato-valutazione { background: #e8f4fd; color: #2980b9; }
+    .stato-incarico { background: #fef9e7; color: #d4a017; }
+    .stato-portale { background: #f0eaff; color: #7b4ccc; }
+    .stato-trattativa { background: #fdf2e9; color: #e67e22; }
+    .stato-venduto { background: #eafaf1; color: #27ae60; }
+    .stato-ritirato { background: #fdedec; color: #c0392b; }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg-card); border-radius: 12px; padding: 28px; width: 560px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+    .modal h3 { font-size: 1rem; font-weight: 600; margin-bottom: 20px; color: var(--text); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .form-input, .form-select, .form-textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 9px 12px; font-size: 0.9rem; font-family: inherit; font-weight: 500; color: var(--text); outline: none; width: 100%; box-sizing: border-box; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+    .form-textarea { resize: vertical; min-height: 70px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-annulla { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; color: var(--text-muted); }
+    .btn-salva { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 9px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+
+    @media (max-width: 900px) { .prop-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .prop-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html"><h1>Ework</h1></a>
+      <div class="sub">Centro operativo</div>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-label">Principale</div>
+      <a class="nav-item" href="index.html"><span class="icon">🎯</span> Centro di comando</a>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-label">Operativo</div>
+      <a class="nav-item" href="attivita.html"><span class="icon">📅</span> Attività</a>
+      <a class="nav-item" href="#"><span class="icon">🤖</span> Agenti</a>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-label">Lavoro</div>
+      <a class="nav-item" href="clienti.html"><span class="icon">👤</span> Clienti</a>
+      <a class="nav-item active" href="proprieta.html"><span class="icon">🏡</span> Proprietà</a>
+      <a class="nav-item" href="#"><span class="icon">🔍</span> Ricerca Immobili</a>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-label">Contenuti</div>
+      <a class="nav-item" href="#"><span class="icon">📸</span> Social</a>
+      <a class="nav-item" href="#"><span class="icon">🌿</span> Fonti</a>
+    </nav>
+    <div class="sidebar-bottom" id="dataOggi"></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h2>Proprietà</h2>
+      <div class="date" id="dataEstesa"></div>
+    </div>
+
+    <div class="content">
+
+      <div class="toolbar">
+        <input class="search-input" type="text" id="searchInput" placeholder="Cerca per titolo, zona, tipo…" oninput="renderLista()" />
+        <button class="btn-nuovo" onclick="apriModal()">+ Nuova proprietà</button>
+      </div>
+
+      <div class="filtri-stato" id="filtriStato"></div>
+
+      <div class="prop-grid" id="propGrid">
+        <div class="placeholder">Nessuna proprietà ancora. Aggiungine una.</div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3 id="modalTitolo">Nuova proprietà</h3>
+      <input type="hidden" id="editId" value="" />
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Titolo / Descrizione breve</label>
+          <input class="form-input" type="text" id="f_titolo" placeholder="es. Rustico con terreno, Orbetello" />
+        </div>
+        <div class="form-group">
+          <label>Riferimento interno</label>
+          <input class="form-input" type="text" id="f_ref" placeholder="es. RIF-2401" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo immobile</label>
+          <select class="form-select" id="f_tipo">
+            <option>Rustico / Casale</option>
+            <option>Villa / Villetta</option>
+            <option>Appartamento</option>
+            <option>Terreno</option>
+            <option>Locale commerciale</option>
+            <option>Altro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stato</label>
+          <select class="form-select" id="f_stato">
+            <option>Valutazione</option>
+            <option>Incarico preso</option>
+            <option>In portale</option>
+            <option>In trattativa</option>
+            <option>Venduto</option>
+            <option>Ritirato</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Zona / Comune</label>
+          <input class="form-input" type="text" id="f_zona" placeholder="es. Manciano, Orbetello…" />
+        </div>
+        <div class="form-group">
+          <label>Indirizzo</label>
+          <input class="form-input" type="text" id="f_indirizzo" placeholder="Facoltativo" />
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label>Prezzo richiesto</label>
+          <input class="form-input" type="text" id="f_prezzo" placeholder="es. 250.000 €" />
+        </div>
+        <div class="form-group">
+          <label>Superficie mq</label>
+          <input class="form-input" type="text" id="f_mq" placeholder="es. 180 mq" />
+        </div>
+        <div class="form-group">
+          <label>Locali</label>
+          <input class="form-input" type="text" id="f_locali" placeholder="es. 4 vani" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Proprietario (nome)</label>
+          <input class="form-input" type="text" id="f_proprietario" placeholder="Collega al cliente proprietario" />
+        </div>
+        <div class="form-group">
+          <label>Data incarico</label>
+          <input class="form-input" type="date" id="f_data_incarico" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Caratteristiche principali</label>
+          <input class="form-input" type="text" id="f_caratteristiche" placeholder="es. piscina, terreno 2 ha, vista mare, ristrutturato" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Note</label>
+          <textarea class="form-textarea" id="f_note" placeholder="Appunti liberi…"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-annulla" onclick="chiudiModal()">Annulla</button>
+        <button class="btn-salva" onclick="salvaProprietà()">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const d = new Date();
+    const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+    const mesi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+    document.getElementById('dataOggi').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()];
+    document.getElementById('dataEstesa').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()] + ' ' + d.getFullYear();
+
+    const STATI = ['Tutti','Valutazione','Incarico preso','In portale','In trattativa','Venduto','Ritirato'];
+    const classeStato = {
+      'Valutazione': 'stato-valutazione',
+      'Incarico preso': 'stato-incarico',
+      'In portale': 'stato-portale',
+      'In trattativa': 'stato-trattativa',
+      'Venduto': 'stato-venduto',
+      'Ritirato': 'stato-ritirato'
+    };
+
+    let filtroStato = 'Tutti';
+
+    function carica() { return JSON.parse(localStorage.getItem('proprieta') || '[]'); }
+    function salva(lista) { localStorage.setItem('proprieta', JSON.stringify(lista)); }
+
+    function renderFiltri() {
+      const lista = carica();
+      document.getElementById('filtriStato').innerHTML = STATI.map(s => {
+        const count = s === 'Tutti' ? lista.length : lista.filter(p => p.stato === s).length;
+        return `<button class="filtro-btn ${filtroStato === s ? 'active' : ''}" onclick="setFiltro('${s}', this)">${s} (${count})</button>`;
+      }).join('');
+    }
+
+    function setFiltro(stato, el) {
+      filtroStato = stato;
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      renderLista();
+    }
+
+    function renderLista() {
+      renderFiltri();
+      let lista = carica();
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      if (filtroStato !== 'Tutti') lista = lista.filter(p => p.stato === filtroStato);
+      if (q) lista = lista.filter(p => (p.titolo+p.zona+p.tipo+p.ref).toLowerCase().includes(q));
+
+      const el = document.getElementById('propGrid');
+      if (lista.length === 0) {
+        el.innerHTML = '<div class="placeholder">Nessuna proprietà trovata.</div>';
+        return;
+      }
+      el.innerHTML = lista.map(p => `
+        <div class="prop-card">
+          ${p.ref ? '<div class="prop-ref">' + p.ref + '</div>' : ''}
+          <div class="prop-titolo">${p.titolo}</div>
+          <div class="prop-zona">📍 ${p.zona || '—'}${p.tipo ? ' · ' + p.tipo : ''}</div>
+          <span class="prop-stato ${classeStato[p.stato] || ''}">${p.stato}</span>
+          <div class="prop-numeri">
+            ${p.prezzo ? '<span><strong>' + p.prezzo + '</strong>Prezzo</span>' : ''}
+            ${p.mq ? '<span><strong>' + p.mq + '</strong>Superficie</span>' : ''}
+            ${p.locali ? '<span><strong>' + p.locali + '</strong>Locali</span>' : ''}
+            ${p.caratteristiche ? '<span style="grid-column:1/-1;flex-direction:row;gap:4px;align-items:center"><strong style="font-size:0.75rem;font-weight:500;color:var(--text-muted)">' + p.caratteristiche + '</strong></span>' : ''}
+          </div>
+          ${p.proprietario ? '<div class="prop-proprietario">👤 ' + p.proprietario + '</div>' : ''}
+          <div class="prop-actions">
+            <button class="btn-card" onclick="modificaProprietà(${p.id})">✏️ Modifica</button>
+            <button class="btn-card btn-card-del" onclick="eliminaProprietà(${p.id})">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function apriModal(id) {
+      document.getElementById('editId').value = '';
+      document.getElementById('modalTitolo').textContent = 'Nuova proprietà';
+      ['titolo','ref','zona','indirizzo','prezzo','mq','locali','proprietario','caratteristiche','note'].forEach(f => {
+        const el = document.getElementById('f_' + f);
+        if (el) el.value = '';
+      });
+      document.getElementById('f_tipo').value = 'Rustico / Casale';
+      document.getElementById('f_stato').value = 'Valutazione';
+      document.getElementById('f_data_incarico').value = '';
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function modificaProprietà(id) {
+      const p = carica().find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('editId').value = id;
+      document.getElementById('modalTitolo').textContent = 'Modifica proprietà';
+      document.getElementById('f_titolo').value = p.titolo || '';
+      document.getElementById('f_ref').value = p.ref || '';
+      document.getElementById('f_tipo').value = p.tipo || 'Rustico / Casale';
+      document.getElementById('f_stato').value = p.stato || 'Valutazione';
+      document.getElementById('f_zona').value = p.zona || '';
+      document.getElementById('f_indirizzo').value = p.indirizzo || '';
+      document.getElementById('f_prezzo').value = p.prezzo || '';
+      document.getElementById('f_mq').value = p.mq || '';
+      document.getElementById('f_locali').value = p.locali || '';
+      document.getElementById('f_proprietario').value = p.proprietario || '';
+      document.getElementById('f_data_incarico').value = p.data_incarico || '';
+      document.getElementById('f_caratteristiche').value = p.caratteristiche || '';
+      document.getElementById('f_note').value = p.note || '';
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function chiudiModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function salvaProprietà() {
+      const titolo = document.getElementById('f_titolo').value.trim();
+      if (!titolo) { alert('Inserisci almeno il titolo.'); return; }
+      const lista = carica();
+      const editId = document.getElementById('editId').value;
+      const obj = {
+        id: editId ? parseInt(editId) : Date.now(),
+        titolo,
+        ref: document.getElementById('f_ref').value.trim(),
+        tipo: document.getElementById('f_tipo').value,
+        stato: document.getElementById('f_stato').value,
+        zona: document.getElementById('f_zona').value.trim(),
+        indirizzo: document.getElementById('f_indirizzo').value.trim(),
+        prezzo: document.getElementById('f_prezzo').value.trim(),
+        mq: document.getElementById('f_mq').value.trim(),
+        locali: document.getElementById('f_locali').value.trim(),
+        proprietario: document.getElementById('f_proprietario').value.trim(),
+        data_incarico: document.getElementById('f_data_incarico').value,
+        caratteristiche: document.getElementById('f_caratteristiche').value.trim(),
+        note: document.getElementById('f_note').value.trim(),
+        aggiornato: new Date().toLocaleDateString('it-IT')
+      };
+      if (editId) {
+        const i = lista.findIndex(x => x.id === parseInt(editId));
+        if (i >= 0) lista[i] = obj;
+      } else {
+        lista.push(obj);
+      }
+      salva(lista);
+      chiudiModal();
+      renderLista();
+    }
+
+    function eliminaProprietà(id) {
+      if (!confirm('Eliminare questa proprietà?')) return;
+      salva(carica().filter(p => p.id !== id));
+      renderLista();
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) chiudiModal();
+    });
+
+    renderLista();
+  </script>
+
+</body>
+</html>
