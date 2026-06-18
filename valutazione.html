@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ework — Valutazione Immobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .val-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    .val-form { display: flex; flex-direction: column; gap: 0; }
+
+    .sezione { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px; margin-bottom: 16px; }
+    .sezione-titolo { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 16px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-row-1 { margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .form-input, .form-select { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 9px 12px; font-size: 0.9rem; font-family: inherit; font-weight: 500; color: var(--text); outline: none; width: 100%; box-sizing: border-box; }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); }
+
+    .toggle-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .toggle-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 7px 14px; font-size: 0.82rem; font-family: inherit; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .toggle-btn.on { background: var(--accent); border-color: var(--accent); color: white; }
+
+    .btn-calcola { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 12px 24px; font-size: 0.95rem; font-family: inherit; font-weight: 600; cursor: pointer; width: 100%; margin-top: 4px; }
+    .btn-calcola:hover { opacity: 0.88; }
+
+    /* RISULTATO */
+    .risultato { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 24px; position: sticky; top: 20px; }
+    .ris-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 16px; }
+    .ris-range { text-align: center; margin-bottom: 20px; }
+    .ris-range .range-val { font-size: 1.9rem; font-weight: 700; color: var(--text); }
+    .ris-range .range-sep { font-size: 1.2rem; color: var(--text-muted); margin: 0 6px; }
+    .ris-range .range-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+    .ris-breakdown { border-top: 1px solid var(--border); padding-top: 16px; }
+    .ris-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+    .ris-row:last-child { border-bottom: none; }
+    .ris-row .r-label { color: var(--text-muted); }
+    .ris-row .r-val { color: var(--text); font-weight: 500; }
+    .ris-row.totale { font-weight: 600; font-size: 0.9rem; color: var(--accent); }
+
+    .omi-nota { font-size: 0.72rem; color: var(--text-faint); margin-top: 14px; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 12px; }
+
+    .placeholder-ris { text-align: center; color: var(--text-faint); font-size: 0.88rem; padding: 40px 0; }
+
+    @media (max-width: 900px) { .val-grid { grid-template-columns: 1fr; } .risultato { position: static; } }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html"><h1>Ework</h1></a>
+      <div class="sub">Centro operativo</div>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-label">Principale</div>
+      <a class="nav-item" href="index.html"><span class="icon">🎯</span> Centro di comando</a>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-label">Operativo</div>
+      <a class="nav-item" href="attivita.html"><span class="icon">📅</span> Attività</a>
+      <a class="nav-item" href="#"><span class="icon">🤖</span> Agenti</a>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-label">Lavoro</div>
+      <a class="nav-item" href="clienti.html"><span class="icon">👤</span> Clienti</a>
+      <a class="nav-item active" href="proprieta.html"><span class="icon">🏡</span> Proprietà</a>
+      <a class="nav-item" href="#"><span class="icon">🔍</span> Ricerca Immobili</a>
+    </nav>
+    <nav class="nav-section">
+      <div class="nav-label">Contenuti</div>
+      <a class="nav-item" href="#"><span class="icon">📸</span> Social</a>
+      <a class="nav-item" href="#"><span class="icon">🌿</span> Fonti</a>
+    </nav>
+    <div class="sidebar-bottom" id="dataOggi"></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h2>Valutazione Immobile</h2>
+      <div class="date" id="dataEstesa"></div>
+    </div>
+
+    <div class="content">
+      <div class="val-grid">
+
+        <!-- FORM -->
+        <div class="val-form">
+
+          <!-- LOCALIZZAZIONE -->
+          <div class="sezione">
+            <div class="sezione-titolo">Localizzazione</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Comune</label>
+                <select class="form-select" id="f_comune" onchange="aggiornaZone()">
+                  <option value="">— Seleziona —</option>
+                  <option value="manciano">Manciano</option>
+                  <option value="orbetello">Orbetello</option>
+                  <option value="capalbio">Capalbio</option>
+                  <option value="pitigliano">Pitigliano</option>
+                  <option value="magliano">Magliano in Toscana</option>
+                  <option value="scansano">Scansano</option>
+                  <option value="sorano">Sorano</option>
+                  <option value="monte_argentario">Monte Argentario</option>
+                  <option value="altro">Altro comune</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Zona OMI</label>
+                <select class="form-select" id="f_zona">
+                  <option value="">— prima seleziona il comune —</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- IMMOBILE -->
+          <div class="sezione">
+            <div class="sezione-titolo">Immobile</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tipologia</label>
+                <select class="form-select" id="f_tipologia">
+                  <option value="rustico">Rustico / Casale</option>
+                  <option value="villa">Villa / Villetta</option>
+                  <option value="civile">Abitazione civile</option>
+                  <option value="economica">Abitazione economica</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Superficie coperta (mq)</label>
+                <input class="form-input" type="number" id="f_mq" placeholder="es. 180" min="0" />
+              </div>
+            </div>
+            <div class="form-row-1">
+              <div class="form-group">
+                <label>Stato di conservazione</label>
+                <div class="toggle-row" id="stato_toggle">
+                  <button class="toggle-btn on" onclick="setToggle('stato', 'ottimo', this)">Ottimo</button>
+                  <button class="toggle-btn" onclick="setToggle('stato', 'buono', this)">Buono</button>
+                  <button class="toggle-btn" onclick="setToggle('stato', 'discreto', this)">Discreto</button>
+                  <button class="toggle-btn" onclick="setToggle('stato', 'daristrutturare', this)">Da ristrutturare</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SPECIFICITÀ MAREMMANE -->
+          <div class="sezione">
+            <div class="sezione-titolo">Specificità Maremmane</div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Terreno totale (ha)</label>
+                <input class="form-input" type="number" id="f_terreno_ha" placeholder="es. 2.5" step="0.1" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Tipo terreno prevalente</label>
+                <select class="form-select" id="f_terreno_tipo">
+                  <option value="none">— nessuno / non applicabile —</option>
+                  <option value="oliveto">Oliveto</option>
+                  <option value="vigneto">Vigneto (DOC/IGT)</option>
+                  <option value="seminativo">Seminativo</option>
+                  <option value="bosco">Bosco / Macchia</option>
+                  <option value="misto">Misto (oliveto + seminativo)</option>
+                  <option value="orto">Orto / Frutteto</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-1">
+              <div class="form-group">
+                <label>Vista</label>
+                <div class="toggle-row" id="vista_toggle">
+                  <button class="toggle-btn on" onclick="setToggle('vista', 'nessuna', this)">Nessuna</button>
+                  <button class="toggle-btn" onclick="setToggle('vista', 'colline', this)">Colline / Campagna</button>
+                  <button class="toggle-btn" onclick="setToggle('vista', 'mare', this)">Mare / Costa</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Piscina</label>
+                <div class="toggle-row" id="piscina_toggle">
+                  <button class="toggle-btn" onclick="setToggle('piscina', 'si', this)">Sì</button>
+                  <button class="toggle-btn on" onclick="setToggle('piscina', 'no', this)">No</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Annesso / Dependance (mq)</label>
+                <input class="form-input" type="number" id="f_annesso" placeholder="es. 60 — 0 se assente" min="0" />
+              </div>
+            </div>
+
+            <div class="form-row-1">
+              <div class="form-group">
+                <label>Accessibilità</label>
+                <div class="toggle-row" id="accesso_toggle">
+                  <button class="toggle-btn on" onclick="setToggle('accesso', 'comodo', this)">Strada comoda</button>
+                  <button class="toggle-btn" onclick="setToggle('accesso', 'sterrato', this)">Sterrato / Tratturo</button>
+                  <button class="toggle-btn" onclick="setToggle('accesso', 'difficile', this)">Difficile / Isolato</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-calcola" onclick="calcola()">Calcola valutazione →</button>
+        </div>
+
+        <!-- RISULTATO -->
+        <div class="risultato" id="risultatoBox">
+          <div class="placeholder-ris">Compila i dati a sinistra<br>e premi "Calcola valutazione"</div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const d = new Date();
+    const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+    const mesi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+    document.getElementById('dataOggi').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()];
+    document.getElementById('dataEstesa').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()] + ' ' + d.getFullYear();
+
+    // ───── DATI OMI (fonte: Agenzia Entrate, 2° sem 2025) ─────
+    // Struttura: comune → zone → { tipologia → [min, max] }
+    const OMI = {
+      manciano: {
+        zone: [
+          { val: 'E1', label: 'Saturnia / Terme di Saturnia' },
+          { val: 'E2', label: 'Montemerano / Poderi' },
+          { val: 'D1', label: 'Manciano centro / zone circostanti' },
+          { val: 'B1', label: 'Manciano centro storico' },
+          { val: 'R1', label: 'Zona rurale / piccoli nuclei' },
+          { val: 'E3', label: 'Poggio Murella / Capanne' },
+          { val: 'E7', label: 'Marsiliana / zone circostanti' },
+          { val: 'E5', label: 'San Martino / zone circostanti' },
+        ],
+        prezzi: {
+          E1: { villa: [1289,1875], rustico: [1000,1600], civile: [869,1285], economica: [600,900] },
+          E2: { villa: [1100,1650], rustico: [900,1400], civile: [750,1100], economica: [500,750] },
+          D1: { villa: [1050,1550], rustico: [850,1300], civile: [720,1050], economica: [500,750] },
+          B1: { villa: [1050,1500], rustico: [820,1250], civile: [700,1020], economica: [480,720] },
+          R1: { villa: [900,1300], rustico: [700,1100], civile: [580,870], economica: [400,600] },
+          E3: { villa: [700,1050], rustico: [560,900], civile: [470,700], economica: [330,500] },
+          E7: { villa: [650,1000], rustico: [520,850], civile: [430,650], economica: [300,450] },
+          E5: { villa: [600,900],  rustico: [480,780], civile: [390,580], economica: [280,420] },
+        }
+      },
+      orbetello: {
+        zone: [
+          { val: 'E6', label: 'Giannella / Santa Liberata' },
+          { val: 'E1', label: 'Ansedonia' },
+          { val: 'E3', label: 'Talamone' },
+          { val: 'B1', label: 'Orbetello centro storico' },
+          { val: 'E4', label: 'Fonteblanda' },
+          { val: 'D2', label: 'Orbetello Scalo' },
+          { val: 'E2', label: 'Albinia' },
+          { val: 'R1', label: 'Zona rurale' },
+          { val: 'E7', label: 'Zona artigianale' },
+        ],
+        prezzi: {
+          E6: { villa: [3800,5500], rustico: [2800,4000], civile: [2300,3100], economica: [1750,2500] },
+          E1: { villa: [3500,5000], rustico: [2600,3800], civile: [2100,2900], economica: [1600,2300] },
+          E3: { villa: [3200,4600], rustico: [2400,3500], civile: [1900,2700], economica: [1450,2100] },
+          B1: { villa: [2500,3600], rustico: [1800,2800], civile: [1500,2100], economica: [1100,1600] },
+          E4: { villa: [2400,3400], rustico: [1700,2600], civile: [1400,2000], economica: [1050,1550] },
+          D2: { villa: [2000,2900], rustico: [1400,2200], civile: [1200,1700], economica: [900,1300] },
+          E2: { villa: [1900,2700], rustico: [1300,2000], civile: [1100,1600], economica: [850,1200] },
+          R1: { villa: [1400,2000], rustico: [1000,1600], civile: [800,1200], economica: [600,900] },
+          E7: { villa: [1200,1800], rustico: [900,1400], civile: [700,1050], economica: [530,800] },
+        }
+      },
+      capalbio: {
+        zone: [
+          { val: 'E1', label: 'Capalbio Scalo e dintorni' },
+          { val: 'B1', label: 'Capalbio centro' },
+          { val: 'E2', label: 'Carige Bassa / Alta' },
+          { val: 'R2', label: 'Zona rurale pianeggiante' },
+          { val: 'R3', label: 'Zona rurale alta collina' },
+        ],
+        prezzi: {
+          E1: { villa: [3200,4500], rustico: [2200,3200], civile: [2000,2900], economica: [1600,2300] },
+          B1: { villa: [3000,4200], rustico: [2000,3000], civile: [1850,2650], economica: [1500,2100] },
+          E2: { villa: [2700,3800], rustico: [1800,2700], civile: [1600,2300], economica: [1300,1850] },
+          R2: { villa: [2200,3200], rustico: [1500,2300], civile: [1300,1900], economica: [1050,1550] },
+          R3: { villa: [1700,2400], rustico: [1200,1900], civile: [1000,1500], economica: [800,1200] },
+        }
+      },
+      pitigliano: {
+        zone: [
+          { val: 'B1', label: 'Pitigliano centro storico' },
+          { val: 'D1', label: 'Pitigliano / zone circostanti' },
+          { val: 'R1', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          B1: { villa: [950,1350], rustico: [750,1100], civile: [780,1150], economica: [530,790] },
+          D1: { villa: [900,1250], rustico: [700,1050], civile: [700,1000], economica: [480,720] },
+          R1: { villa: [750,1100], rustico: [600,950], civile: [580,870], economica: [400,600] },
+        }
+      },
+      magliano: {
+        zone: [
+          { val: 'D1', label: 'Magliano / Periferia' },
+          { val: 'B1', label: 'Magliano centro storico' },
+          { val: 'E1', label: 'Marina di Alberese / Principina' },
+          { val: 'R1', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          D1: { villa: [1700,2300], rustico: [1300,1900], civile: [1300,1850], economica: [900,1300] },
+          B1: { villa: [1650,2200], rustico: [1250,1800], civile: [1250,1800], economica: [860,1250] },
+          E1: { villa: [2000,2800], rustico: [1500,2200], civile: [1500,2100], economica: [1050,1550] },
+          R1: { villa: [1300,1900], rustico: [1000,1600], civile: [1000,1450], economica: [700,1050] },
+        }
+      },
+      scansano: {
+        zone: [
+          { val: 'D1', label: 'Scansano / zone circostanti' },
+          { val: 'B1', label: 'Scansano centro storico' },
+          { val: 'E6', label: 'Pancole / Montorgiali' },
+          { val: 'R1', label: 'Territorio rurale' },
+        ],
+        prezzi: {
+          D1: { villa: [1200,1700], rustico: [950,1400], civile: [770,1050], economica: [410,610] },
+          B1: { villa: [1100,1550], rustico: [870,1300], civile: [700,960], economica: [360,540] },
+          E6: { villa: [950,1350], rustico: [750,1150], civile: [600,850], economica: [330,490] },
+          R1: { villa: [870,1250], rustico: [700,1050], civile: [540,780], economica: [300,450] },
+        }
+      },
+      sorano: {
+        zone: [
+          { val: 'B1', label: 'Sorano centro storico' },
+          { val: 'D1', label: 'Sorano / zone circostanti' },
+          { val: 'E1', label: 'Sovana / Vitozza' },
+          { val: 'R1', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          B1: { villa: [900,1300], rustico: [700,1050], civile: [650,950], economica: [430,650] },
+          D1: { villa: [850,1200], rustico: [670,1000], civile: [610,890], economica: [410,610] },
+          E1: { villa: [1000,1450], rustico: [800,1200], civile: [700,1050], economica: [470,700] },
+          R1: { villa: [700,1050], rustico: [560,900], civile: [510,760], economica: [350,530] },
+        }
+      },
+      monte_argentario: {
+        zone: [
+          { val: 'B1', label: 'Porto Santo Stefano centro' },
+          { val: 'B2', label: 'Porto Ercole centro' },
+          { val: 'D1', label: 'Periferia / collinare' },
+          { val: 'E1', label: 'Panoramica / zona alta' },
+          { val: 'R1', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          B1: { villa: [3500,5000], rustico: [2500,3800], civile: [2200,3200], economica: [1700,2500] },
+          B2: { villa: [3800,5500], rustico: [2700,4000], civile: [2400,3500], economica: [1800,2600] },
+          D1: { villa: [3000,4200], rustico: [2100,3200], civile: [1800,2700], economica: [1400,2100] },
+          E1: { villa: [4000,6000], rustico: [2800,4200], civile: [2600,3800], economica: [2000,2900] },
+          R1: { villa: [2200,3200], rustico: [1600,2400], civile: [1300,2000], economica: [1000,1500] },
+        }
+      },
+      altro: {
+        zone: [
+          { val: 'centrale', label: 'Zona centrale' },
+          { val: 'periferica', label: 'Zona periferica' },
+          { val: 'rurale', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          centrale: { villa: [1200,1800], rustico: [950,1450], civile: [900,1300], economica: [600,900] },
+          periferica: { villa: [900,1350], rustico: [720,1100], civile: [680,1000], economica: [460,700] },
+          rurale: { villa: [700,1100], rustico: [560,900], civile: [530,800], economica: [370,560] },
+        }
+      }
+    };
+
+    // Coefficienti stato
+    const COEFF_STATO = { ottimo: 1.0, buono: 0.87, discreto: 0.74, daristrutturare: 0.58 };
+
+    // Valore terreno €/mq
+    const TERRENO_MQ = { oliveto: 3.2, vigneto: 9.0, seminativo: 1.2, bosco: 0.5, misto: 2.5, orto: 2.0, none: 0 };
+
+    // Stato toggle
+    const toggleState = { stato: 'ottimo', vista: 'nessuna', piscina: 'no', accesso: 'comodo' };
+
+    function setToggle(gruppo, valore, el) {
+      toggleState[gruppo] = valore;
+      el.closest('.toggle-row').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('on'));
+      el.classList.add('on');
+    }
+
+    function aggiornaZone() {
+      const comune = document.getElementById('f_comune').value;
+      const sel = document.getElementById('f_zona');
+      sel.innerHTML = '';
+      if (!comune || !OMI[comune]) {
+        sel.innerHTML = '<option value="">— prima seleziona il comune —</option>';
+        return;
+      }
+      OMI[comune].zone.forEach(z => {
+        sel.innerHTML += `<option value="${z.val}">${z.label}</option>`;
+      });
+    }
+
+    function fmt(n) {
+      return Math.round(n).toLocaleString('it-IT') + ' €';
+    }
+
+    function calcola() {
+      const comune = document.getElementById('f_comune').value;
+      const zona = document.getElementById('f_zona').value;
+      const tipologia = document.getElementById('f_tipologia').value;
+      const mq = parseFloat(document.getElementById('f_mq').value) || 0;
+      const terrenoHa = parseFloat(document.getElementById('f_terreno_ha').value) || 0;
+      const terrenoTipo = document.getElementById('f_terreno_tipo').value;
+      const annesso = parseFloat(document.getElementById('f_annesso').value) || 0;
+
+      if (!comune || !zona || !mq) {
+        alert('Compila almeno: comune, zona e superficie.');
+        return;
+      }
+
+      const prezzi = OMI[comune].prezzi[zona][tipologia];
+      const coeffStato = COEFF_STATO[toggleState.stato];
+
+      // BASE FABBRICATO
+      const baseMin = prezzi[0] * mq * coeffStato;
+      const baseMax = prezzi[1] * mq * coeffStato;
+
+      // ANNESSO/DEPENDANCE (50% del valore rustico della stessa zona)
+      const annMin = annesso > 0 ? annesso * OMI[comune].prezzi[zona].rustico[0] * 0.5 * coeffStato : 0;
+      const annMax = annesso > 0 ? annesso * OMI[comune].prezzi[zona].rustico[1] * 0.5 * coeffStato : 0;
+
+      // TERRENO
+      const mqTerreno = terrenoHa * 10000;
+      const valTerreno = mqTerreno * TERRENO_MQ[terrenoTipo] || 0;
+
+      // PISCINA
+      const valPiscina = toggleState.piscina === 'si' ? 22000 : 0;
+
+      // VISTA
+      let coeffVista = 1.0;
+      if (toggleState.vista === 'colline') coeffVista = 1.06;
+      if (toggleState.vista === 'mare') coeffVista = 1.14;
+
+      // ACCESSO
+      let coeffAccesso = 1.0;
+      if (toggleState.accesso === 'sterrato') coeffAccesso = 0.96;
+      if (toggleState.accesso === 'difficile') coeffAccesso = 0.90;
+
+      // TOTALE
+      const totMin = ((baseMin + annMin) * coeffVista * coeffAccesso) + valTerreno + valPiscina;
+      const totMax = ((baseMax + annMax) * coeffVista * coeffAccesso) + valTerreno + valPiscina;
+
+      const comuneLabel = document.getElementById('f_comune').selectedOptions[0].text;
+      const zonaLabel = document.getElementById('f_zona').selectedOptions[0].text;
+      const tipoLabel = document.getElementById('f_tipologia').selectedOptions[0].text;
+      const statoLabel = document.querySelector('#stato_toggle .toggle-btn.on').textContent;
+
+      const vistaLabel = { nessuna:'—', colline:'Colline / Campagna (+6%)', mare:'Vista mare (+14%)' }[toggleState.vista];
+      const accessoLabel = { comodo:'—', sterrato:'Sterrato (-4%)', difficile:'Difficile / Isolato (-10%)' }[toggleState.accesso];
+
+      document.getElementById('risultatoBox').innerHTML = `
+        <div class="ris-label">Valutazione stimata</div>
+        <div class="ris-range">
+          <div>
+            <span class="range-val">${fmt(totMin)}</span>
+            <span class="range-sep">–</span>
+            <span class="range-val">${fmt(totMax)}</span>
+          </div>
+          <div class="range-sub">${comuneLabel} · ${zonaLabel}</div>
+        </div>
+
+        <div class="ris-breakdown">
+          <div class="ris-row">
+            <span class="r-label">${tipoLabel} (${mq} mq · ${statoLabel})</span>
+            <span class="r-val">${fmt(baseMin)} – ${fmt(baseMax)}</span>
+          </div>
+          ${annesso > 0 ? `<div class="ris-row"><span class="r-label">Annesso / Dependance (${annesso} mq)</span><span class="r-val">${fmt(annMin)} – ${fmt(annMax)}</span></div>` : ''}
+          ${valTerreno > 0 ? `<div class="ris-row"><span class="r-label">Terreno ${terrenoHa} ha (${document.getElementById('f_terreno_tipo').selectedOptions[0].text})</span><span class="r-val">${fmt(valTerreno)}</span></div>` : ''}
+          ${valPiscina > 0 ? `<div class="ris-row"><span class="r-label">Piscina</span><span class="r-val">+ ${fmt(valPiscina)}</span></div>` : ''}
+          ${toggleState.vista !== 'nessuna' ? `<div class="ris-row"><span class="r-label">Vista</span><span class="r-val">${vistaLabel}</span></div>` : ''}
+          ${toggleState.accesso !== 'comodo' ? `<div class="ris-row"><span class="r-label">Accessibilità</span><span class="r-val">${accessoLabel}</span></div>` : ''}
+          <div class="ris-row totale">
+            <span class="r-label">Totale stimato</span>
+            <span class="r-val">${fmt(totMin)} – ${fmt(totMax)}</span>
+          </div>
+        </div>
+
+        <div class="omi-nota">
+          📊 Dati OMI Agenzia delle Entrate — 2° semestre 2025.<br>
+          Prezzi al mq: ${prezzi[0].toLocaleString()} – ${prezzi[1].toLocaleString()} €/mq (${tipoLabel}, ${zonaLabel}).<br>
+          Valori indicativi per uso professionale interno. Aggiornare semestralmente con i nuovi dati OMI.
+        </div>
+      `;
+    }
+
+    aggiornaZone();
+  </script>
+
+</body>
+</html>
