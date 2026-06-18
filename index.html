@@ -4,237 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ework</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Georgia', serif;
-      background: #0f0f0f;
-      color: #f0ece4;
-      min-height: 100vh;
-      display: flex;
-    }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 220px;
-      min-width: 220px;
-      background: #111;
-      border-right: 1px solid #2a2a2a;
-      display: flex;
-      flex-direction: column;
-      padding: 28px 0;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
-
-    .sidebar-logo {
-      padding: 0 20px 28px;
-      border-bottom: 1px solid #2a2a2a;
-      margin-bottom: 16px;
-    }
-
-    .sidebar-logo h1 {
-      font-size: 0.9rem;
-      font-weight: normal;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #c9a96e;
-    }
-
-    .sidebar-logo .sub {
-      font-size: 0.7rem;
-      color: #444;
-      margin-top: 4px;
-      letter-spacing: 0.05em;
-    }
-
-    .nav-section {
-      padding: 8px 0;
-    }
-
-    .nav-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #444;
-      padding: 8px 20px 4px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 20px;
-      font-size: 0.85rem;
-      color: #888;
-      cursor: pointer;
-      border-left: 2px solid transparent;
-      transition: all 0.15s;
-      text-decoration: none;
-    }
-
-    .nav-item:hover {
-      color: #f0ece4;
-      background: #1a1a1a;
-    }
-
-    .nav-item.active {
-      color: #c9a96e;
-      border-left-color: #c9a96e;
-      background: #1a1510;
-    }
-
-    .nav-item .icon {
-      font-size: 1rem;
-      width: 20px;
-      text-align: center;
-    }
-
-    .sidebar-bottom {
-      margin-top: auto;
-      padding: 16px 20px;
-      border-top: 1px solid #2a2a2a;
-      font-size: 0.72rem;
-      color: #444;
-    }
-
-    /* MAIN */
-    .main {
-      margin-left: 220px;
-      flex: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .topbar {
-      padding: 24px 40px;
-      border-bottom: 1px solid #1e1e1e;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .topbar h2 {
-      font-size: 1.1rem;
-      font-weight: normal;
-      letter-spacing: 0.05em;
-      color: #f0ece4;
-    }
-
-    .date {
-      font-size: 0.8rem;
-      color: #555;
-    }
-
-    .content {
-      padding: 36px 40px;
-      flex: 1;
-    }
-
-    /* CENTRO DI COMANDO */
     .comando {
-      background: #161616;
-      border: 1px solid #2a2a2a;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 24px 28px;
       margin-bottom: 32px;
     }
-
     .comando-label {
-      font-size: 0.65rem;
+      font-size: 0.67rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #c9a96e;
+      color: var(--accent);
       margin-bottom: 16px;
-    }
-
-    .oggi {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .oggi-item {
-      background: #1e1e1e;
-      border: 1px solid #2a2a2a;
-      border-radius: 8px;
-      padding: 12px 18px;
-      font-size: 0.9rem;
-      color: #ccc;
-      min-width: 140px;
-    }
-
-    .oggi-item span {
-      display: block;
-      font-size: 0.65rem;
-      color: #555;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 6px;
-    }
-
-    /* GRIGLIA SEZIONI */
-    .sezioni {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .sezione {
-      background: #161616;
-      border: 1px solid #2a2a2a;
-      border-radius: 10px;
-      padding: 22px;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-    }
-
-    .sezione:hover {
-      border-color: #c9a96e;
-      background: #1a1a1a;
-    }
-
-    .sezione-icon { font-size: 1.4rem; margin-bottom: 12px; }
-
-    .sezione h3 {
-      font-size: 0.85rem;
-      font-weight: normal;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #f0ece4;
-      margin-bottom: 6px;
-    }
-
-    .sezione p {
-      font-size: 0.78rem;
-      color: #555;
-      line-height: 1.5;
-    }
-
-    .badge {
-      display: inline-block;
-      margin-top: 12px;
-      background: #1e1e1e;
-      color: #c9a96e;
-      font-size: 0.65rem;
-      padding: 3px 8px;
-      border-radius: 20px;
-      letter-spacing: 0.08em;
-      border: 1px solid #333;
-    }
-
-    @media (max-width: 900px) {
-      .sezioni { grid-template-columns: repeat(2, 1fr); }
-      .sidebar { width: 180px; min-width: 180px; }
-      .main { margin-left: 180px; }
     }
   </style>
 </head>
@@ -248,7 +32,7 @@
 
     <nav class="nav-section">
       <div class="nav-label">Principale</div>
-      <a class="nav-item active" href="#">
+      <a class="nav-item active" href="index.html">
         <span class="icon">⌂</span> Centro di comando
       </a>
     </nav>
