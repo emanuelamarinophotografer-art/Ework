@@ -39,6 +39,9 @@
     .btn-card { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 0.75rem; font-family: inherit; font-weight: 500; cursor: pointer; color: var(--text-muted); transition: all 0.15s; }
     .btn-card:hover { border-color: var(--accent); color: var(--accent); }
     .btn-card-del:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-stella { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 2px 6px; border-radius: 6px; line-height: 1; transition: transform 0.15s; }
+    .btn-stella:hover { transform: scale(1.2); }
+    .btn-stella.attiva { color: #f0a500; }
 
     /* STATI COLORI */
     .stato-potenziale { background: #e8f4fd; color: #2980b9; }
@@ -249,6 +252,7 @@
             ${c.note ? '<span>📝 ' + c.note + '</span>' : ''}
           </div>
           <div class="cliente-actions">
+            <button class="btn-stella ${c.stella ? 'attiva' : ''}" onclick="toggleStella(${c.id})" title="Porta in Centro di Comando">${c.stella ? '⭐' : '☆'}</button>
             <button class="btn-card" onclick="modificaCliente(${c.id})">✏️ Modifica</button>
             <button class="btn-card btn-card-del" onclick="eliminaCliente(${c.id})">✕</button>
           </div>
@@ -327,6 +331,14 @@
       aggiornaSelect();
       document.getElementById('f_stato').value = c.stato;
       document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function toggleStella(id) {
+      const lista = carica();
+      const c = lista.find(c => c.id === id);
+      if (c) c.stella = !c.stella;
+      salvaStorage(lista);
+      renderClienti();
     }
 
     function eliminaCliente(id) {

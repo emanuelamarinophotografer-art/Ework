@@ -185,6 +185,13 @@
 
         <!-- SINISTRA: VENDITE + AGENDA + PRIORITÀ -->
         <div>
+          <!-- DA SEGUIRE -->
+          <div class="col-card" style="margin-bottom:16px;">
+            <div class="col-card-title">⭐ Da seguire oggi</div>
+            <div id="recapStellati"><div class="placeholder">Nessun cliente in evidenza.</div></div>
+            <a href="clienti.html" style="display:block;margin-top:12px;font-size:0.78rem;color:var(--accent);text-decoration:none;">→ Vai ai Clienti</a>
+          </div>
+
           <!-- AGENDA -->
           <div class="col-card" style="margin-bottom:16px;">
             <div class="col-card-title">📅 Agenda di oggi</div>
@@ -281,6 +288,22 @@
     const venditeCount = JSON.parse(localStorage.getItem('vendite') || '[]').length;
     document.getElementById('contVendite').textContent = venditeCount || '—';
 
+
+    // CLIENTI STELLATI
+    const clienti = JSON.parse(localStorage.getItem('clienti') || '[]');
+    const stellati = clienti.filter(c => c.stella);
+    const recapStellati = document.getElementById('recapStellati');
+    if (stellati.length === 0) {
+      recapStellati.innerHTML = '<div class="placeholder">Nessun cliente in evidenza.</div>';
+    } else {
+      recapStellati.innerHTML = stellati.map(c => `
+        <div class="priorita-recap-item">
+          <div class="dot-p" style="background:#f0a500"></div>
+          <div class="priorita-recap-testo" style="flex:1">${c.nome}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted)">${c.stato}</div>
+        </div>
+      `).join('');
+    }
 
     // PRIORITÀ
     const recapEl = document.getElementById('recapPriorita');
