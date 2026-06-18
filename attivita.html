@@ -144,10 +144,15 @@
     }
 
     /* SETTIMANA */
+    .settimana-wrap {
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
     .settimana {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      display: flex;
       gap: 8px;
+      min-width: max-content;
     }
 
     .giorno {
@@ -155,7 +160,8 @@
       border: 1px solid #2a2a2a;
       border-radius: 8px;
       padding: 12px 10px;
-      min-height: 100px;
+      min-height: 120px;
+      min-width: 140px;
     }
 
     .giorno.oggi {
@@ -321,7 +327,7 @@
       <!-- 1. SETTIMANA -->
       <div class="blocco">
         <div class="blocco-header">Settimana</div>
-        <div class="settimana" id="settimana"></div>
+        <div class="settimana-wrap"><div class="settimana" id="settimana"></div></div>
       </div>
 
       <!-- 2. DA FARE OGGI -->
