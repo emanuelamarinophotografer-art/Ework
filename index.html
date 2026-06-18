@@ -183,8 +183,16 @@
       <!-- GRIGLIA PRINCIPALE: AGENDA + METRICHE -->
       <div class="centro-grid">
 
-        <!-- SINISTRA: AGENDA OGGI -->
+        <!-- SINISTRA: VENDITE + AGENDA + PRIORITÀ -->
         <div>
+          <!-- VENDITE -->
+          <div class="col-card" style="margin-bottom:16px;">
+            <div class="col-card-title">💰 Vendite chiuse</div>
+            <div id="recapVendite"><div class="placeholder">Nessuna vendita registrata.</div></div>
+            <a href="attivita.html" style="display:block;margin-top:12px;font-size:0.78rem;color:var(--accent);text-decoration:none;">→ Vai alle metriche</a>
+          </div>
+
+          <!-- AGENDA -->
           <div class="col-card" style="margin-bottom:16px;">
             <div class="col-card-title">📅 Agenda di oggi</div>
             <div class="agenda-input-wrap">
@@ -196,11 +204,11 @@
             <a href="attivita.html" style="display:block;margin-top:12px;font-size:0.78rem;color:var(--accent);text-decoration:none;">→ Vai ad Attività</a>
           </div>
 
-          <!-- VENDITE -->
+          <!-- PRIORITÀ -->
           <div class="col-card">
-            <div class="col-card-title">💰 Vendite chiuse</div>
-            <div id="recapVendite"><div class="placeholder">Nessuna vendita registrata.</div></div>
-            <a href="attivita.html" style="display:block;margin-top:12px;font-size:0.78rem;color:var(--accent);text-decoration:none;">→ Vai alle metriche</a>
+            <div class="col-card-title">🔴 Priorità aperte</div>
+            <div id="recapPriorita"><div class="placeholder">Nessuna priorità aperta.</div></div>
+            <a href="attivita.html" style="display:block;margin-top:12px;font-size:0.78rem;color:var(--accent);text-decoration:none;">→ Vai ad Attività</a>
           </div>
         </div>
 
@@ -289,6 +297,19 @@
           <div class="dot-p" style="background:#4a9e6b"></div>
           <div class="priorita-recap-testo" style="flex:1">${v.immobile}</div>
           <div style="font-size:0.78rem;color:var(--text-muted)">${v.data}</div>
+        </div>
+      `).join('');
+    }
+
+    // PRIORITÀ
+    const recapEl = document.getElementById('recapPriorita');
+    if (aperte.length === 0) {
+      recapEl.innerHTML = '<div class="placeholder">Nessuna priorità aperta.</div>';
+    } else {
+      recapEl.innerHTML = aperte.slice(0, 6).map(p => `
+        <div class="priorita-recap-item">
+          <div class="dot-p"></div>
+          <div class="priorita-recap-testo">${p.testo}</div>
         </div>
       `).join('');
     }
