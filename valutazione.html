@@ -110,6 +110,21 @@
                   <option value="roccastrada">Roccastrada</option>
                   <option value="massa_marittima">Massa Marittima</option>
                   <option value="cinigiano">Cinigiano</option>
+                  <option value="grosseto">Grosseto</option>
+                  <option value="follonica">Follonica</option>
+                  <option value="castiglione">Castiglione della Pescaia</option>
+                  <option value="gavorrano">Gavorrano</option>
+                  <option value="campagnatico">Campagnatico</option>
+                  <option value="arcidosso">Arcidosso</option>
+                  <option value="castel_del_piano">Castel del Piano</option>
+                  <option value="santa_fiora">Santa Fiora</option>
+                  <option value="semproniano">Semproniano</option>
+                  <option value="seggiano">Seggiano</option>
+                  <option value="civitella_paganico">Civitella Paganico</option>
+                  <option value="roccalbegna">Roccalbegna</option>
+                  <option value="monterotondo">Monterotondo Marittimo</option>
+                  <option value="montieri">Montieri</option>
+                  <option value="isola_giglio">Isola del Giglio</option>
                   <option value="altro">Altro comune</option>
                 </select>
               </div>
@@ -405,6 +420,192 @@
           B1: { villa: [1100,1380], rustico: [870,1150], civile: [750,1000], economica: [420,625] },
           E3: { villa: [1020,1280], rustico: [820,1080], civile: [700,940], economica: [390,580] },
           R1: { villa: [860,1100], rustico: [690,950], civile: [600,800], economica: [330,500] },
+        }
+      },
+      grosseto: {
+        zone: [
+          { val: 'E3', label: 'Marina di Grosseto / Principina' },
+          { val: 'B1', label: 'Centro storico' },
+          { val: 'C1', label: 'Abitato Mura Medicee' },
+          { val: 'D14', label: 'Cittadella / Sugherella' },
+          { val: 'D15', label: 'Verde Maremma' },
+        ],
+        prezzi: {
+          E3: { villa: [2200,3100], rustico: [1600,2300], civile: [1800,2500], economica: [1400,1950] },
+          B1: { villa: [2100,2900], rustico: [1500,2200], civile: [1700,2300], economica: [1350,1850] },
+          C1: { villa: [1600,2200], rustico: [1200,1700], civile: [1300,1800], economica: [1050,1450] },
+          D14: { villa: [1500,2100], rustico: [1100,1600], civile: [1250,1700], economica: [1000,1400] },
+          D15: { villa: [1400,1950], rustico: [1050,1550], civile: [1150,1600], economica: [950,1300] },
+        }
+      },
+      follonica: {
+        zone: [
+          { val: 'D6', label: 'Prato Ranieri Sud' },
+          { val: 'B1', label: 'Centro' },
+          { val: 'D5', label: 'Prato Ranieri Nord' },
+          { val: 'D7', label: 'Cassarello / San Luigi' },
+        ],
+        prezzi: {
+          D6: { villa: [3200,4500], rustico: [2200,3200], civile: [2200,3000], economica: [1600,2200] },
+          B1: { villa: [2800,4000], rustico: [2000,2900], civile: [2000,2700], economica: [1400,2000] },
+          D5: { villa: [2400,3400], rustico: [1700,2500], civile: [1700,2300], economica: [1200,1750] },
+          D7: { villa: [2200,3100], rustico: [1600,2300], civile: [1600,2200], economica: [1150,1650] },
+        }
+      },
+      castiglione: {
+        zone: [
+          { val: 'B1', label: 'Castiglione della Pescaia e zone circostanti' },
+          { val: 'E4', label: 'Punta Ala e zone circostanti' },
+          { val: 'E1', label: 'Roccamare / Riva del Sole / Rocchette' },
+          { val: 'R2', label: 'Zona rurale pianeggiante / piccoli centri' },
+          { val: 'R3', label: 'Zona rurale bassa collina' },
+        ],
+        prezzi: {
+          B1: { villa: [4200,6000], rustico: [2800,4000], civile: [2500,3400], economica: [1900,2700] },
+          E4: { villa: [4000,5800], rustico: [2700,3900], civile: [2400,3300], economica: [1800,2600] },
+          E1: { villa: [3600,5200], rustico: [2400,3500], civile: [2200,3000], economica: [1650,2350] },
+          R2: { villa: [1600,2300], rustico: [1100,1700], civile: [1100,1600], economica: [850,1200] },
+          R3: { villa: [1300,1900], rustico: [900,1400], civile: [900,1300], economica: [700,1000] },
+        }
+      },
+      gavorrano: {
+        zone: [
+          { val: 'E1', label: 'Bagno di Gavorrano / Filare' },
+          { val: 'B1', label: 'Gavorrano e zone circostanti' },
+          { val: 'E4', label: 'Caldana e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+        ],
+        prezzi: {
+          E1: { villa: [1700,2400], rustico: [1250,1800], civile: [1000,1420], economica: [710,1050] },
+          B1: { villa: [1600,2300], rustico: [1200,1750], civile: [950,1350], economica: [670,1000] },
+          E4: { villa: [1500,2100], rustico: [1100,1600], civile: [890,1250], economica: [630,940] },
+          R1: { villa: [1200,1700], rustico: [900,1350], civile: [730,1050], economica: [520,760] },
+        }
+      },
+      campagnatico: {
+        zone: [
+          { val: 'B1', label: 'Campagnatico e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+        ],
+        prezzi: {
+          B1: { villa: [1300,1750], rustico: [1000,1400], civile: [960,1370], economica: [580,870] },
+          R1: { villa: [1000,1400], rustico: [780,1150], civile: [730,1050], economica: [440,660] },
+        }
+      },
+      arcidosso: {
+        zone: [
+          { val: 'D1', label: 'Arcidosso e zone circostanti' },
+          { val: 'B1', label: 'Centro storico' },
+          { val: 'E4', label: 'Montelaterone e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+        ],
+        prezzi: {
+          D1: { villa: [1000,1430], rustico: [790,1150], civile: [620,900], economica: [400,600] },
+          B1: { villa: [950,1380], rustico: [750,1100], civile: [580,850], economica: [380,570] },
+          E4: { villa: [870,1250], rustico: [690,1020], civile: [530,780], economica: [350,520] },
+          R1: { villa: [780,1100], rustico: [620,920], civile: [480,700], economica: [310,480] },
+        }
+      },
+      castel_del_piano: {
+        zone: [
+          { val: 'D1', label: 'Castel del Piano centro / periferia' },
+          { val: 'B1', label: 'Centro storico' },
+          { val: 'R1', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          D1: { villa: [1250,1730], rustico: [980,1380], civile: [630,930], economica: [490,730] },
+          B1: { villa: [1160,1600], rustico: [920,1300], civile: [570,840], economica: [440,660] },
+          R1: { villa: [1000,1400], rustico: [790,1150], civile: [490,720], economica: [380,560] },
+        }
+      },
+      santa_fiora: {
+        zone: [
+          { val: 'B1', label: 'Santa Fiora centro storico' },
+          { val: 'R1', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          B1: { villa: [1030,1400], rustico: [820,1150], civile: [770,1020], economica: [630,950] },
+          R1: { villa: [850,1180], rustico: [670,970], civile: [630,850], economica: [520,780] },
+        }
+      },
+      semproniano: {
+        zone: [
+          { val: 'B1', label: 'Semproniano e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+        ],
+        prezzi: {
+          B1: { villa: [850,1250], rustico: [670,1000], civile: [670,980], economica: [370,550] },
+          R1: { villa: [700,1050], rustico: [560,880], civile: [550,800], economica: [300,450] },
+        }
+      },
+      seggiano: {
+        zone: [
+          { val: 'B1', label: 'Seggiano e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+        ],
+        prezzi: {
+          B1: { villa: [800,1140], rustico: [640,920], civile: [510,760], economica: [330,490] },
+          R1: { villa: [630,920], rustico: [510,750], civile: [410,620], economica: [270,400] },
+        }
+      },
+      civitella_paganico: {
+        zone: [
+          { val: 'B2', label: 'Paganico e zone circostanti' },
+          { val: 'B1', label: 'Civitella Marittima e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+        ],
+        prezzi: {
+          B2: { villa: [1250,1800], rustico: [980,1430], civile: [890,1250], economica: [640,930] },
+          B1: { villa: [1150,1650], rustico: [900,1330], civile: [800,1120], economica: [570,840] },
+          R1: { villa: [900,1300], rustico: [710,1050], civile: [620,900], economica: [450,660] },
+        }
+      },
+      roccalbegna: {
+        zone: [
+          { val: 'B1', label: 'Roccalbegna e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / intero territorio' },
+        ],
+        prezzi: {
+          B1: { villa: [1300,1800], rustico: [1000,1430], civile: [650,970], economica: [410,610] },
+          R1: { villa: [1100,1600], rustico: [880,1300], civile: [580,870], economica: [360,540] },
+        }
+      },
+      monterotondo: {
+        zone: [
+          { val: 'B1', label: 'Monterotondo Marittimo e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+        ],
+        prezzi: {
+          B1: { villa: [1000,1420], rustico: [800,1140], civile: [800,1140], economica: [380,570] },
+          R1: { villa: [810,1150], rustico: [650,930], civile: [650,930], economica: [310,480] },
+        }
+      },
+      montieri: {
+        zone: [
+          { val: 'E3', label: 'Boccheggiano e zone circostanti' },
+          { val: 'B1', label: 'Montieri e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+        ],
+        prezzi: {
+          E3: { villa: [940,1190], rustico: [750,990], civile: [720,980], economica: [460,680] },
+          B1: { villa: [880,1100], rustico: [700,930], civile: [680,930], economica: [430,640] },
+          R1: { villa: [740,970], rustico: [590,810], civile: [570,780], economica: [360,560] },
+        }
+      },
+      isola_giglio: {
+        zone: [
+          { val: 'B1', label: 'Giglio Castello e zone circostanti' },
+          { val: 'E7', label: 'Costa Est – Giglio Porto / Cannelle / Arenella' },
+          { val: 'E2', label: 'Costa Ovest – Campese / Allume' },
+          { val: 'R1', label: 'Zona rurale / piccoli centri' },
+          { val: 'E6', label: 'Isola di Giannutri' },
+        ],
+        prezzi: {
+          B1: { villa: [4500,6500], rustico: [3000,4500], civile: [2900,4200], economica: [2200,3200] },
+          E7: { villa: [4200,6000], rustico: [2800,4200], civile: [2700,3900], economica: [2000,3000] },
+          E2: { villa: [3700,5300], rustico: [2500,3700], civile: [2300,3400], economica: [1750,2600] },
+          R1: { villa: [2800,4000], rustico: [1900,2900], civile: [1700,2600], economica: [1300,1950] },
+          E6: { villa: [7000,10000], rustico: [5000,7500], civile: [5000,7500], economica: [4000,6000] },
         }
       },
       altro: {
