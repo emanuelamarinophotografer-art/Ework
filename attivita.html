@@ -53,6 +53,11 @@
     .metriche-autosave { font-size: 0.75rem; color: var(--text-muted); font-style: italic; }
     .btn-chiudi { background: #4a9e6b; color: white; border: none; border-radius: 8px; padding: 10px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; }
     .btn-chiudi:hover { opacity: 0.85; }
+    .btn-mese-passato { background: none; border: 1px solid var(--accent); color: var(--accent); border-radius: 6px; padding: 3px 10px; font-size: 0.72rem; font-family: inherit; font-weight: 600; cursor: pointer; margin-left: 10px; }
+    .btn-mese-passato:hover { background: var(--accent-bg); }
+    .mese-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; }
+    .mese-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .mese-card-title { font-size: 0.88rem; font-weight: 600; color: var(--text); text-transform: capitalize; }
 
     .storico-settimana {
       background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
@@ -283,6 +288,71 @@
         <!-- STORICO -->
         <div id="storicoMetriche" style="margin-top: 20px;"></div>
 
+        <!-- MESI PASSATI -->
+        <div style="margin-top: 24px;">
+          <div class="blocco-header" style="margin-bottom:12px;">Storico mesi passati
+            <button class="btn-mese-passato" onclick="toggleFormMese()">+ Aggiungi mese</button>
+          </div>
+
+          <div id="formMesePassato" style="display:none;">
+            <div class="metriche-form" style="margin-bottom:12px;">
+              <div class="metriche-gruppo">
+                <div class="metriche-gruppo-label">Mese di riferimento</div>
+                <div class="metriche-row" style="grid-template-columns: 1fr 1fr;">
+                  <div class="metrica-item">
+                    <label>Mese</label>
+                    <select id="mp_mese" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.9rem;background:var(--bg);">
+                      <option value="0">Gennaio</option><option value="1">Febbraio</option>
+                      <option value="2">Marzo</option><option value="3">Aprile</option>
+                      <option value="4">Maggio</option><option value="5">Giugno</option>
+                      <option value="6">Luglio</option><option value="7">Agosto</option>
+                      <option value="8">Settembre</option><option value="9">Ottobre</option>
+                      <option value="10">Novembre</option><option value="11">Dicembre</option>
+                    </select>
+                  </div>
+                  <div class="metrica-item">
+                    <label>Anno</label>
+                    <input type="number" id="mp_anno" value="2026" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:0.9rem;background:var(--bg);" />
+                  </div>
+                </div>
+              </div>
+              <div class="metriche-gruppo">
+                <div class="metriche-gruppo-label">Transazioni & Incarichi</div>
+                <div class="metriche-row">
+                  <div class="metrica-item"><label>Transazioni</label><input type="number" min="0" id="mp_transazioni" placeholder="0" /></div>
+                  <div class="metrica-item"><label>Incarichi E.</label><input type="number" min="0" id="mp_incarichi_e" placeholder="0" /></div>
+                  <div class="metrica-item"><label>Incarichi N.E.</label><input type="number" min="0" id="mp_incarichi_ne" placeholder="0" /></div>
+                  <div class="metrica-item"><label>Valutazioni</label><input type="number" min="0" id="mp_valutazioni" placeholder="0" /></div>
+                </div>
+              </div>
+              <div class="metriche-gruppo">
+                <div class="metriche-gruppo-label">Visite & Appuntamenti</div>
+                <div class="metriche-row">
+                  <div class="metrica-item"><label>App. visita</label><input type="number" min="0" id="mp_visita" placeholder="0" /></div>
+                  <div class="metrica-item"><label>Coll. interna</label><input type="number" min="0" id="mp_coll_int" placeholder="0" /></div>
+                  <div class="metrica-item"><label>Coll. esterna</label><input type="number" min="0" id="mp_coll_ext" placeholder="0" /></div>
+                  <div class="metrica-item"><label>App. incarico</label><input type="number" min="0" id="mp_x_incarico" placeholder="0" /></div>
+                </div>
+              </div>
+              <div class="metriche-gruppo">
+                <div class="metriche-gruppo-label">Contatti & Altro</div>
+                <div class="metriche-row">
+                  <div class="metrica-item"><label>Contatti</label><input type="number" min="0" id="mp_contatti" placeholder="0" /></div>
+                  <div class="metrica-item"><label>Telefonate</label><input type="number" min="0" id="mp_telefonate" placeholder="0" /></div>
+                  <div class="metrica-item"><label>Ribassi</label><input type="number" min="0" id="mp_ribassi" placeholder="0" /></div>
+                  <div class="metrica-item"><label>Prop. ritirate</label><input type="number" min="0" id="mp_proposte_rit" placeholder="0" /></div>
+                </div>
+              </div>
+              <div class="metriche-actions">
+                <span></span>
+                <button class="btn-aggiungi" onclick="salvaMesePassato()">💾 Salva mese</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="storicoMesi"></div>
+        </div>
+
       </div>
 
     </div>
@@ -490,6 +560,55 @@
 
     caricaCampi();
     renderMetriche();
+
+    // MESI PASSATI
+    const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+    function toggleFormMese() {
+      const f = document.getElementById('formMesePassato');
+      f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function caricaMesiPassati() { return JSON.parse(localStorage.getItem('mesi_passati') || '[]'); }
+    function salvaMesiPassatiStorage(lista) { localStorage.setItem('mesi_passati', JSON.stringify(lista)); }
+
+    function salvaMesePassato() {
+      const mese = parseInt(document.getElementById('mp_mese').value);
+      const anno = parseInt(document.getElementById('mp_anno').value);
+      const record = { mese, anno, ts: Date.now() };
+      campi.forEach(c => { record[c] = parseInt(document.getElementById('mp_' + c).value) || 0; });
+      const lista = caricaMesiPassati();
+      lista.unshift(record);
+      lista.sort((a, b) => (b.anno * 12 + b.mese) - (a.anno * 12 + a.mese));
+      salvaMesiPassatiStorage(lista);
+      campi.forEach(c => { document.getElementById('mp_' + c).value = ''; });
+      document.getElementById('formMesePassato').style.display = 'none';
+      renderMesiPassati();
+    }
+
+    function eliminaMese(ts) {
+      salvaMesiPassatiStorage(caricaMesiPassati().filter(r => r.ts !== ts));
+      renderMesiPassati();
+    }
+
+    function renderMesiPassati() {
+      const lista = caricaMesiPassati();
+      const el = document.getElementById('storicoMesi');
+      if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessun mese passato inserito.</div>'; return; }
+      el.innerHTML = lista.map(r => `
+        <div class="mese-card">
+          <div class="mese-card-header">
+            <div class="mese-card-title">${nomiMesi[r.mese]} ${r.anno}</div>
+            <button class="btn-del-storico" onclick="eliminaMese(${r.ts})">✕ elimina</button>
+          </div>
+          <div class="storico-grid">
+            ${campi.map(c => `<div class="storico-val"><span>${etichette[c]}</span><strong class="${(r[c]||0) === 0 ? 'zero' : ''}">${r[c]||0}</strong></div>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderMesiPassati();
   </script>
 
 </body>
