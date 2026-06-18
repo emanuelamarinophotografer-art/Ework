@@ -39,6 +39,9 @@
 
     <nav class="nav-section">
       <div class="nav-label">Operativo</div>
+      <a class="nav-item" href="priorita.html">
+        <span class="icon">🔴</span> Priorità
+      </a>
       <a class="nav-item" href="attivita.html">
         <span class="icon">📅</span> Attività
       </a>
@@ -88,7 +91,7 @@
           <div class="oggi-item"><span>Proprietà in gestione</span>—</div>
           <div class="oggi-item"><span>Follow-up da fare</span>—</div>
           <div class="oggi-item"><span>Prossimo evento</span>—</div>
-          <div class="oggi-item urgente"><span>Priorità</span>—</div>
+          <div class="oggi-item urgente"><span>Priorità</span><span id="contPriorita">—</span></div>
         </div>
       </div>
 
@@ -146,6 +149,10 @@
     const str = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()];
     document.getElementById('dataOggi').textContent = str;
     document.getElementById('dataEstesa').textContent = str + ' ' + d.getFullYear();
+
+    const priorita = JSON.parse(localStorage.getItem('priorita') || '[]');
+    const aperte = priorita.filter(i => !i.fatto).length;
+    document.getElementById('contPriorita').textContent = aperte || '—';
   </script>
 
 </body>
