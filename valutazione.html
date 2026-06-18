@@ -107,6 +107,9 @@
                   <option value="scansano">Scansano</option>
                   <option value="sorano">Sorano</option>
                   <option value="monte_argentario">Monte Argentario</option>
+                  <option value="roccastrada">Roccastrada</option>
+                  <option value="massa_marittima">Massa Marittima</option>
+                  <option value="cinigiano">Cinigiano</option>
                   <option value="altro">Altro comune</option>
                 </select>
               </div>
@@ -362,6 +365,46 @@
           D1: { villa: [3000,4200], rustico: [2100,3200], civile: [1800,2700], economica: [1400,2100] },
           E1: { villa: [4000,6000], rustico: [2800,4200], civile: [2600,3800], economica: [2000,2900] },
           R1: { villa: [2200,3200], rustico: [1600,2400], civile: [1300,2000], economica: [1000,1500] },
+        }
+      },
+      roccastrada: {
+        zone: [
+          { val: 'E5', label: 'Ribolla e zone circostanti' },
+          { val: 'B1', label: 'Roccastrada centro / zone circostanti' },
+          { val: 'E1', label: 'Torniella e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          E5: { villa: [1200,1650], rustico: [950,1350], civile: [820,1150], economica: [580,820] },
+          B1: { villa: [1150,1550], rustico: [900,1300], civile: [780,1100], economica: [550,790] },
+          E1: { villa: [1000,1400], rustico: [800,1150], civile: [680,970], economica: [470,680] },
+          R1: { villa: [820,1150], rustico: [660,1000], civile: [560,800], economica: [390,560] },
+        }
+      },
+      massa_marittima: {
+        zone: [
+          { val: 'B1', label: 'Massa Marittima centro storico' },
+          { val: 'D1', label: 'Ghirlanda / Periferia' },
+          { val: 'E2', label: 'Valpiana e dintorni' },
+          { val: 'R1', label: 'Zona rurale / collinare' },
+        ],
+        prezzi: {
+          B1: { villa: [1400,1750], rustico: [1100,1450], civile: [1000,1400], economica: [750,1100] },
+          D1: { villa: [1300,1650], rustico: [1000,1350], civile: [930,1300], economica: [700,1000] },
+          E2: { villa: [1350,1700], rustico: [1050,1400], civile: [960,1350], economica: [720,1050] },
+          R1: { villa: [1050,1400], rustico: [830,1150], civile: [750,1050], economica: [560,820] },
+        }
+      },
+      cinigiano: {
+        zone: [
+          { val: 'B1', label: 'Cinigiano e zone circostanti' },
+          { val: 'E3', label: 'Monticello Amiata e zone circostanti' },
+          { val: 'R1', label: 'Zona rurale' },
+        ],
+        prezzi: {
+          B1: { villa: [1100,1380], rustico: [870,1150], civile: [750,1000], economica: [420,625] },
+          E3: { villa: [1020,1280], rustico: [820,1080], civile: [700,940], economica: [390,580] },
+          R1: { villa: [860,1100], rustico: [690,950], civile: [600,800], economica: [330,500] },
         }
       },
       altro: {
