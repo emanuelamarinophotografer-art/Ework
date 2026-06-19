@@ -103,9 +103,37 @@
       gap: 14px;
     }
 
+    /* MAPPA */
+    .mappa-container { margin-bottom: 8px; }
+    .mappa-rami { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+    .mappa-ramo-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .mappa-nodi { display: flex; flex-direction: column; gap: 8px; }
+    .mappa-nodo { background: var(--bg-card); border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; text-decoration: none; color: inherit; display: block; transition: border-color 0.15s, box-shadow 0.15s; }
+    .mappa-nodo.fatto { border-left: 3px solid #27ae60; }
+    .mappa-nodo.sviluppo { border-left: 3px solid #e6a817; }
+    .mappa-nodo.pianificato { border-left: 3px solid var(--border); opacity: 0.75; }
+    a.mappa-nodo:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); opacity: 1; }
+    .mappa-nodo-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .mappa-nodo-icon { font-size: 1rem; }
+    .mappa-nodo-nome { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .mappa-nodo-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
+    .fatto-badge { font-size: 0.62rem; font-weight: 700; background: #eafaf1; color: #27ae60; padding: 2px 7px; border-radius: 10px; }
+    .sviluppo-badge { font-size: 0.62rem; font-weight: 700; background: #fef9e7; color: #b7860b; padding: 2px 7px; border-radius: 10px; }
+    .piano-badge { font-size: 0.62rem; font-weight: 700; background: #f0f0f0; color: #888; padding: 2px 7px; border-radius: 10px; }
+    .mappa-legenda { display: flex; gap: 20px; padding-top: 4px; }
+    .legenda-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); }
+    .legenda-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legenda-dot.verde { background: #27ae60; }
+    .legenda-dot.giallo { background: #e6a817; }
+    .legenda-dot.grigio { background: #ccc; }
+
     @media (max-width: 1100px) {
       .centro-grid { grid-template-columns: 1fr; }
       .sezioni { grid-template-columns: repeat(2, 1fr); }
+      .mappa-rami { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .mappa-rami { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -290,6 +318,126 @@
           <p>Automazioni e supervisore.</p>
           <span class="badge">In costruzione</span>
         </a>
+      </div>
+
+      <!-- MAPPA VISIVA -->
+      <div class="blocco-header" style="margin-top:28px;margin-bottom:16px;">🗺 Mappa Ework — cosa c'è e cosa fa</div>
+      <div class="mappa-container">
+
+        <div class="mappa-rami">
+
+          <div class="mappa-ramo">
+            <div class="mappa-ramo-label">🎯 Operativo</div>
+            <div class="mappa-nodi">
+              <a href="index.html" class="mappa-nodo fatto">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🎯</span><span class="mappa-nodo-stato fatto-badge">✅ Live</span></div>
+                <div class="mappa-nodo-nome">Centro di Comando</div>
+                <div class="mappa-nodo-desc">Panoramica clienti, agenda, priorità, osservatorio acquisizioni</div>
+              </a>
+              <a href="attivita.html" class="mappa-nodo fatto">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">📅</span><span class="mappa-nodo-stato fatto-badge">✅ Live</span></div>
+                <div class="mappa-nodo-nome">Attività & Agenda</div>
+                <div class="mappa-nodo-desc">Todo giornaliero, journal, metriche mensili e goal</div>
+              </a>
+              <div class="mappa-nodo pianificato">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🤖</span><span class="mappa-nodo-stato piano-badge">📋 Pianificato</span></div>
+                <div class="mappa-nodo-nome">Agenti AI</div>
+                <div class="mappa-nodo-desc">Automazioni intelligenti e supervisore attività</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mappa-ramo">
+            <div class="mappa-ramo-label">🏡 Lavoro immobiliare</div>
+            <div class="mappa-nodi">
+              <a href="clienti.html" class="mappa-nodo fatto">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">👤</span><span class="mappa-nodo-stato fatto-badge">✅ Live</span></div>
+                <div class="mappa-nodo-nome">Clienti & Scheda</div>
+                <div class="mappa-nodo-desc">Rubrica acquirenti e proprietari, storico attività, note</div>
+              </a>
+              <a href="proprieta.html" class="mappa-nodo fatto">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🏡</span><span class="mappa-nodo-stato fatto-badge">✅ Live</span></div>
+                <div class="mappa-nodo-nome">Proprietà</div>
+                <div class="mappa-nodo-desc">Immobili in gestione, stati (incarico → portale → venduto)</div>
+              </a>
+              <a href="valutazione.html" class="mappa-nodo fatto">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🧮</span><span class="mappa-nodo-stato fatto-badge">✅ Live</span></div>
+                <div class="mappa-nodo-nome">Valutazione OMI</div>
+                <div class="mappa-nodo-desc">Stima valore con dati reali OMI, score vendibilità 120gg, plus</div>
+              </a>
+              <a href="ricerca.html" class="mappa-nodo fatto">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🔍</span><span class="mappa-nodo-stato fatto-badge">✅ Live</span></div>
+                <div class="mappa-nodo-nome">Ricerca Immobili</div>
+                <div class="mappa-nodo-desc">Schede valutazione salvate, stati, promozione a incarico</div>
+              </a>
+              <a href="radar.html" class="mappa-nodo fatto">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">📡</span><span class="mappa-nodo-stato fatto-badge">✅ Live</span></div>
+                <div class="mappa-nodo-nome">Radar Lunedì</div>
+                <div class="mappa-nodo-desc">9 portali privati, apertura massiva, log annunci interessanti</div>
+              </a>
+              <div class="mappa-nodo sviluppo">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">📋</span><span class="mappa-nodo-stato sviluppo-badge">🔧 Prossimo</span></div>
+                <div class="mappa-nodo-nome">Scheda Incarico</div>
+                <div class="mappa-nodo-desc">Check strategico pre-acquisizione, scoring decisionale</div>
+              </div>
+              <div class="mappa-nodo pianificato">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">💶</span><span class="mappa-nodo-stato piano-badge">📋 Pianificato</span></div>
+                <div class="mappa-nodo-nome">Finanze</div>
+                <div class="mappa-nodo-desc">Provvigioni, entrate/uscite, previsione mese</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mappa-ramo">
+            <div class="mappa-ramo-label">📸 Contenuti</div>
+            <div class="mappa-nodi">
+              <div class="mappa-nodo sviluppo">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">📸</span><span class="mappa-nodo-stato sviluppo-badge">🔧 Prossimo</span></div>
+                <div class="mappa-nodo-nome">Social & Piano editoriale</div>
+                <div class="mappa-nodo-desc">Calendario reel, rubriche, script HeyGen integrati</div>
+              </div>
+              <div class="mappa-nodo pianificato">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🎬</span><span class="mappa-nodo-stato piano-badge">📋 Pianificato</span></div>
+                <div class="mappa-nodo-nome">HeyGen / Higgsfield</div>
+                <div class="mappa-nodo-desc">Generazione video avatar e reel proprietà direttamente da Ework</div>
+              </div>
+              <div class="mappa-nodo pianificato">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🌿</span><span class="mappa-nodo-stato piano-badge">📋 Pianificato</span></div>
+                <div class="mappa-nodo-nome">Fonti & Portali</div>
+                <div class="mappa-nodo-desc">Risorse, link utili, dati mercato Maremma</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mappa-ramo">
+            <div class="mappa-ramo-label">🔌 Integrazioni</div>
+            <div class="mappa-nodi">
+              <div class="mappa-nodo sviluppo">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🏛</span><span class="mappa-nodo-stato sviluppo-badge">⏳ In attesa</span></div>
+                <div class="mappa-nodo-nome">API Idealista</div>
+                <div class="mappa-nodo-desc">Ricerca automatica lunedì con parametri tuoi, annunci direttamente in Radar</div>
+              </div>
+              <div class="mappa-nodo pianificato">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">📅</span><span class="mappa-nodo-stato piano-badge">📋 Pianificato</span></div>
+                <div class="mappa-nodo-nome">Google Calendar</div>
+                <div class="mappa-nodo-desc">Agenda reale sincronizzata con Attività</div>
+              </div>
+              <div class="mappa-nodo pianificato">
+                <div class="mappa-nodo-top"><span class="mappa-nodo-icon">🗄</span><span class="mappa-nodo-stato piano-badge">📋 Pianificato</span></div>
+                <div class="mappa-nodo-nome">Supabase</div>
+                <div class="mappa-nodo-desc">Dati in cloud, accesso da qualsiasi dispositivo</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mappa-legenda">
+          <span class="legenda-item"><span class="legenda-dot verde"></span>Live</span>
+          <span class="legenda-item"><span class="legenda-dot giallo"></span>Prossimo / In attesa</span>
+          <span class="legenda-item"><span class="legenda-dot grigio"></span>Pianificato</span>
+        </div>
+
       </div>
 
     </div>
