@@ -105,21 +105,22 @@
 
     /* MAPPA */
     .mappa-container { margin-bottom: 8px; }
-    .mappa-rami { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
-    .mappa-ramo-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
-    .mappa-nodi { display: flex; flex-direction: column; gap: 8px; }
-    .mappa-nodo { background: var(--bg-card); border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; text-decoration: none; color: inherit; display: block; transition: border-color 0.15s, box-shadow 0.15s; }
-    .mappa-nodo.fatto { border-left: 3px solid #27ae60; }
-    .mappa-nodo.sviluppo { border-left: 3px solid #e6a817; }
-    .mappa-nodo.pianificato { border-left: 3px solid var(--border); opacity: 0.75; }
+    .mappa-rami { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+    .mappa-ramo { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; }
+    .mappa-ramo-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 12px; }
+    .mappa-nodi { display: flex; flex-wrap: wrap; gap: 8px; }
+    .mappa-nodo { background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 10px 14px; text-decoration: none; color: inherit; display: block; transition: border-color 0.15s, box-shadow 0.15s; min-width: 160px; flex: 1; }
+    .mappa-nodo.fatto { border-top: 3px solid #27ae60; }
+    .mappa-nodo.sviluppo { border-top: 3px solid #e6a817; }
+    .mappa-nodo.pianificato { border-top: 3px solid #ccc; opacity: 0.75; }
     a.mappa-nodo:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.06); opacity: 1; }
     .mappa-nodo-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .mappa-nodo-icon { font-size: 1rem; }
     .mappa-nodo-nome { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
-    .mappa-nodo-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; }
-    .fatto-badge { font-size: 0.62rem; font-weight: 700; background: #eafaf1; color: #27ae60; padding: 2px 7px; border-radius: 10px; }
-    .sviluppo-badge { font-size: 0.62rem; font-weight: 700; background: #fef9e7; color: #b7860b; padding: 2px 7px; border-radius: 10px; }
-    .piano-badge { font-size: 0.62rem; font-weight: 700; background: #f0f0f0; color: #888; padding: 2px 7px; border-radius: 10px; }
+    .mappa-nodo-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; }
+    .fatto-badge { font-size: 0.62rem; font-weight: 700; background: #eafaf1; color: #27ae60; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+    .sviluppo-badge { font-size: 0.62rem; font-weight: 700; background: #fef9e7; color: #b7860b; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
+    .piano-badge { font-size: 0.62rem; font-weight: 700; background: #f0f0f0; color: #888; padding: 2px 7px; border-radius: 10px; white-space: nowrap; }
     .mappa-legenda { display: flex; gap: 20px; padding-top: 4px; }
     .legenda-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); }
     .legenda-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
