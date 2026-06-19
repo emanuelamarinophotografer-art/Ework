@@ -256,18 +256,18 @@
               <!-- PREZZI -->
               <div class="prezzi-grid">
                 <div class="prezzo-box">
-                  <div class="prezzo-box-label">Prezzo di mercato stimato (OMI)</div>
-                  <div class="prezzo-box-val calcolato" id="prezzoOMI">— €</div>
-                  <div class="delta-note" id="prezzoOMIrange"></div>
+                  <div class="prezzo-box-label">Range €/mq zona (OMI)</div>
+                  <div class="prezzo-box-val calcolato" id="prezzoOMI">— €/mq</div>
+                  <div class="delta-note" id="prezzoOMIrange">Seleziona comune e tipologia</div>
                 </div>
                 <div class="prezzo-box">
-                  <div class="prezzo-box-label">Prezzo richiesto dal proprietario</div>
-                  <input class="field-input" type="number" id="f_prezzo_richiesto" placeholder="es. 280000" oninput="aggiornaDelta()" style="width:100%;margin-top:4px" />
+                  <div class="prezzo-box-label">€/mq richiesto dal proprietario</div>
+                  <input class="field-input" type="number" id="f_prezzo_richiesto" placeholder="es. 1200" oninput="aggiornaDelta()" style="width:100%;margin-top:4px" />
                 </div>
                 <div class="prezzo-box">
-                  <div class="prezzo-box-label">Delta e note trattativa</div>
+                  <div class="prezzo-box-label">Confronto con mercato</div>
                   <div class="prezzo-box-val" id="deltaPrezzi" style="font-size:0.9rem">—</div>
-                  <div class="delta-note" id="deltaNote">Inserisci entrambi i prezzi per il confronto</div>
+                  <div class="delta-note" id="deltaNote">Inserisci entrambi i valori</div>
                 </div>
               </div>
             </div>
@@ -293,7 +293,7 @@
           </div>
 
           <div class="sezione-card" style="padding:16px">
-            <div class="field-label" style="margin-bottom:10px">Dati OMI per stima</div>
+            <div class="field-label" style="margin-bottom:10px">Riferimento €/mq OMI</div>
             <div class="field-group" style="margin-bottom:8px">
               <div class="field-label">Comune</div>
               <select class="field-input" id="omi_comune" onchange="aggiornaOMI()">
@@ -326,10 +326,6 @@
                 <option value="abitazioni_civili">Casa civile</option>
                 <option value="abitazioni_economiche">Economica</option>
               </select>
-            </div>
-            <div class="field-group" style="margin-bottom:8px">
-              <div class="field-label">Superficie (mq)</div>
-              <input class="field-input" type="number" id="omi_mq" placeholder="mq" oninput="aggiornaOMI()" />
             </div>
             <div class="field-group">
               <div class="field-label">Stato conservativo</div>
@@ -541,25 +537,23 @@
     function aggiornaOMI() {
       const comune = document.getElementById('omi_comune').value;
       const tipo = document.getElementById('omi_tipo').value;
-      const mq = parseFloat(document.getElementById('omi_mq').value);
       const stato = document.getElementById('omi_stato').value;
       const coeff = COEFF_STATO[stato] || 1;
 
-      if (!comune || !OMI[comune] || !mq) {
-        document.getElementById('prezzoOMI').textContent = '— €';
-        document.getElementById('prezzoOMIrange').textContent = '';
+      if (!comune || !OMI[comune]) {
+        document.getElementById('prezzoOMI').textContent = '— €/mq';
+        document.getElementById('prezzoOMIrange').textContent = 'Seleziona comune e tipologia';
         return;
       }
 
       const range = OMI[comune].prezzi[tipo] || [800, 1200];
-      const min = Math.round(range[0] * coeff * mq);
-      const max = Math.round(range[1] * coeff * mq);
-      const mid = Math.round((min + max) / 2);
+      const minMq = Math.round(range[0] * coeff);
+      const maxMq = Math.round(range[1] * coeff);
 
-      document.getElementById('prezzoOMI').textContent = mid.toLocaleString('it-IT') + ' €';
-      document.getElementById('prezzoOMIrange').textContent = `Range: ${min.toLocaleString('it-IT')} – ${max.toLocaleString('it-IT')} €`;
+      document.getElementById('prezzoOMI').textContent = `${minMq.toLocaleString('it-IT')} – ${maxMq.toLocaleString('it-IT')} €/mq`;
+      document.getElementById('prezzoOMIrange').textContent = stato !== 'ottimo' ? `Corretto per stato: ${stato}` : 'Fonte: OMI 2° sem 2025';
 
-      window._omiCalc = { min, max, mid };
+      window._omiCalc = { minMq, maxMq, midMq: Math.round((minMq + maxMq) / 2) };
       aggiornaDelta();
     }
 
@@ -567,17 +561,21 @@
       const richiesto = parseFloat(document.getElementById('f_prezzo_richiesto').value);
       if (!window._omiCalc || !richiesto) {
         document.getElementById('deltaPrezzi').textContent = '—';
-        document.getElementById('deltaNote').textContent = 'Inserisci entrambi i prezzi per il confronto';
+        document.getElementById('deltaNote').textContent = 'Inserisci il €/mq richiesto per confrontare';
         return;
       }
-      const delta = richiesto - window._omiCalc.mid;
-      const perc = Math.round((delta / window._omiCalc.mid) * 100);
+      const { minMq, maxMq, midMq } = window._omiCalc;
+      const delta = richiesto - midMq;
+      const perc = Math.round((delta / midMq) * 100);
       const segno = delta > 0 ? '+' : '';
-      const col = delta > 0 ? '#c0392b' : '#27ae60';
-      document.getElementById('deltaPrezzi').innerHTML = `<span style="color:${col}">${segno}${Math.abs(delta).toLocaleString('it-IT')} € (${segno}${perc}%)</span>`;
-      document.getElementById('deltaNote').textContent = delta > 0
-        ? `Proprietario chiede ${perc}% sopra la stima — da trattare`
-        : `Proprietario in linea o sotto la stima — buon segnale`;
+      const col = richiesto <= maxMq ? '#27ae60' : '#c0392b';
+      const dentro = richiesto >= minMq && richiesto <= maxMq;
+      document.getElementById('deltaPrezzi').innerHTML = `<span style="color:${col}">${segno}${perc}% vs media</span>`;
+      document.getElementById('deltaNote').textContent = dentro
+        ? `In range OMI (${minMq.toLocaleString('it-IT')}–${maxMq.toLocaleString('it-IT')} €/mq) ✓`
+        : richiesto > maxMq
+          ? `Sopra il range OMI — da trattare`
+          : `Sotto il range OMI — ottimo segnale`;
     }
 
     /* ---- SALVA / CARICA ---- */
