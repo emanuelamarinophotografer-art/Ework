@@ -46,6 +46,27 @@
 
     .placeholder-ris { text-align: center; color: var(--text-faint); font-size: 0.88rem; padding: 40px 0; }
 
+    /* PLUS CHECKBOX */
+    .plus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .plus-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text); cursor: pointer; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg); transition: all 0.15s; user-select: none; }
+    .plus-item:hover { border-color: var(--accent); }
+    .plus-item.on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+    .plus-item input { display: none; }
+
+    /* VENDIBILITÀ */
+    .vend-box { background: var(--bg); border-radius: 10px; padding: 18px; margin-top: 20px; border: 1px solid var(--border); }
+    .vend-titolo { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; margin-bottom: 14px; }
+    .vend-badge { text-align: center; font-size: 1.1rem; font-weight: 700; padding: 12px; border-radius: 8px; margin-bottom: 14px; }
+    .vend-verde { background: #eafaf1; color: #27ae60; }
+    .vend-giallo { background: #fef9e7; color: #b7860b; }
+    .vend-rosso { background: #fdedec; color: #c0392b; }
+    .vend-barra-wrap { margin-bottom: 10px; }
+    .vend-barra-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+    .vend-barra { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .vend-barra-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+    .vend-motivazioni { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .vend-motivazioni li { margin-bottom: 3px; }
+
     @media (max-width: 900px) { .val-grid { grid-template-columns: 1fr; } .risultato { position: static; } }
   </style>
 </head>
@@ -166,6 +187,58 @@
                   <button class="toggle-btn" onclick="setToggle('stato', 'daristrutturare', this)">Da ristrutturare</button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- CLASSE ENERGETICA + PREZZO RICHIESTO -->
+          <div class="sezione">
+            <div class="sezione-titolo">Classe energetica & Prezzo richiesto</div>
+            <div class="form-row-1">
+              <div class="form-group">
+                <label>Classe energetica</label>
+                <div class="toggle-row" id="classe_toggle">
+                  <button class="toggle-btn" onclick="setToggle('classe','A4',this)">A4</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','A3',this)">A3</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','A2',this)">A2</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','A1',this)">A1</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','B',this)">B</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','C',this)">C</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','D',this)">D</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','E',this)">E</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','F',this)">F</button>
+                  <button class="toggle-btn on" onclick="setToggle('classe','G',this)">G</button>
+                  <button class="toggle-btn" onclick="setToggle('classe','nd',this)">N.D.</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Prezzo richiesto dal proprietario (€)</label>
+                <input class="form-input" type="number" id="f_prezzo_richiesto" placeholder="es. 320000" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Giorni già in mercato</label>
+                <input class="form-input" type="number" id="f_giorni_mercato" placeholder="es. 0 se nuovo" min="0" />
+              </div>
+            </div>
+          </div>
+
+          <!-- PLUS IMMOBILE -->
+          <div class="sezione">
+            <div class="sezione-titolo">Plus dell'immobile</div>
+            <div class="plus-grid" id="plusGrid">
+              <label class="plus-item" onclick="togglePlus(this,'giardino')"><input type="checkbox" value="giardino"> 🌿 Giardino / Parco</label>
+              <label class="plus-item on" onclick="togglePlus(this,'piscina')"><input type="checkbox" value="piscina"> 🏊 Piscina</label>
+              <label class="plus-item" onclick="togglePlus(this,'pannelli')"><input type="checkbox" value="pannelli"> ☀️ Pannelli fotovoltaici</label>
+              <label class="plus-item" onclick="togglePlus(this,'pompa')"><input type="checkbox" value="pompa"> 🌡️ Pompa di calore</label>
+              <label class="plus-item" onclick="togglePlus(this,'pozzo')"><input type="checkbox" value="pozzo"> 💧 Pozzo / Cisterna</label>
+              <label class="plus-item" onclick="togglePlus(this,'irrigazione')"><input type="checkbox" value="irrigazione"> 🚿 Impianto irrigazione</label>
+              <label class="plus-item" onclick="togglePlus(this,'cappotto')"><input type="checkbox" value="cappotto"> 🧱 Cappotto termico</label>
+              <label class="plus-item" onclick="togglePlus(this,'infissi')"><input type="checkbox" value="infissi"> 🪟 Infissi nuovi</label>
+              <label class="plus-item" onclick="togglePlus(this,'pavimento')"><input type="checkbox" value="pavimento"> 🔆 Riscaldamento a pavimento</label>
+              <label class="plus-item" onclick="togglePlus(this,'garage')"><input type="checkbox" value="garage"> 🚗 Rimessa / Garage</label>
+              <label class="plus-item" onclick="togglePlus(this,'cancello')"><input type="checkbox" value="cancello"> 🔐 Cancello automatico / Recinzione</label>
+              <label class="plus-item" onclick="togglePlus(this,'agriturismo')"><input type="checkbox" value="agriturismo"> 🏷️ Idoneo agriturismo</label>
             </div>
           </div>
 
@@ -630,13 +703,35 @@
     const TERRENO_MQ = { oliveto: 3.2, vigneto: 9.0, seminativo: 1.2, bosco: 0.5, misto: 2.5, orto: 2.0, none: 0 };
 
     // Stato toggle
-    const toggleState = { stato: 'ottimo', vista: 'nessuna', piscina: 'no', accesso: 'comodo' };
+    const toggleState = { stato: 'ottimo', vista: 'nessuna', piscina: 'no', accesso: 'comodo', classe: 'G' };
+    const plusAttivi = new Set(['piscina']);
 
     function setToggle(gruppo, valore, el) {
       toggleState[gruppo] = valore;
       el.closest('.toggle-row').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('on'));
       el.classList.add('on');
     }
+
+    function togglePlus(el, chiave) {
+      el.classList.toggle('on');
+      if (plusAttivi.has(chiave)) plusAttivi.delete(chiave);
+      else plusAttivi.add(chiave);
+    }
+
+    // Coefficienti classe energetica sul valore
+    const COEFF_CLASSE = { A4:1.06, A3:1.055, A2:1.05, A1:1.04, B:1.03, C:1.0, D:1.0, E:0.97, F:0.95, G:0.93, nd:1.0 };
+
+    // Valore aggiunto dai plus (€ fissi)
+    const PLUS_VALORE = { pannelli:10000, pompa:6500, pozzo:4000, irrigazione:2500, cappotto:5500, infissi:4500, pavimento:6500, garage:8000, cancello:2000, agriturismo:15000, giardino:0, piscina:0 };
+
+    // Zone macro per vendibilità
+    const ZONA_MACRO = {
+      orbetello:'costa', castiglione:'costa', capalbio:'costa', monte_argentario:'costa', isola_giglio:'costa', follonica:'costa',
+      grosseto:'intermedia', gavorrano:'intermedia', massa_marittima:'intermedia', roccastrada:'intermedia',
+      manciano:'entroterra_value', scansano:'entroterra_value', magliano:'entroterra_value', campagnatico:'entroterra_value', civitella_paganico:'entroterra_value',
+      pitigliano:'entroterra_deep', sorano:'entroterra_deep', cinigiano:'entroterra_deep', arcidosso:'entroterra_deep', castel_del_piano:'entroterra_deep', santa_fiora:'entroterra_deep', semproniano:'entroterra_deep', seggiano:'entroterra_deep', roccalbegna:'entroterra_deep', monterotondo:'entroterra_deep', montieri:'entroterra_deep',
+      altro:'entroterra_value'
+    };
 
     function aggiornaZone() {
       const comune = document.getElementById('f_comune').value;
@@ -663,29 +758,39 @@
       const terrenoHa = parseFloat(document.getElementById('f_terreno_ha').value) || 0;
       const terrenoTipo = document.getElementById('f_terreno_tipo').value;
       const annesso = parseFloat(document.getElementById('f_annesso').value) || 0;
+      const prezzoRichiesto = parseFloat(document.getElementById('f_prezzo_richiesto').value) || 0;
+      const giorniMercato = parseFloat(document.getElementById('f_giorni_mercato').value) || 0;
 
-      if (!comune || !zona || !mq) {
-        alert('Compila almeno: comune, zona e superficie.');
-        return;
-      }
+      if (!comune || !zona || !mq) { alert('Compila almeno: comune, zona e superficie.'); return; }
 
       const prezzi = OMI[comune].prezzi[zona][tipologia];
       const coeffStato = COEFF_STATO[toggleState.stato];
+      const coeffClasse = COEFF_CLASSE[toggleState.classe];
 
       // BASE FABBRICATO
       const baseMin = prezzi[0] * mq * coeffStato;
       const baseMax = prezzi[1] * mq * coeffStato;
 
-      // ANNESSO/DEPENDANCE (50% del valore rustico della stessa zona)
+      // ANNESSO
       const annMin = annesso > 0 ? annesso * OMI[comune].prezzi[zona].rustico[0] * 0.5 * coeffStato : 0;
       const annMax = annesso > 0 ? annesso * OMI[comune].prezzi[zona].rustico[1] * 0.5 * coeffStato : 0;
 
       // TERRENO
       const mqTerreno = terrenoHa * 10000;
-      const valTerreno = mqTerreno * TERRENO_MQ[terrenoTipo] || 0;
+      const valTerreno = mqTerreno * (TERRENO_MQ[terrenoTipo] || 0);
 
-      // PISCINA
-      const valPiscina = toggleState.piscina === 'si' ? 22000 : 0;
+      // PISCINA (nella sezione maremmane rimane)
+      const valPiscina = plusAttivi.has('piscina') ? 22000 : 0;
+
+      // PLUS
+      let valPlus = 0;
+      const plusDesc = [];
+      plusAttivi.forEach(p => {
+        if (p === 'piscina') return;
+        const v = PLUS_VALORE[p] || 0;
+        valPlus += v;
+        if (v > 0) plusDesc.push(`+ ${fmt(v)} ${document.querySelector('.plus-item.on [value="'+p+'"]')?.closest('.plus-item')?.textContent?.trim() || p}`);
+      });
 
       // VISTA
       let coeffVista = 1.0;
@@ -697,17 +802,83 @@
       if (toggleState.accesso === 'sterrato') coeffAccesso = 0.96;
       if (toggleState.accesso === 'difficile') coeffAccesso = 0.90;
 
-      // TOTALE
-      const totMin = ((baseMin + annMin) * coeffVista * coeffAccesso) + valTerreno + valPiscina;
-      const totMax = ((baseMax + annMax) * coeffVista * coeffAccesso) + valTerreno + valPiscina;
+      // TOTALE (classe energetica applicata alla base fabbricato)
+      const totMin = ((baseMin + annMin) * coeffVista * coeffAccesso * coeffClasse) + valTerreno + valPiscina + valPlus;
+      const totMax = ((baseMax + annMax) * coeffVista * coeffAccesso * coeffClasse) + valTerreno + valPiscina + valPlus;
+      const totMed = (totMin + totMax) / 2;
 
       const comuneLabel = document.getElementById('f_comune').selectedOptions[0].text;
       const zonaLabel = document.getElementById('f_zona').selectedOptions[0].text;
       const tipoLabel = document.getElementById('f_tipologia').selectedOptions[0].text;
       const statoLabel = document.querySelector('#stato_toggle .toggle-btn.on').textContent;
-
       const vistaLabel = { nessuna:'—', colline:'Colline / Campagna (+6%)', mare:'Vista mare (+14%)' }[toggleState.vista];
       const accessoLabel = { comodo:'—', sterrato:'Sterrato (-4%)', difficile:'Difficile / Isolato (-10%)' }[toggleState.accesso];
+      const classeLabel = toggleState.classe === 'nd' ? 'N.D.' : `Classe ${toggleState.classe}`;
+
+      // ── VENDIBILITÀ ────────────────────────────────────────────────
+      const macro = ZONA_MACRO[comune] || 'entroterra_value';
+      let score = 0;
+      const note = [];
+
+      // 1. Metratura (max 20)
+      if (mq >= 200) { score += 20; }
+      else if (mq >= 150) { score += 17; note.push('⚠️ Metratura buona ma i clienti internazionali preferiscono ≥200 mq'); }
+      else if (mq >= 120) { score += 13; note.push('⚠️ Soglia minima accettabile (120 mq): il 99% dei clienti vuole di più'); }
+      else if (mq >= 90) { score += 7; note.push('🔴 Sotto 120 mq: difficile per clientela internazionale'); }
+      else { score += 2; note.push('🔴 Metratura troppo ridotta per il mercato maremmano'); }
+
+      // 2. Stato conservazione (max 25)
+      if (toggleState.stato === 'ottimo') { score += 25; }
+      else if (toggleState.stato === 'buono') { score += 20; note.push('✅ Stato buono: vendibile, qualche ritocco da comunicare'); }
+      else if (toggleState.stato === 'discreto') { score += 11; note.push('⚠️ Stato discreto: l\'81.6% dei clienti vuole pronto uso — prezzo deve compensare'); }
+      else { score += 4; note.push('🔴 Da ristrutturare: solo l\'18.4% dei clienti accetta — prezzo deve essere molto sotto benchmark'); }
+
+      // 3. Tipologia match zona (max 20)
+      const tipoMatch = {
+        costa: { rustico: 18, villa: 20, civile: 10, economica: 5 },
+        intermedia: { rustico: 16, villa: 18, civile: 14, economica: 10 },
+        entroterra_value: { rustico: 20, villa: 18, civile: 10, economica: 6 },
+        entroterra_deep: { rustico: 18, villa: 15, civile: 12, economica: 8 }
+      };
+      const tm = tipoMatch[macro]?.[tipologia] || 10;
+      score += tm;
+      if (tm < 12) note.push('⚠️ Tipologia meno richiesta in questa zona — domanda più lenta');
+
+      // 4. Classe energetica (max 15)
+      const classeScore = { A4:15,A3:14,A2:13,A1:12,B:10,C:8,D:7,E:5,F:3,G:2,nd:5 };
+      score += classeScore[toggleState.classe] || 5;
+      if (['F','G'].includes(toggleState.classe)) note.push('⚠️ Classe energetica bassa: peso crescente nella decisione d\'acquisto');
+      if (['A4','A3','A2','A1','B'].includes(toggleState.classe)) note.push('✅ Classe energetica elevata: valore aggiunto significativo');
+
+      // 5. Plus chiave (max 20)
+      let plusScore = 0;
+      if (plusAttivi.has('giardino')) plusScore += 7;
+      if (plusAttivi.has('piscina')) plusScore += 7;
+      if (terrenoHa >= 1) plusScore += 4;
+      if (plusAttivi.has('pannelli') || plusAttivi.has('pompa')) plusScore += 2;
+      score += Math.min(plusScore, 20);
+      if (!plusAttivi.has('giardino') && !plusAttivi.has('piscina') && terrenoHa < 1) note.push('⚠️ Nessun plus esterno: giardino (68%) e piscina (23%) sono i più ricercati');
+
+      // 6. Gap prezzo richiesto vs stima (bonus/malus)
+      let gapHtml = '';
+      if (prezzoRichiesto > 0) {
+        const gapPct = Math.round(((prezzoRichiesto - totMed) / totMed) * 100);
+        if (gapPct <= -10) { score += 5; gapHtml = `<div class="ris-row" style="color:#27ae60"><span class="r-label">Gap prezzo/stima</span><span class="r-val">−${Math.abs(gapPct)}% sotto mercato ✅</span></div>`; note.push('✅ Prezzo sotto mercato: alta probabilità di vendita rapida'); }
+        else if (gapPct <= 5) { score += 2; gapHtml = `<div class="ris-row"><span class="r-label">Gap prezzo/stima</span><span class="r-val">${gapPct > 0 ? '+' : ''}${gapPct}% (allineato)</span></div>`; }
+        else if (gapPct <= 15) { score -= 3; gapHtml = `<div class="ris-row" style="color:#b7860b"><span class="r-label">Gap prezzo/stima</span><span class="r-val">+${gapPct}% sopra mercato ⚠️</span></div>`; note.push(`⚠️ Prezzo +${gapPct}% sopra stima OMI: rallenta la vendita`); }
+        else { score -= 8; gapHtml = `<div class="ris-row" style="color:#c0392b"><span class="r-label">Gap prezzo/stima</span><span class="r-val">+${gapPct}% sopra mercato 🔴</span></div>`; note.push(`🔴 Prezzo +${gapPct}% sopra stima: difficile vendere entro 120 giorni senza ribasso`); }
+      }
+
+      // 7. Giorni in mercato
+      if (giorniMercato > 180) { score -= 8; note.push(`🔴 ${giorniMercato} giorni in mercato: segnale di prezzo sbagliato o problemi strutturali`); }
+      else if (giorniMercato > 90) { score -= 4; note.push(`⚠️ ${giorniMercato} giorni in mercato: valuta le obiezioni dei clienti precedenti`); }
+
+      score = Math.max(0, Math.min(100, score));
+
+      let vendClass, vendLabel, vendColor;
+      if (score >= 72) { vendClass = 'vend-verde'; vendLabel = '🟢 Alta vendibilità — stima <120 giorni'; vendColor = '#27ae60'; }
+      else if (score >= 45) { vendClass = 'vend-giallo'; vendLabel = '🟡 Media vendibilità — 120–200 giorni'; vendColor = '#b7860b'; }
+      else { vendClass = 'vend-rosso'; vendLabel = '🔴 Vendibilità bassa — valuta se prendere l\'incarico'; vendColor = '#c0392b'; }
 
       document.getElementById('risultatoBox').innerHTML = `
         <div class="ris-label">Valutazione stimata</div>
@@ -721,25 +892,31 @@
         </div>
 
         <div class="ris-breakdown">
-          <div class="ris-row">
-            <span class="r-label">${tipoLabel} (${mq} mq · ${statoLabel})</span>
-            <span class="r-val">${fmt(baseMin)} – ${fmt(baseMax)}</span>
-          </div>
-          ${annesso > 0 ? `<div class="ris-row"><span class="r-label">Annesso / Dependance (${annesso} mq)</span><span class="r-val">${fmt(annMin)} – ${fmt(annMax)}</span></div>` : ''}
+          <div class="ris-row"><span class="r-label">${tipoLabel} (${mq} mq · ${statoLabel})</span><span class="r-val">${fmt(baseMin)} – ${fmt(baseMax)}</span></div>
+          ${annesso > 0 ? `<div class="ris-row"><span class="r-label">Annesso (${annesso} mq)</span><span class="r-val">${fmt(annMin)} – ${fmt(annMax)}</span></div>` : ''}
           ${valTerreno > 0 ? `<div class="ris-row"><span class="r-label">Terreno ${terrenoHa} ha (${document.getElementById('f_terreno_tipo').selectedOptions[0].text})</span><span class="r-val">${fmt(valTerreno)}</span></div>` : ''}
           ${valPiscina > 0 ? `<div class="ris-row"><span class="r-label">Piscina</span><span class="r-val">+ ${fmt(valPiscina)}</span></div>` : ''}
+          ${valPlus > 0 ? `<div class="ris-row"><span class="r-label">Plus impianti</span><span class="r-val">+ ${fmt(valPlus)}</span></div>` : ''}
           ${toggleState.vista !== 'nessuna' ? `<div class="ris-row"><span class="r-label">Vista</span><span class="r-val">${vistaLabel}</span></div>` : ''}
           ${toggleState.accesso !== 'comodo' ? `<div class="ris-row"><span class="r-label">Accessibilità</span><span class="r-val">${accessoLabel}</span></div>` : ''}
-          <div class="ris-row totale">
-            <span class="r-label">Totale stimato</span>
-            <span class="r-val">${fmt(totMin)} – ${fmt(totMax)}</span>
+          <div class="ris-row"><span class="r-label">Classe energetica</span><span class="r-val">${classeLabel} (${coeffClasse >= 1 ? '+' : ''}${Math.round((coeffClasse-1)*100)}%)</span></div>
+          ${gapHtml}
+          <div class="ris-row totale"><span class="r-label">Valore stimato</span><span class="r-val">${fmt(totMin)} – ${fmt(totMax)}</span></div>
+        </div>
+
+        <div class="vend-box">
+          <div class="vend-titolo" style="color:${vendColor}">Indice di vendibilità a 120 giorni</div>
+          <div class="vend-badge ${vendClass}">${vendLabel}</div>
+          <div class="vend-barra-wrap">
+            <div class="vend-barra-label"><span>0</span><span>${score}/100</span><span>100</span></div>
+            <div class="vend-barra"><div class="vend-barra-fill" style="width:${score}%;background:${vendColor}"></div></div>
           </div>
+          ${note.length > 0 ? `<div class="vend-motivazioni"><ul style="padding-left:14px;margin:0">${note.map(n=>`<li>${n}</li>`).join('')}</ul></div>` : ''}
         </div>
 
         <div class="omi-nota">
-          📊 Dati OMI Agenzia delle Entrate — 2° semestre 2025.<br>
-          Prezzi al mq: ${prezzi[0].toLocaleString()} – ${prezzi[1].toLocaleString()} €/mq (${tipoLabel}, ${zonaLabel}).<br>
-          Valori indicativi per uso professionale interno. Aggiornare semestralmente con i nuovi dati OMI.
+          📊 Dati OMI — 2° sem 2025 · ${prezzi[0].toLocaleString()}–${prezzi[1].toLocaleString()} €/mq (${tipoLabel}, ${zonaLabel})<br>
+          Valori indicativi per uso professionale interno.
         </div>
       `;
     }
