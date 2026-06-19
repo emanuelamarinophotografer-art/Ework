@@ -67,6 +67,22 @@
     .vend-motivazioni { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
     .vend-motivazioni li { margin-bottom: 3px; }
 
+    /* SALVA MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg-card); border-radius: 12px; padding: 28px; width: 440px; max-width: 95vw; }
+    .modal h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .modal p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 18px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .form-group label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .form-input-m { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 10px 14px; font-size: 0.95rem; font-family: inherit; font-weight: 500; color: var(--text); outline: none; width: 100%; box-sizing: border-box; }
+    .form-input-m:focus { border-color: var(--accent); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-annulla { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; color: var(--text-muted); }
+    .btn-salva-modal { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 9px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .btn-salva-ris { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 10px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; width: 100%; margin-top: 14px; }
+    .btn-salva-ris:hover { opacity: 0.88; }
+
     @media (max-width: 900px) { .val-grid { grid-template-columns: 1fr; } .risultato { position: static; } }
   </style>
 </head>
@@ -91,7 +107,7 @@
       <a class="nav-item" href="clienti.html"><span class="icon">👤</span> Clienti</a>
       <a class="nav-item" href="proprieta.html"><span class="icon">🏡</span> Proprietà</a>
       <a class="nav-item active" href="valutazione.html"><span class="icon">🧮</span> Valutazione</a>
-      <a class="nav-item" href="#"><span class="icon">🔍</span> Ricerca Immobili</a>
+      <a class="nav-item" href="ricerca.html"><span class="icon">🔍</span> Ricerca Immobili</a>
     </nav>
     <nav class="nav-section">
       <div class="nav-label">Contenuti</div>
@@ -313,6 +329,26 @@
       </div>
     </div>
   </main>
+
+  <!-- MODAL SALVA -->
+  <div class="modal-overlay" id="modalSalva">
+    <div class="modal">
+      <h3>Salva in Ricerca Immobili</h3>
+      <p>Dai un nome a questa scheda per ritrovarla facilmente.</p>
+      <div class="form-group">
+        <label>Nome proprietà</label>
+        <input class="form-input-m" type="text" id="nomeScheda" placeholder="es. Casale Manciano via del Poggio" />
+      </div>
+      <div class="form-group">
+        <label>Note rapide (opzionale)</label>
+        <input class="form-input-m" type="text" id="noteScheda" placeholder="es. proprietario motivato, strada sterrata" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-annulla" onclick="document.getElementById('modalSalva').classList.remove('open')">Annulla</button>
+        <button class="btn-salva-modal" onclick="confermaSalva()">Salva scheda →</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const d = new Date();
@@ -919,8 +955,55 @@
           📊 Dati OMI — 2° sem 2025 · ${prezzi[0].toLocaleString()}–${prezzi[1].toLocaleString()} €/mq (${tipoLabel}, ${zonaLabel})<br>
           Valori indicativi per uso professionale interno.
         </div>
+        <button class="btn-salva-ris" onclick="apriModalSalva()">💾 Salva in Ricerca Immobili</button>
       `;
+
+      // Memorizza dati per il salvataggio
+      window._ultimaValutazione = {
+        comune, comuneLabel, zona, zonaLabel,
+        tipologia, tipoLabel,
+        mq, stato: toggleState.stato, statoLabel,
+        classeEnergetica: toggleState.classe,
+        prezzoRichiesto, giorniMercato,
+        terrenoHa, terrenoTipo: document.getElementById('f_terreno_tipo').selectedOptions[0].text,
+        annesso, vista: toggleState.vista, accesso: toggleState.accesso,
+        plus: [...plusAttivi],
+        totMin, totMax,
+        score, vendLabel,
+        data: new Date().toLocaleDateString('it-IT')
+      };
     }
+
+    function apriModalSalva() {
+      document.getElementById('nomeScheda').value = '';
+      document.getElementById('noteScheda').value = '';
+      document.getElementById('modalSalva').classList.add('open');
+      setTimeout(() => document.getElementById('nomeScheda').focus(), 100);
+    }
+
+    function confermaSalva() {
+      const nome = document.getElementById('nomeScheda').value.trim();
+      if (!nome) { alert('Inserisci un nome per la scheda.'); return; }
+      const note = document.getElementById('noteScheda').value.trim();
+      const lista = JSON.parse(localStorage.getItem('ricerca_immobili') || '[]');
+      lista.unshift({
+        id: Date.now(),
+        nome,
+        note,
+        stato_scheda: 'in_valutazione',
+        ...(window._ultimaValutazione || {})
+      });
+      localStorage.setItem('ricerca_immobili', JSON.stringify(lista));
+      document.getElementById('modalSalva').classList.remove('open');
+      // Feedback visivo
+      const btn = document.querySelector('.btn-salva-ris');
+      if (btn) { btn.textContent = '✅ Salvata in Ricerca Immobili'; btn.disabled = true; btn.style.background = '#27ae60'; }
+    }
+
+    document.getElementById('modalSalva').addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+    });
+    document.getElementById('nomeScheda').addEventListener('keydown', e => { if (e.key === 'Enter') confermaSalva(); });
 
     aggiornaZone();
   </script>
