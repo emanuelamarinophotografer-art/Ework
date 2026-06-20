@@ -91,7 +91,6 @@
       <a class="nav-item" href="ricerca.html"><span class="icon">🔍</span> Ricerca Immobili</a>
       <a class="nav-item" href="radar.html"><span class="icon">📡</span> Radar Lunedì</a>
       <a class="nav-item" href="incarico.html"><span class="icon">📋</span> Scheda Incarico</a>
-      <a class="nav-item" href="incarico.html"><span class="icon">📋</span> Scheda Incarico</a>
     </nav>
     <nav class="nav-section c-contenuti">
       <div class="nav-label">Contenuti</div>
@@ -234,15 +233,23 @@
       'Ritirato': 'stato-ritirato'
     };
 
-    let filtroStato = 'Tutti';
+    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
-    function carica() { return JSON.parse(localStorage.getItem('proprieta') || '[]'); }
-    function salva(lista) { localStorage.setItem('proprieta', JSON.stringify(lista)); }
+    let filtroStato = 'Tutti';
+    let _lista = [];
+
+    async function aggiorna() {
+      const res = await fetch(`${SB_URL}/rest/v1/proprieta?order=created_at.desc`, { headers: SB_H });
+      _lista = await res.json();
+      renderFiltri();
+      renderLista();
+    }
 
     function renderFiltri() {
-      const lista = carica();
       document.getElementById('filtriStato').innerHTML = STATI.map(s => {
-        const count = s === 'Tutti' ? lista.length : lista.filter(p => p.stato === s).length;
+        const count = s === 'Tutti' ? _lista.length : _lista.filter(p => p.stato === s).length;
         return `<button class="filtro-btn ${filtroStato === s ? 'active' : ''}" onclick="setFiltro('${s}', this)">${s} (${count})</button>`;
       }).join('');
     }
@@ -255,22 +262,18 @@
     }
 
     function renderLista() {
-      renderFiltri();
-      let lista = carica();
+      let lista = [..._lista];
       const q = document.getElementById('searchInput').value.toLowerCase();
       if (filtroStato !== 'Tutti') lista = lista.filter(p => p.stato === filtroStato);
-      if (q) lista = lista.filter(p => (p.titolo+p.zona+p.tipo+p.ref).toLowerCase().includes(q));
+      if (q) lista = lista.filter(p => ((p.titolo||'')+(p.zona||'')+(p.tipologia||'')+(p.ref||'')).toLowerCase().includes(q));
 
       const el = document.getElementById('propGrid');
-      if (lista.length === 0) {
-        el.innerHTML = '<div class="placeholder">Nessuna proprietà trovata.</div>';
-        return;
-      }
+      if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessuna proprietà trovata.</div>'; return; }
       el.innerHTML = lista.map(p => `
         <div class="prop-card">
           ${p.ref ? '<div class="prop-ref">' + p.ref + '</div>' : ''}
-          <div class="prop-titolo">${p.titolo}</div>
-          <div class="prop-zona">📍 ${p.zona || '—'}${p.tipo ? ' · ' + p.tipo : ''}</div>
+          <div class="prop-titolo">${p.titolo || p.nome || '—'}</div>
+          <div class="prop-zona">📍 ${p.zona || '—'}${p.tipologia ? ' · ' + p.tipologia : ''}</div>
           <span class="prop-stato ${classeStato[p.stato] || ''}">${p.stato}</span>
           <div class="prop-numeri">
             ${p.prezzo ? '<span><strong>' + p.prezzo + '</strong>Prezzo</span>' : ''}
@@ -287,7 +290,7 @@
       `).join('');
     }
 
-    function apriModal(id) {
+    function apriModal() {
       document.getElementById('editId').value = '';
       document.getElementById('modalTitolo').textContent = 'Nuova proprietà';
       ['titolo','ref','zona','indirizzo','prezzo','mq','locali','proprietario','caratteristiche','note'].forEach(f => {
@@ -301,13 +304,13 @@
     }
 
     function modificaProprietà(id) {
-      const p = carica().find(x => x.id === id);
+      const p = _lista.find(x => x.id === id);
       if (!p) return;
       document.getElementById('editId').value = id;
       document.getElementById('modalTitolo').textContent = 'Modifica proprietà';
       document.getElementById('f_titolo').value = p.titolo || '';
       document.getElementById('f_ref').value = p.ref || '';
-      document.getElementById('f_tipo').value = p.tipo || 'Rustico / Casale';
+      document.getElementById('f_tipo').value = p.tipologia || 'Rustico / Casale';
       document.getElementById('f_stato').value = p.stato || 'Valutazione';
       document.getElementById('f_zona').value = p.zona || '';
       document.getElementById('f_indirizzo').value = p.indirizzo || '';
@@ -321,54 +324,48 @@
       document.getElementById('modalOverlay').classList.add('open');
     }
 
-    function chiudiModal() {
-      document.getElementById('modalOverlay').classList.remove('open');
-    }
+    function chiudiModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
-    function salvaProprietà() {
+    async function salvaProprietà() {
       const titolo = document.getElementById('f_titolo').value.trim();
       if (!titolo) { alert('Inserisci almeno il titolo.'); return; }
-      const lista = carica();
       const editId = document.getElementById('editId').value;
       const obj = {
-        id: editId ? parseInt(editId) : Date.now(),
-        titolo,
+        titolo, nome: titolo,
         ref: document.getElementById('f_ref').value.trim(),
-        tipo: document.getElementById('f_tipo').value,
+        tipologia: document.getElementById('f_tipo').value,
         stato: document.getElementById('f_stato').value,
         zona: document.getElementById('f_zona').value.trim(),
+        comune: document.getElementById('f_zona').value.trim(),
         indirizzo: document.getElementById('f_indirizzo').value.trim(),
         prezzo: document.getElementById('f_prezzo').value.trim(),
-        mq: document.getElementById('f_mq').value.trim(),
+        mq: document.getElementById('f_mq').value.trim() || null,
         locali: document.getElementById('f_locali').value.trim(),
         proprietario: document.getElementById('f_proprietario').value.trim(),
-        data_incarico: document.getElementById('f_data_incarico').value,
+        data_incarico: document.getElementById('f_data_incarico').value || null,
         caratteristiche: document.getElementById('f_caratteristiche').value.trim(),
         note: document.getElementById('f_note').value.trim(),
-        aggiornato: new Date().toLocaleDateString('it-IT')
       };
       if (editId) {
-        const i = lista.findIndex(x => x.id === parseInt(editId));
-        if (i >= 0) lista[i] = obj;
+        await fetch(`${SB_URL}/rest/v1/proprieta?id=eq.${editId}`, { method: 'PATCH', headers: SB_H, body: JSON.stringify(obj) });
       } else {
-        lista.push(obj);
+        await fetch(`${SB_URL}/rest/v1/proprieta`, { method: 'POST', headers: SB_H, body: JSON.stringify(obj) });
       }
-      salva(lista);
       chiudiModal();
-      renderLista();
+      await aggiorna();
     }
 
-    function eliminaProprietà(id) {
+    async function eliminaProprietà(id) {
       if (!confirm('Eliminare questa proprietà?')) return;
-      salva(carica().filter(p => p.id !== id));
-      renderLista();
+      await fetch(`${SB_URL}/rest/v1/proprieta?id=eq.${id}`, { method: 'DELETE', headers: SB_H });
+      await aggiorna();
     }
 
     document.getElementById('modalOverlay').addEventListener('click', e => {
       if (e.target === e.currentTarget) chiudiModal();
     });
 
-    renderLista();
+    aggiorna();
   </script>
 
 </body>
