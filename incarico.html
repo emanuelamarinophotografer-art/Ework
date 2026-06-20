@@ -3,36 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ework — Scheda Qualifica Incarico</title>
+  <title>Ework — Scheda Qualifica</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .scheda-intro { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 24px; margin-bottom: 20px; display: flex; gap: 20px; align-items: flex-start; }
-    .scheda-intro-fields { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; flex: 1; }
+    /* HEADER SCHEDA */
+    .scheda-intro { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 24px; margin-bottom: 20px; }
+    .scheda-intro-fields { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px; }
     .field-group { display: flex; flex-direction: column; gap: 4px; }
     .field-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); font-weight: 600; }
-    .field-input { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 8px 11px; font-size: 0.88rem; font-family: inherit; color: var(--text); outline: none; }
-    .field-input:focus { border-color: var(--accent); }
+    .field-input, .field-select { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 8px 11px; font-size: 0.88rem; font-family: inherit; color: var(--text); outline: none; width: 100%; box-sizing: border-box; }
+    .field-input:focus, .field-select:focus { border-color: var(--accent); }
 
     /* SEZIONI */
     .sezione-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
-    .sezione-header { padding: 14px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
-    .sezione-num { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: white; background: var(--accent); padding: 3px 8px; border-radius: 4px; }
-    .sezione-titolo { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+    .sezione-header { padding: 12px 20px; display: flex; align-items: center; gap: 10px; background: var(--bg); border-bottom: 1px solid var(--border); }
+    .sezione-tag { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: white; padding: 3px 8px; border-radius: 4px; }
+    .tag-qualifica { background: #8b1a3a; }
+    .tag-tecnica { background: #2e6080; }
+    .sezione-titolo { font-size: 0.92rem; font-weight: 600; color: var(--text); }
     .sezione-body { padding: 0; }
+    .sezione-sub { padding: 10px 20px 4px; font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); font-weight: 700; border-bottom: 1px solid var(--border); background: var(--bg); }
 
-    /* TABELLA IMMOBILE */
-    .param-table { width: 100%; border-collapse: collapse; }
-    .param-table th { text-align: left; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-faint); padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--border); font-weight: 600; }
-    .param-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 0.85rem; }
-    .param-table tr:last-child td { border-bottom: none; }
-    .param-nome { font-weight: 600; color: var(--text); white-space: nowrap; }
+    /* RIGHE PARAMETRO */
+    .param-row { display: grid; grid-template-columns: 180px 1fr 160px; align-items: start; padding: 12px 20px; border-bottom: 1px solid var(--border); gap: 16px; }
+    .param-row:last-child { border-bottom: none; }
+    .param-row-full { display: block; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+    .param-row-full:last-child { border-bottom: none; }
+    .param-nome { font-size: 0.85rem; font-weight: 600; color: var(--text); padding-top: 2px; }
     .param-guida { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
-    .param-nota { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; resize: none; min-height: 36px; }
-    .param-nota:focus { border-color: var(--accent); }
+    .param-input { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.85rem; font-family: inherit; color: var(--text); outline: none; width: 100%; box-sizing: border-box; }
+    .param-input:focus { border-color: var(--accent); }
+    .param-textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; resize: none; min-height: 60px; width: 100%; box-sizing: border-box; margin-top: 8px; }
+    .param-textarea:focus { border-color: var(--accent); }
 
-    /* VALUTAZIONE CHIP */
+    /* CHIP VALUTAZIONE */
     .val-chips { display: flex; gap: 6px; white-space: nowrap; }
-    .val-chip { padding: 5px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; opacity: 0.4; }
+    .val-chip { padding: 5px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; opacity: 0.35; }
     .val-chip.ok { background: #eafaf1; color: #27ae60; }
     .val-chip.ok.sel { border-color: #27ae60; opacity: 1; }
     .val-chip.daverif { background: #fef9e7; color: #b7860b; }
@@ -40,75 +46,53 @@
     .val-chip.rischio { background: #fdedec; color: #c0392b; }
     .val-chip.rischio.sel { border-color: #c0392b; opacity: 1; }
 
-    /* SEZIONE 2 — DOMANDE */
-    .domanda-item { padding: 16px 20px; border-bottom: 1px solid var(--border); }
-    .domanda-item:last-child { border-bottom: none; }
-    .domanda-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
-    .domanda-num { font-size: 0.7rem; font-weight: 700; color: white; background: var(--accent); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-    .domanda-testo { font-size: 0.88rem; font-weight: 600; color: var(--text); }
-    .domanda-guida { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; padding-left: 34px; }
-    .domanda-guida .ok-text { color: #27ae60; }
-    .domanda-guida .risk-text { color: #c0392b; }
-    .domanda-row { display: flex; gap: 10px; align-items: flex-start; padding-left: 34px; }
-    .domanda-nota { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; resize: none; min-height: 36px; }
-    .domanda-nota:focus { border-color: var(--accent); }
+    /* CHIP SI/NO */
+    .bool-chips { display: flex; gap: 6px; }
+    .bool-chip { padding: 5px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 2px solid var(--border); background: var(--bg); color: var(--text-muted); transition: all 0.15s; }
+    .bool-chip.sel-si { border-color: #27ae60; background: #eafaf1; color: #27ae60; }
+    .bool-chip.sel-no { border-color: #c0392b; background: #fdedec; color: #c0392b; }
 
-    /* SEZIONE 3 — ESITO */
-    .esito-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
-    .esito-sinistra { display: flex; flex-direction: column; gap: 14px; }
-    .esito-chips { display: flex; gap: 10px; }
-    .esito-chip { flex: 1; padding: 14px; border-radius: 10px; border: 3px solid transparent; cursor: pointer; text-align: center; transition: all 0.15s; opacity: 0.45; }
-    .esito-chip.verde { background: #eafaf1; color: #27ae60; }
-    .esito-chip.verde.sel { border-color: #27ae60; opacity: 1; box-shadow: 0 2px 8px #27ae6030; }
-    .esito-chip.giallo { background: #fef9e7; color: #b7860b; }
-    .esito-chip.giallo.sel { border-color: #b7860b; opacity: 1; box-shadow: 0 2px 8px #b7860b30; }
-    .esito-chip.rosso { background: #fdedec; color: #c0392b; }
-    .esito-chip.rosso.sel { border-color: #c0392b; opacity: 1; box-shadow: 0 2px 8px #c0392b30; }
-    .esito-chip-emoji { font-size: 1.4rem; display: block; margin-bottom: 4px; }
-    .esito-chip-label { font-size: 0.82rem; font-weight: 700; display: block; }
-    .esito-chip-desc { font-size: 0.68rem; margin-top: 4px; display: block; opacity: 0.8; }
+    /* GRID 2-COL FORM */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .form-grid:last-child { border-bottom: none; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
 
-    .esito-azioni { display: flex; flex-direction: column; gap: 10px; }
-    .esito-field { display: flex; flex-direction: column; gap: 4px; }
-    .esito-textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 9px 12px; font-size: 0.85rem; font-family: inherit; color: var(--text); outline: none; resize: vertical; min-height: 64px; }
-    .esito-textarea:focus { border-color: var(--accent); }
-
-    /* PREZZI */
-    .prezzi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 20px; border-top: 1px solid var(--border); }
-    .prezzo-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
-    .prezzo-box-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
-    .prezzo-box-val { font-size: 1.1rem; font-weight: 700; color: var(--text); }
-    .prezzo-box-val.calcolato { color: #27ae60; }
-    .prezzo-box-val.richiesto { color: #c0392b; }
-    .delta-note { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+    /* ESITO */
+    .esito-section { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .esito-chips { display: flex; gap: 10px; margin-bottom: 12px; }
+    .esito-chip { padding: 8px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; cursor: pointer; border: 2px solid transparent; opacity: 0.35; transition: all 0.15s; }
+    .esito-verde { background: #eafaf1; color: #27ae60; }
+    .esito-verde.sel { border-color: #27ae60; opacity: 1; }
+    .esito-giallo { background: #fef9e7; color: #b7860b; }
+    .esito-giallo.sel { border-color: #b7860b; opacity: 1; }
+    .esito-rosso { background: #fdedec; color: #c0392b; }
+    .esito-rosso.sel { border-color: #c0392b; opacity: 1; }
+    .esito-label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
 
     /* SCORE SIDEBAR */
-    .score-bar-wrap { display: flex; flex-direction: column; gap: 8px; }
-    .score-section-row { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
-    .score-section-label { width: 120px; color: var(--text-muted); flex-shrink: 0; }
-    .score-mini-bar { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-    .score-mini-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-    .score-num { font-weight: 700; font-size: 0.75rem; width: 28px; text-align: right; }
+    .layout-con-score { display: grid; grid-template-columns: 1fr 260px; gap: 20px; align-items: start; }
+    .score-sidebar { position: sticky; top: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .score-num { font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+    .score-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+    .score-bar-wrap { margin-bottom: 10px; }
+    .score-bar-nome { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .score-bar-track { background: var(--border); border-radius: 10px; height: 6px; overflow: hidden; }
+    .score-bar-fill { height: 100%; border-radius: 10px; background: var(--accent); transition: width 0.3s; }
+    .score-esito-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; margin-bottom: 16px; }
+    .score-verde { background: #eafaf1; color: #27ae60; }
+    .score-giallo { background: #fef9e7; color: #b7860b; }
+    .score-rosso { background: #fdedec; color: #c0392b; }
+    .btn-salva-scheda { width: 100%; background: var(--accent); color: white; border: none; border-radius: 8px; padding: 12px; font-size: 0.9rem; font-family: inherit; font-weight: 700; cursor: pointer; margin-top: 12px; }
+    .btn-salva-scheda:hover { opacity: 0.85; }
+    .salva-msg { font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-top: 8px; font-style: italic; }
+    .caricato-check { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; }
+    .caricato-check input { cursor: pointer; }
 
-    /* PUNTEGGIO TOTALE */
-    .score-totale { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 16px; text-align: center; }
-    .score-circle { width: 80px; height: 80px; border-radius: 50%; border: 5px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 10px; transition: all 0.3s; }
-    .score-circle .num { font-size: 1.5rem; font-weight: 700; line-height: 1; }
-    .score-circle .su { font-size: 0.68rem; color: var(--text-muted); }
-    .score-label { font-size: 0.9rem; font-weight: 600; }
-    .score-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
-
-    /* BTN SALVA */
-    .btn-salva-incarico { width: 100%; background: var(--accent); color: white; border: none; border-radius: 8px; padding: 12px; font-size: 0.92rem; font-family: inherit; font-weight: 700; cursor: pointer; margin-top: 12px; }
-    .btn-salva-incarico:hover { opacity: 0.88; }
-    .btn-nuova { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; padding: 9px; font-size: 0.82rem; font-family: inherit; font-weight: 600; cursor: pointer; margin-top: 6px; }
-
-    /* LAYOUT PRINCIPALE */
-    .incarico-layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
-    .incarico-main { min-width: 0; }
-    .incarico-sidebar { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 14px; }
-
-    @media (max-width: 1000px) { .incarico-layout { grid-template-columns: 1fr; } .scheda-intro-fields { grid-template-columns: 1fr 1fr; } .esito-grid { grid-template-columns: 1fr; } .prezzi-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 1100px) { .layout-con-score { grid-template-columns: 1fr; } .score-sidebar { position: static; } }
+    @media (max-width: 700px) { .scheda-intro-fields { grid-template-columns: 1fr 1fr; } .param-row { grid-template-columns: 1fr; } .form-grid, .form-grid-3 { grid-template-columns: 1fr; } .esito-section { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -135,7 +119,7 @@
       <a class="nav-item" href="valutazione.html"><span class="icon">🧮</span> Valutazione</a>
       <a class="nav-item" href="ricerca.html"><span class="icon">🔍</span> Ricerca Immobili</a>
       <a class="nav-item" href="radar.html"><span class="icon">📡</span> Radar Lunedì</a>
-      <a class="nav-item active" href="incarico.html"><span class="icon">📋</span> Scheda Incarico</a>
+      <a class="nav-item active" href="incarico.html"><span class="icon">📋</span> Scheda Qualifica</a>
     </nav>
     <nav class="nav-section c-contenuti">
       <div class="nav-label">Contenuti</div>
@@ -147,504 +131,764 @@
 
   <main class="main">
     <div class="topbar">
-      <h2>📋 Scheda Qualifica Incarico</h2>
+      <h2>Scheda Qualifica</h2>
       <div class="date" id="dataEstesa"></div>
     </div>
 
     <div class="content">
 
-      <!-- DATI SOPRALLUOGO -->
+      <!-- IDENTIFICAZIONE -->
       <div class="scheda-intro">
         <div class="scheda-intro-fields">
           <div class="field-group">
-            <div class="field-label">Data sopralluogo</div>
-            <input class="field-input" type="date" id="f_data" />
+            <div class="field-label">Nome / Descrizione</div>
+            <input class="field-input" type="text" id="h_nome" placeholder="es. Rustico Magliano in Toscana" />
           </div>
           <div class="field-group">
-            <div class="field-label">Nome proprietario</div>
-            <input class="field-input" type="text" id="f_proprietario" placeholder="Nome Cognome" />
+            <div class="field-label">Indirizzo</div>
+            <input class="field-input" type="text" id="h_indirizzo" placeholder="Via / Loc." />
           </div>
           <div class="field-group">
-            <div class="field-label">Contatto</div>
-            <input class="field-input" type="text" id="f_contatto" placeholder="+39…" />
+            <div class="field-label">Comune</div>
+            <input class="field-input" type="text" id="h_comune" placeholder="Comune" />
           </div>
           <div class="field-group">
-            <div class="field-label">Indirizzo / Zona</div>
-            <input class="field-input" type="text" id="f_indirizzo" placeholder="Comune, zona…" />
+            <div class="field-label">Zona / Quartiere</div>
+            <input class="field-input" type="text" id="h_zona" placeholder="Zona" />
           </div>
         </div>
       </div>
 
-      <div class="incarico-layout">
-        <div class="incarico-main">
+      <div class="layout-con-score">
 
-          <!-- SEZIONE 1: IMMOBILE -->
+        <!-- COLONNA PRINCIPALE -->
+        <div>
+
+          <!-- ══════════════════════════════════════════ -->
+          <!-- PARTE 1 — PREQUALIFICA -->
+          <!-- ══════════════════════════════════════════ -->
+
           <div class="sezione-card">
             <div class="sezione-header">
-              <span class="sezione-num">Sezione 1</span>
-              <span class="sezione-titolo">Scheda Immobile</span>
+              <span class="sezione-tag tag-qualifica">Parte 1</span>
+              <span class="sezione-titolo">Prequalifica — Vale la pena?</span>
             </div>
             <div class="sezione-body">
-              <table class="param-table">
-                <thead>
-                  <tr>
-                    <th style="width:140px">Parametro</th>
-                    <th>Cosa verificare</th>
-                    <th style="width:220px">Note rilevate</th>
-                    <th style="width:160px">Valutazione</th>
-                  </tr>
-                </thead>
-                <tbody id="tabellaImmobile"></tbody>
-              </table>
-            </div>
-          </div>
 
-          <!-- SEZIONE 2: PROPRIETARIO -->
-          <div class="sezione-card">
-            <div class="sezione-header">
-              <span class="sezione-num">Sezione 2</span>
-              <span class="sezione-titolo">Qualifica Proprietario</span>
-            </div>
-            <div class="sezione-body" id="listaDomande"></div>
-          </div>
-
-          <!-- SEZIONE 3: ESITO -->
-          <div class="sezione-card">
-            <div class="sezione-header">
-              <span class="sezione-num">Sezione 3</span>
-              <span class="sezione-titolo">Valutazione Finale</span>
-            </div>
-            <div class="sezione-body">
-              <div class="esito-grid">
-                <div class="esito-sinistra">
-                  <div>
-                    <div class="field-label" style="margin-bottom:10px">Esito complessivo</div>
-                    <div class="esito-chips">
-                      <div class="esito-chip verde" id="esito_verde" onclick="setEsito('verde')">
-                        <span class="esito-chip-emoji">🟢</span>
-                        <span class="esito-chip-label">Verde</span>
-                        <span class="esito-chip-desc">Procedi — firma incarico in esclusiva</span>
-                      </div>
-                      <div class="esito-chip giallo" id="esito_giallo" onclick="setEsito('giallo')">
-                        <span class="esito-chip-emoji">🟡</span>
-                        <span class="esito-chip-label">Giallo</span>
-                        <span class="esito-chip-desc">Condizionato — risolvi punti aperti prima</span>
-                      </div>
-                      <div class="esito-chip rosso" id="esito_rosso" onclick="setEsito('rosso')">
-                        <span class="esito-chip-emoji">🔴</span>
-                        <span class="esito-chip-label">Rosso</span>
-                        <span class="esito-chip-desc">Non procedere — torna tra 3–6 mesi</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="esito-azioni">
-                    <div class="esito-field">
-                      <div class="field-label">Punti aperti / Azioni da fare</div>
-                      <textarea class="esito-textarea" id="f_punti_aperti" placeholder="Es: verificare conformità catastale, allineare prezzo…"></textarea>
-                    </div>
-                    <div class="esito-field">
-                      <div class="field-label">Prossimo step concordato</div>
-                      <textarea class="esito-textarea" id="f_prossimo_step" placeholder="Es: richiamo martedì, appuntamento per firma mandato il…"></textarea>
-                    </div>
-                  </div>
+              <!-- Motivazione -->
+              <div class="param-row">
+                <div>
+                  <div class="param-nome">Motivazione</div>
+                  <div class="param-guida">Perché vende? È convinto?</div>
                 </div>
                 <div>
-                  <div class="field-label" style="margin-bottom:8px">Note agente</div>
-                  <textarea class="esito-textarea" id="f_note" placeholder="Impressioni, dettagli non codificati, sensazioni sul proprietario…" style="min-height:160px;width:100%"></textarea>
+                  <input class="param-input" type="text" id="q_motivazione" placeholder="Descrivi la motivazione…" oninput="aggiornaPunteggio()" />
+                </div>
+                <div class="val-chips">
+                  <span class="val-chip ok" data-field="q_motivazione_v" data-val="ok" onclick="selChip(this)">OK</span>
+                  <span class="val-chip daverif" data-field="q_motivazione_v" data-val="daverif" onclick="selChip(this)">?</span>
+                  <span class="val-chip rischio" data-field="q_motivazione_v" data-val="rischio" onclick="selChip(this)">✕</span>
                 </div>
               </div>
 
-              <!-- PREZZI -->
-              <div class="prezzi-grid">
-                <div class="prezzo-box">
-                  <div class="prezzo-box-label">Range €/mq zona (OMI)</div>
-                  <div class="prezzo-box-val calcolato" id="prezzoOMI">— €/mq</div>
-                  <div class="delta-note" id="prezzoOMIrange">Seleziona comune e tipologia</div>
+              <!-- Urgenza -->
+              <div class="param-row">
+                <div>
+                  <div class="param-nome">Urgenza</div>
+                  <div class="param-guida">Ha fretta? Tempistiche reali?</div>
                 </div>
-                <div class="prezzo-box">
-                  <div class="prezzo-box-label">€/mq richiesto dal proprietario</div>
-                  <input class="field-input" type="number" id="f_prezzo_richiesto" placeholder="es. 1200" oninput="aggiornaDelta()" style="width:100%;margin-top:4px" />
+                <div>
+                  <input class="param-input" type="text" id="q_urgenza" placeholder="Tempistiche previste…" oninput="aggiornaPunteggio()" />
                 </div>
-                <div class="prezzo-box">
-                  <div class="prezzo-box-label">Confronto con mercato</div>
-                  <div class="prezzo-box-val" id="deltaPrezzi" style="font-size:0.9rem">—</div>
-                  <div class="delta-note" id="deltaNote">Inserisci entrambi i valori</div>
+                <div class="val-chips">
+                  <span class="val-chip ok" data-field="q_urgenza_v" data-val="ok" onclick="selChip(this)">OK</span>
+                  <span class="val-chip daverif" data-field="q_urgenza_v" data-val="daverif" onclick="selChip(this)">?</span>
+                  <span class="val-chip rischio" data-field="q_urgenza_v" data-val="rischio" onclick="selChip(this)">✕</span>
+                </div>
+              </div>
+
+              <!-- Prezzo -->
+              <div class="param-row">
+                <div>
+                  <div class="param-nome">Prezzo</div>
+                  <div class="param-guida">Allineato al mercato?</div>
+                </div>
+                <div>
+                  <input class="param-input" type="text" id="q_prezzo" placeholder="Prezzo richiesto e note…" oninput="aggiornaPunteggio()" />
+                </div>
+                <div class="val-chips">
+                  <span class="val-chip ok" data-field="q_prezzo_v" data-val="ok" onclick="selChip(this)">OK</span>
+                  <span class="val-chip daverif" data-field="q_prezzo_v" data-val="daverif" onclick="selChip(this)">?</span>
+                  <span class="val-chip rischio" data-field="q_prezzo_v" data-val="rischio" onclick="selChip(this)">✕</span>
+                </div>
+              </div>
+
+              <!-- Esclusiva -->
+              <div class="param-row">
+                <div>
+                  <div class="param-nome">Esclusiva</div>
+                  <div class="param-guida">Disponibile all'esclusiva?</div>
+                </div>
+                <div>
+                  <input class="param-input" type="text" id="q_esclusiva" placeholder="Note sull'esclusiva…" oninput="aggiornaPunteggio()" />
+                </div>
+                <div class="val-chips">
+                  <span class="val-chip ok" data-field="q_esclusiva_v" data-val="ok" onclick="selChip(this)">OK</span>
+                  <span class="val-chip daverif" data-field="q_esclusiva_v" data-val="daverif" onclick="selChip(this)">?</span>
+                  <span class="val-chip rischio" data-field="q_esclusiva_v" data-val="rischio" onclick="selChip(this)">✕</span>
+                </div>
+              </div>
+
+              <!-- Documentazione -->
+              <div class="param-row">
+                <div>
+                  <div class="param-nome">Documentazione</div>
+                  <div class="param-guida">Ha i documenti? Situazione regolare?</div>
+                </div>
+                <div>
+                  <input class="param-input" type="text" id="q_documentazione" placeholder="Situazione documenti…" oninput="aggiornaPunteggio()" />
+                </div>
+                <div class="val-chips">
+                  <span class="val-chip ok" data-field="q_documentazione_v" data-val="ok" onclick="selChip(this)">OK</span>
+                  <span class="val-chip daverif" data-field="q_documentazione_v" data-val="daverif" onclick="selChip(this)">?</span>
+                  <span class="val-chip rischio" data-field="q_documentazione_v" data-val="rischio" onclick="selChip(this)">✕</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ESITO QUALIFICA -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-qualifica">Esito</span>
+              <span class="sezione-titolo">Valutazione finale prequalifica</span>
+            </div>
+            <div class="esito-section">
+              <div>
+                <div class="esito-label">Esito</div>
+                <div class="esito-chips">
+                  <span class="esito-chip esito-verde" data-val="verde" onclick="selEsito(this)">✓ Verde</span>
+                  <span class="esito-chip esito-giallo" data-val="giallo" onclick="selEsito(this)">⚠ Giallo</span>
+                  <span class="esito-chip esito-rosso" data-val="rosso" onclick="selEsito(this)">✕ Rosso</span>
+                </div>
+                <div class="field-group" style="margin-top:12px">
+                  <label class="field-label">Punti aperti / da chiarire</label>
+                  <input class="field-input" type="text" id="q_punti_aperti" placeholder="Cosa manca o va verificato…" />
+                </div>
+              </div>
+              <div>
+                <div class="field-group">
+                  <label class="field-label">Prossimo step</label>
+                  <input class="field-input" type="text" id="q_prossimo_step" placeholder="es. Richiamare per esclusiva…" />
+                </div>
+                <div class="field-group" style="margin-top:12px">
+                  <label class="field-label">Note qualifica</label>
+                  <textarea class="param-textarea" id="q_note_qualifica" placeholder="Impressioni generali, contesto…" rows="3"></textarea>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- ══════════════════════════════════════════ -->
+          <!-- PARTE 2 — SCHEDA TECNICA (C21) -->
+          <!-- ══════════════════════════════════════════ -->
+
+          <!-- DATI GENERALI -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-tecnica">Parte 2</span>
+              <span class="sezione-titolo">Dati Generali</span>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Tipologia</label>
+                <select class="field-select" id="t_tipologia">
+                  <option value="">—</option>
+                  <option>Appartamento</option>
+                  <option>Villa / Villetta</option>
+                  <option>Casale / Rustico</option>
+                  <option>Fondo Commerciale</option>
+                  <option>Terreno</option>
+                  <option>Altro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Anno di costruzione</label>
+                <input class="field-input" type="text" id="t_anno_costruzione" placeholder="es. 1960" />
+              </div>
+              <div class="form-group">
+                <label>Stato manutentivo</label>
+                <select class="field-select" id="t_stato_manutentivo">
+                  <option value="">—</option>
+                  <option>Ristrutturato</option>
+                  <option>Buono</option>
+                  <option>Da ristrutturare</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Classe energetica</label>
+                <input class="field-input" type="text" id="t_classe_energetica" placeholder="es. C" />
+              </div>
+              <div class="form-group">
+                <label>APE disponibile</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_ape_disponibile" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_ape_disponibile" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DIMENSIONI -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-tecnica">Dimensioni</span>
+              <span class="sezione-titolo">Dimensioni e Distribuzione</span>
+            </div>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Sup. abitabile (mq)</label>
+                <input class="field-input" type="text" id="t_mq_abitabili" placeholder="mq" />
+              </div>
+              <div class="form-group">
+                <label>Sup. totale (mq)</label>
+                <input class="field-input" type="text" id="t_mq_totali" placeholder="mq" />
+              </div>
+              <div class="form-group">
+                <label>Piano</label>
+                <input class="field-input" type="text" id="t_piano" placeholder="es. T, 1, 2…" />
+              </div>
+              <div class="form-group">
+                <label>N. locali</label>
+                <input class="field-input" type="text" id="t_n_locali" placeholder="es. 4" />
+              </div>
+              <div class="form-group">
+                <label>N. bagni</label>
+                <input class="field-input" type="text" id="t_n_bagni" placeholder="es. 2" />
+              </div>
+              <div class="form-group">
+                <label>Ascensore</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_ascensore" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_ascensore" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Balconi / Terrazzi</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+                  <div class="bool-chips">
+                    <span class="bool-chip" data-field="t_balconi" data-val="si" onclick="selBool(this)">Sì</span>
+                    <span class="bool-chip" data-field="t_balconi" data-val="no" onclick="selBool(this)">No</span>
+                  </div>
+                  <input class="field-input" type="text" id="t_mq_balconi" placeholder="mq totali" style="max-width:100px" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Giardino</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+                  <select class="field-select" id="t_giardino" style="max-width:150px">
+                    <option value="">—</option>
+                    <option>Privato</option>
+                    <option>Condominiale</option>
+                    <option>No</option>
+                  </select>
+                  <input class="field-input" type="text" id="t_mq_giardino" placeholder="mq" style="max-width:80px" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Garage</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+                  <div class="bool-chips">
+                    <span class="bool-chip" data-field="t_garage" data-val="si" onclick="selBool(this)">Sì</span>
+                    <span class="bool-chip" data-field="t_garage" data-val="no" onclick="selBool(this)">No</span>
+                  </div>
+                  <input class="field-input" type="text" id="t_mq_garage" placeholder="mq" style="max-width:80px" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Posti auto</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+                  <div class="bool-chips">
+                    <span class="bool-chip" data-field="t_posti_auto" data-val="si" onclick="selBool(this)">Sì</span>
+                    <span class="bool-chip" data-field="t_posti_auto" data-val="no" onclick="selBool(this)">No</span>
+                  </div>
+                  <input class="field-input" type="text" id="t_n_posti_auto" placeholder="n." style="max-width:60px" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARATTERISTICHE INTERNE -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-tecnica">Interne</span>
+              <span class="sezione-titolo">Caratteristiche Interne</span>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Riscaldamento</label>
+                <select class="field-select" id="t_riscaldamento">
+                  <option value="">—</option>
+                  <option>Autonomo</option>
+                  <option>Centralizzato</option>
+                  <option>Altro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Tipo impianto</label>
+                <select class="field-select" id="t_tipo_impianto">
+                  <option value="">—</option>
+                  <option>Gas</option>
+                  <option>Pompa di calore</option>
+                  <option>Stufa / Pellet</option>
+                  <option>Altro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Aria condizionata</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_aria_condizionata" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_aria_condizionata" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Infissi</label>
+                <select class="field-select" id="t_infissi">
+                  <option value="">—</option>
+                  <option>PVC</option>
+                  <option>Alluminio</option>
+                  <option>Legno</option>
+                  <option>Doppio vetro</option>
+                  <option>Altro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Pavimentazione</label>
+                <select class="field-select" id="t_pavimentazione">
+                  <option value="">—</option>
+                  <option>Gres</option>
+                  <option>Parquet</option>
+                  <option>Marmo</option>
+                  <option>Cotto</option>
+                  <option>Altro</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- IMPIANTI E DOTAZIONI -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-tecnica">Impianti</span>
+              <span class="sezione-titolo">Impianti e Dotazioni</span>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Impianti certificati</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_impianti_certificati" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_impianti_certificati" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Allarme</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_allarme" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_allarme" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Fibra ottica / Internet veloce</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_fibra" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_fibra" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Domotica</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_domotica" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_domotica" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Videocitofono</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_videocitofono" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_videocitofono" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- URBANISTICA E CATASTO -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-tecnica">Documenti</span>
+              <span class="sezione-titolo">Situazione Urbanistica e Catastale</span>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Proprietario</label>
+                <input class="field-input" type="text" id="t_proprietario" placeholder="Nome proprietario" />
+              </div>
+              <div class="form-group">
+                <label>Titolo di provenienza</label>
+                <select class="field-select" id="t_titolo_provenienza">
+                  <option value="">—</option>
+                  <option>Atto di compravendita</option>
+                  <option>Donazione</option>
+                  <option>Successione</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Conformità urbanistica</label>
+                <select class="field-select" id="t_conformita_urbanistica">
+                  <option value="">—</option>
+                  <option>Regolare</option>
+                  <option>Da verificare</option>
+                  <option>Irregolarità sanabili</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Conformità catastale</label>
+                <select class="field-select" id="t_conformita_catastale">
+                  <option value="">—</option>
+                  <option>Regolare</option>
+                  <option>Da verificare</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label>Vincoli sull'immobile</label>
+                <input class="field-input" type="text" id="t_vincoli" placeholder="Ipoteche, usufrutto, altro…" />
+              </div>
+            </div>
+          </div>
+
+          <!-- COSTI E VENDITA -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-tecnica">Vendita</span>
+              <span class="sezione-titolo">Costi e Condizioni di Vendita</span>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Prezzo richiesto (€)</label>
+                <input class="field-input" type="text" id="t_prezzo_richiesto" placeholder="es. 350.000" />
+              </div>
+              <div class="form-group">
+                <label>Trattabile</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_trattabile" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_trattabile" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Spese condominiali (€)</label>
+                <input class="field-input" type="text" id="t_spese_condominiali" placeholder="Mensili / annuali" />
+              </div>
+              <div class="form-group">
+                <label>Disponibilità immobile</label>
+                <input class="field-input" type="text" id="t_disponibilita" placeholder="Libero / Occupato fino al…" />
+              </div>
+              <div class="form-group">
+                <label>Mutuo in corso</label>
+                <div class="bool-chips" style="margin-top:4px">
+                  <span class="bool-chip" data-field="t_mutuo" data-val="si" onclick="selBool(this)">Sì</span>
+                  <span class="bool-chip" data-field="t_mutuo" data-val="no" onclick="selBool(this)">No</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Importo residuo mutuo</label>
+                <input class="field-input" type="text" id="t_mutuo_residuo" placeholder="€" />
+              </div>
+              <div class="form-group full">
+                <label>Tempistiche di vendita previste</label>
+                <input class="field-input" type="text" id="t_tempistiche" placeholder="es. entro 6 mesi, non urgente…" />
+              </div>
+            </div>
+          </div>
+
+          <!-- ALTRE INFO -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-tecnica">Note</span>
+              <span class="sezione-titolo">Altre Informazioni Utili</span>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Punti di forza</label>
+                <textarea class="param-textarea" id="t_punti_forza" placeholder="Cosa vende questo immobile…" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Lavori eseguiti</label>
+                <textarea class="param-textarea" id="t_lavori_eseguiti" placeholder="Ristrutturazioni, miglioramenti…" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Lavori necessari</label>
+                <textarea class="param-textarea" id="t_lavori_necessari" placeholder="Cosa andrebbe fatto…" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Note aggiuntive</label>
+                <textarea class="param-textarea" id="t_note" placeholder="Tutto il resto…" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- REFERENTE -->
+          <div class="sezione-card">
+            <div class="sezione-header">
+              <span class="sezione-tag tag-tecnica">Referente</span>
+              <span class="sezione-titolo">Referente per la Vendita</span>
+            </div>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label>Nome e Cognome</label>
+                <input class="field-input" type="text" id="t_referente_nome" placeholder="Nome" />
+              </div>
+              <div class="form-group">
+                <label>Telefono</label>
+                <input class="field-input" type="tel" id="t_referente_tel" placeholder="+39 333…" />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input class="field-input" type="email" id="t_referente_email" placeholder="email@…" />
+              </div>
+            </div>
+          </div>
+
+        </div><!-- fine colonna principale -->
+
+        <!-- SCORE SIDEBAR -->
+        <div class="score-sidebar">
+          <div class="score-num" id="scoreNum">—</div>
+          <div class="score-label">Score prequalifica</div>
+          <div id="esitoBadge"></div>
+
+          <div style="margin: 16px 0; border-top: 1px solid var(--border); padding-top: 16px;">
+            <div class="score-bar-wrap">
+              <div class="score-bar-nome"><span>Motivazione</span><span id="sb_motivazione">—</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill" id="fill_motivazione" style="width:0%"></div></div>
+            </div>
+            <div class="score-bar-wrap">
+              <div class="score-bar-nome"><span>Urgenza</span><span id="sb_urgenza">—</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill" id="fill_urgenza" style="width:0%"></div></div>
+            </div>
+            <div class="score-bar-wrap">
+              <div class="score-bar-nome"><span>Prezzo</span><span id="sb_prezzo">—</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill" id="fill_prezzo" style="width:0%"></div></div>
+            </div>
+            <div class="score-bar-wrap">
+              <div class="score-bar-nome"><span>Esclusiva</span><span id="sb_esclusiva">—</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill" id="fill_esclusiva" style="width:0%"></div></div>
+            </div>
+            <div class="score-bar-wrap">
+              <div class="score-bar-nome"><span>Documentazione</span><span id="sb_documentazione">—</span></div>
+              <div class="score-bar-track"><div class="score-bar-fill" id="fill_documentazione" style="width:0%"></div></div>
+            </div>
+          </div>
+
+          <button class="btn-salva-scheda" onclick="salva()">💾 Salva scheda</button>
+          <div class="salva-msg" id="salvaMsg"></div>
+
+          <label class="caricato-check">
+            <input type="checkbox" id="caricato_admin" onchange="salva()" />
+            Caricato in amministrazione
+          </label>
         </div>
 
-        <!-- SIDEBAR SCORE -->
-        <div class="incarico-sidebar">
+      </div><!-- fine layout-con-score -->
 
-          <div class="score-totale">
-            <div class="score-circle" id="scoreCircle">
-              <span class="num" id="scoreNum">—</span>
-              <span class="su">/100</span>
-            </div>
-            <div class="score-label" id="scoreLabel">Compila la scheda</div>
-            <div class="score-sub" id="scoreSub">per vedere il punteggio</div>
-          </div>
-
-          <div class="sezione-card" style="padding:16px">
-            <div class="field-label" style="margin-bottom:10px">Dettaglio punteggio</div>
-            <div class="score-bar-wrap" id="scoreDettaglio"></div>
-          </div>
-
-          <div class="sezione-card" style="padding:16px">
-            <div class="field-label" style="margin-bottom:10px">Riferimento €/mq OMI</div>
-            <div class="field-group" style="margin-bottom:8px">
-              <div class="field-label">Comune</div>
-              <select class="field-input" id="omi_comune" onchange="aggiornaOMI()">
-                <option value="">— seleziona —</option>
-                <option value="manciano">Manciano</option>
-                <option value="scansano">Scansano</option>
-                <option value="magliano">Magliano in Toscana</option>
-                <option value="campagnatico">Campagnatico</option>
-                <option value="orbetello">Orbetello</option>
-                <option value="capalbio">Capalbio</option>
-                <option value="grosseto">Grosseto</option>
-                <option value="follonica">Follonica</option>
-                <option value="castiglione">Castiglione della Pescaia</option>
-                <option value="pitigliano">Pitigliano</option>
-                <option value="sorano">Sorano</option>
-                <option value="massa_marittima">Massa Marittima</option>
-                <option value="roccastrada">Roccastrada</option>
-                <option value="cinigiano">Cinigiano</option>
-                <option value="arcidosso">Arcidosso</option>
-                <option value="civitella_paganico">Civitella Paganico</option>
-                <option value="monte_argentario">Monte Argentario</option>
-                <option value="gavorrano">Gavorrano</option>
-                <option value="altro">Altro comune</option>
-              </select>
-            </div>
-            <div class="field-group" style="margin-bottom:8px">
-              <div class="field-label">Tipologia</div>
-              <select class="field-input" id="omi_tipo" onchange="aggiornaOMI()">
-                <option value="ville_villini">Rustico / Villa</option>
-                <option value="abitazioni_civili">Casa civile</option>
-                <option value="abitazioni_economiche">Economica</option>
-              </select>
-            </div>
-            <div class="field-group">
-              <div class="field-label">Stato conservativo</div>
-              <select class="field-input" id="omi_stato" onchange="aggiornaOMI()">
-                <option value="ottimo">Ottimo / Ristrutturato</option>
-                <option value="buono">Buono</option>
-                <option value="discreto">Discreto</option>
-                <option value="daristrutturare">Da ristrutturare</option>
-              </select>
-            </div>
-          </div>
-
-          <button class="btn-salva-incarico" onclick="salva()">💾 Salva scheda</button>
-          <button class="btn-nuova" onclick="nuovaScheda()">+ Nuova scheda</button>
-
-        </div>
-      </div>
     </div>
   </main>
 
   <script>
-    /* ---- DATE ---- */
     const d = new Date();
     const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
     const mesi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
     document.getElementById('dataOggi').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()];
     document.getElementById('dataEstesa').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()] + ' ' + d.getFullYear();
-    document.getElementById('f_data').value = d.toISOString().split('T')[0];
 
-    /* ---- DATI ---- */
-    const PARAMETRI = [
-      { id:'tipologia', nome:'Tipologia', guida:'Casale · Rustico · Villa con terreno · Casa in borgo · Appartamento', peso:15 },
-      { id:'metratura', nome:'Metratura', guida:'Min. 120 mq per mercato straniero · indicare mq totali + abitativi', peso:15 },
-      { id:'stato', nome:'Stato conservativo', guida:"Pronto uso / Da ristrutturare / Parziale · l'81,6% degli acquirenti vuole pronto uso", peso:15 },
-      { id:'posizione', nome:'Posizione', guida:'Panoramica · autentica · max 40 min dal mare · borghi o campagna', peso:10 },
-      { id:'spazi_esterni', nome:'Spazi esterni', guida:'Giardino (richiesto dal 68%) · Terreno · Piscina · Corte', peso:15 },
-      { id:'documentazione', nome:'Documentazione', guida:'Conformità urbanistica e catastale · Eredità chiusa · Nessun abuso pendente', peso:15 },
-      { id:'connettivita', nome:'Connettività', guida:'Fibra o 4G stabile · verificare copertura · rilevante per smart worker', peso:5 },
-      { id:'energetica', nome:'Classe energetica', guida:'Classe energetica nota · richiesta crescente da acquirenti tedeschi e italiani 2026', peso:10 },
-    ];
+    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
-    const DOMANDE = [
-      { id:'motivazione', num:1, testo:'Motivazione alla vendita', domanda:'"Cosa la porta a mettere in vendita proprio adesso?"', ok:'Ragione concreta — trasferimento, eredità, cambio progetto di vita, liquidità', rischio:'"Non ho fretta, vedo se arriva qualcosa"', peso:20 },
-      { id:'urgenza', num:2, testo:'Urgenza temporale', domanda:'"Ha già un\'idea di quando vorrebbe concludere la vendita?"', ok:'Entro l\'anno / il prima possibile / ha già un progetto successivo', rischio:'"Non lo so, dipende" — nessun vincolo temporale', peso:20 },
-      { id:'prezzo', num:3, testo:'Prezzo atteso', domanda:'"Ha già un valore in mente? Come è arrivato a quella cifra?"', ok:'Aperto alla valutazione professionale', rischio:'"Me l\'ha detto un amico / ho letto online / l\'ho pagato X anni fa"', peso:25 },
-      { id:'esclusiva', num:4, testo:'Disponibilità esclusiva', domanda:'"Ha già altri agenti coinvolti, o sta valutando?"', ok:'Vuole lavorare con una persona sola, capisce il valore dell\'esclusiva', rischio:'"Voglio tenermi le mani libere"', peso:20 },
-      { id:'doc_prop', num:5, testo:'Documentazione proprietario', domanda:'"Ha già verificato conformità catastale e urbanistica?"', ok:'Sì, o disponibile a verificare subito', rischio:'"Credo di sì" / "non ho mai controllato" — approfondire prima di firmare', peso:15 },
-    ];
+    // Leggi ID da URL se presente (per edit futuro)
+    const params = new URLSearchParams(location.search);
+    let schedaId = params.get('id') ? parseInt(params.get('id')) : null;
 
-    const OMI = {
-      manciano:{ prezzi:{ ville_villini:[900,1400], abitazioni_civili:[700,1100], abitazioni_economiche:[500,850] }},
-      scansano:{ prezzi:{ ville_villini:[950,1500], abitazioni_civili:[750,1100], abitazioni_economiche:[550,900] }},
-      magliano:{ prezzi:{ ville_villini:[850,1350], abitazioni_civili:[650,1000], abitazioni_economiche:[480,800] }},
-      campagnatico:{ prezzi:{ ville_villini:[750,1200], abitazioni_civili:[580,900], abitazioni_economiche:[420,700] }},
-      orbetello:{ prezzi:{ ville_villini:[1800,2800], abitazioni_civili:[1400,2200], abitazioni_economiche:[1000,1600] }},
-      capalbio:{ prezzi:{ ville_villini:[2200,3500], abitazioni_civili:[1600,2600], abitazioni_economiche:[1200,2000] }},
-      grosseto:{ prezzi:{ ville_villini:[1100,1700], abitazioni_civili:[900,1400], abitazioni_economiche:[650,1000] }},
-      follonica:{ prezzi:{ ville_villini:[1400,2200], abitazioni_civili:[1100,1700], abitazioni_economiche:[800,1300] }},
-      castiglione:{ prezzi:{ ville_villini:[2000,3200], abitazioni_civili:[1500,2400], abitazioni_economiche:[1100,1800] }},
-      pitigliano:{ prezzi:{ ville_villini:[700,1100], abitazioni_civili:[550,850], abitazioni_economiche:[400,650] }},
-      sorano:{ prezzi:{ ville_villini:[650,1050], abitazioni_civili:[500,800], abitazioni_economiche:[380,620] }},
-      massa_marittima:{ prezzi:{ ville_villini:[900,1450], abitazioni_civili:[700,1100], abitazioni_economiche:[500,850] }},
-      roccastrada:{ prezzi:{ ville_villini:[800,1250], abitazioni_civili:[620,970], abitazioni_economiche:[460,750] }},
-      cinigiano:{ prezzi:{ ville_villini:[700,1100], abitazioni_civili:[550,860], abitazioni_economiche:[400,650] }},
-      arcidosso:{ prezzi:{ ville_villini:[750,1200], abitazioni_civili:[580,900], abitazioni_economiche:[430,700] }},
-      civitella_paganico:{ prezzi:{ ville_villini:[800,1300], abitazioni_civili:[620,970], abitazioni_economiche:[460,760] }},
-      monte_argentario:{ prezzi:{ ville_villini:[2000,3200], abitazioni_civili:[1500,2500], abitazioni_economiche:[1100,1800] }},
-      gavorrano:{ prezzi:{ ville_villini:[850,1350], abitazioni_civili:[660,1030], abitazioni_economiche:[480,790] }},
-    };
+    // Stato chip
+    const chipState = {};
+    let esitoSel = null;
 
-    const COEFF_STATO = { ottimo:1.0, buono:0.87, discreto:0.74, daristrutturare:0.58 };
-    const COEFF_VAL = { ok:1, daverif:0.5, rischio:0 };
-    const COEFF_DOM = { ok:1, rischio:0 };
-
-    let valutazioniImmobile = {};
-    let valutazioniDomande = {};
-    let esitoCorrente = null;
-
-    /* ---- RENDER SEZIONE 1 ---- */
-    function renderTabella() {
-      const tbody = document.getElementById('tabellaImmobile');
-      tbody.innerHTML = PARAMETRI.map(p => `
-        <tr>
-          <td><div class="param-nome">${p.nome}</div></td>
-          <td><div class="param-guida">${p.guida}</div></td>
-          <td><textarea class="param-nota" id="nota_${p.id}" placeholder="Note…" oninput="salvaAuto()" rows="2"></textarea></td>
-          <td>
-            <div class="val-chips">
-              <span class="val-chip ok" id="chip_${p.id}_ok" onclick="setVal('${p.id}','ok')">✅ OK</span>
-              <span class="val-chip daverif" id="chip_${p.id}_daverif" onclick="setVal('${p.id}','daverif')">⚠️ Da verif.</span>
-              <span class="val-chip rischio" id="chip_${p.id}_rischio" onclick="setVal('${p.id}','rischio')">🚫 Rischio</span>
-            </div>
-          </td>
-        </tr>
-      `).join('');
+    function selChip(el) {
+      const field = el.dataset.field;
+      const val = el.dataset.val;
+      el.closest('.val-chips').querySelectorAll('.val-chip').forEach(c => c.classList.remove('sel'));
+      el.classList.add('sel');
+      chipState[field] = val;
+      aggiornaPunteggio();
     }
 
-    /* ---- RENDER SEZIONE 2 ---- */
-    function renderDomande() {
-      document.getElementById('listaDomande').innerHTML = DOMANDE.map(d => `
-        <div class="domanda-item">
-          <div class="domanda-top">
-            <div class="domanda-num">${d.num}</div>
-            <div class="domanda-testo">${d.testo} <span style="font-weight:400;color:var(--text-muted)">${d.domanda}</span></div>
-          </div>
-          <div class="domanda-guida">
-            <span class="ok-text">✔ OK: ${d.ok}</span><br>
-            <span class="risk-text">✘ Rischio: ${d.rischio}</span>
-          </div>
-          <div class="domanda-row">
-            <textarea class="domanda-nota" id="dnota_${d.id}" placeholder="Risposta / note…" oninput="salvaAuto()" rows="2"></textarea>
-            <div class="val-chips" style="flex-direction:column;gap:4px">
-              <span class="val-chip ok" id="dchip_${d.id}_ok" onclick="setDom('${d.id}','ok')">✅ OK</span>
-              <span class="val-chip rischio" id="dchip_${d.id}_rischio" onclick="setDom('${d.id}','rischio')">🚫 Rischio</span>
-            </div>
-          </div>
-        </div>
-      `).join('');
+    function selBool(el) {
+      const field = el.dataset.field;
+      const val = el.dataset.val;
+      el.closest('.bool-chips').querySelectorAll('.bool-chip').forEach(c => {
+        c.classList.remove('sel-si','sel-no');
+      });
+      el.classList.add(val === 'si' ? 'sel-si' : 'sel-no');
+      chipState[field] = val;
     }
 
-    /* ---- INTERAZIONI ---- */
-    function setVal(id, val) {
-      valutazioniImmobile[id] = val;
-      ['ok','daverif','rischio'].forEach(v => document.getElementById(`chip_${id}_${v}`)?.classList.remove('sel'));
-      document.getElementById(`chip_${id}_${val}`)?.classList.add('sel');
-      aggiornaScore();
+    function selEsito(el) {
+      document.querySelectorAll('.esito-chip').forEach(c => c.classList.remove('sel'));
+      el.classList.add('sel');
+      esitoSel = el.dataset.val;
+      aggiornaPunteggio();
     }
 
-    function setDom(id, val) {
-      valutazioniDomande[id] = val;
-      ['ok','rischio'].forEach(v => document.getElementById(`dchip_${id}_${v}`)?.classList.remove('sel'));
-      document.getElementById(`dchip_${id}_${val}`)?.classList.add('sel');
-      aggiornaScore();
-    }
+    const pesi = { q_motivazione_v: 20, q_urgenza_v: 20, q_prezzo_v: 25, q_esclusiva_v: 20, q_documentazione_v: 15 };
+    const valori = { ok: 1, daverif: 0.5, rischio: 0 };
 
-    function setEsito(val) {
-      esitoCorrente = val;
-      ['verde','giallo','rosso'].forEach(v => document.getElementById(`esito_${v}`)?.classList.remove('sel'));
-      document.getElementById(`esito_${val}`)?.classList.add('sel');
-    }
-
-    /* ---- SCORE ---- */
-    function aggiornaScore() {
-      // Punteggio immobile (50 punti totali pesati)
-      let scoreImm = 0, pesoImm = 0;
-      PARAMETRI.forEach(p => {
-        const v = valutazioniImmobile[p.id];
-        if (v) { scoreImm += COEFF_VAL[v] * p.peso; }
-        pesoImm += p.peso;
+    function aggiornaPunteggio() {
+      let score = 0;
+      const campi = ['motivazione','urgenza','prezzo','esclusiva','documentazione'];
+      campi.forEach(c => {
+        const v = chipState['q_' + c + '_v'];
+        const peso = pesi['q_' + c + '_v'];
+        const pts = v ? Math.round(valori[v] * peso) : 0;
+        score += pts;
+        document.getElementById('sb_' + c).textContent = v ? (pts + '/' + peso) : '—';
+        document.getElementById('fill_' + c).style.width = (pts / peso * 100) + '%';
       });
 
-      // Punteggio proprietario (50 punti totali pesati)
-      let scoreProp = 0, pesoProp = 0;
-      DOMANDE.forEach(d => {
-        const v = valutazioniDomande[d.id];
-        if (v) { scoreProp += COEFF_DOM[v] * d.peso; }
-        pesoProp += d.peso;
-      });
+      document.getElementById('scoreNum').textContent = score;
 
-      const compilatiImm = Object.keys(valutazioniImmobile).length;
-      const compilatiProp = Object.keys(valutazioniDomande).length;
-      const totCompilati = compilatiImm + compilatiProp;
-      const totCampi = PARAMETRI.length + DOMANDE.length;
-
-      if (totCompilati === 0) {
-        document.getElementById('scoreNum').textContent = '—';
-        document.getElementById('scoreLabel').textContent = 'Compila la scheda';
-        document.getElementById('scoreSub').textContent = 'per vedere il punteggio';
-        document.getElementById('scoreCircle').style.borderColor = 'var(--border)';
-        document.getElementById('scoreDettaglio').innerHTML = '';
-        return;
+      // Auto-esito
+      let autoEsito = score >= 70 ? 'verde' : score >= 40 ? 'giallo' : 'rosso';
+      if (!esitoSel) {
+        document.querySelectorAll('.esito-chip').forEach(c => {
+          c.classList.remove('sel');
+          if (c.dataset.val === autoEsito) c.classList.add('sel');
+        });
+        esitoSel = autoEsito;
       }
 
-      const scoreImmNorm = pesoImm > 0 ? (scoreImm / pesoImm) * 50 : 0;
-      const scorePropNorm = pesoProp > 0 ? (scoreProp / pesoProp) * 50 : 0;
-      const totale = Math.round(scoreImmNorm + scorePropNorm);
-
-      const col = totale >= 72 ? '#27ae60' : totale >= 45 ? '#b7860b' : '#c0392b';
-      const label = totale >= 72 ? '🟢 Procedi' : totale >= 45 ? '🟡 Valuta con cautela' : '🔴 Non procedere';
-      const sub = totale >= 72 ? 'Buon candidato per l\'incarico' : totale >= 45 ? 'Chiarisci i punti aperti prima' : 'Troppi elementi critici';
-
-      document.getElementById('scoreNum').textContent = totale;
-      document.getElementById('scoreCircle').style.borderColor = col;
-      document.getElementById('scoreCircle').querySelector('.num').style.color = col;
-      document.getElementById('scoreLabel').textContent = label;
-      document.getElementById('scoreSub').textContent = sub;
-
-      // Dettaglio barre
-      const righe = [
-        { label: 'Immobile', val: Math.round(scoreImmNorm), max: 50, col },
-        { label: 'Proprietario', val: Math.round(scorePropNorm), max: 50, col },
-      ];
-      document.getElementById('scoreDettaglio').innerHTML = righe.map(r => `
-        <div class="score-section-row">
-          <span class="score-section-label">${r.label}</span>
-          <div class="score-mini-bar"><div class="score-mini-fill" style="width:${(r.val/r.max)*100}%;background:${r.col}"></div></div>
-          <span class="score-num" style="color:${r.col}">${r.val}</span>
-        </div>
-      `).join('');
-
-      // Auto-suggerisci esito
-      if (!esitoCorrente && totCompilati === totCampi) {
-        const esito = totale >= 72 ? 'verde' : totale >= 45 ? 'giallo' : 'rosso';
-        setEsito(esito);
-      }
+      const badge = document.getElementById('esitoBadge');
+      const esitoAttivo = esitoSel || autoEsito;
+      const classi = { verde: 'score-verde', giallo: 'score-giallo', rosso: 'score-rosso' };
+      const testi = { verde: '✓ Verde — Procedi', giallo: '⚠ Giallo — Valuta', rosso: '✕ Rosso — Evita' };
+      badge.innerHTML = `<span class="score-esito-badge ${classi[esitoAttivo]}">${testi[esitoAttivo]}</span>`;
     }
 
-    /* ---- OMI ---- */
-    function aggiornaOMI() {
-      const comune = document.getElementById('omi_comune').value;
-      const tipo = document.getElementById('omi_tipo').value;
-      const stato = document.getElementById('omi_stato').value;
-      const coeff = COEFF_STATO[stato] || 1;
-
-      if (!comune || !OMI[comune]) {
-        document.getElementById('prezzoOMI').textContent = '— €/mq';
-        document.getElementById('prezzoOMIrange').textContent = 'Seleziona comune e tipologia';
-        return;
-      }
-
-      const range = OMI[comune].prezzi[tipo] || [800, 1200];
-      const minMq = Math.round(range[0] * coeff);
-      const maxMq = Math.round(range[1] * coeff);
-
-      document.getElementById('prezzoOMI').textContent = `${minMq.toLocaleString('it-IT')} – ${maxMq.toLocaleString('it-IT')} €/mq`;
-      document.getElementById('prezzoOMIrange').textContent = stato !== 'ottimo' ? `Corretto per stato: ${stato}` : 'Fonte: OMI 2° sem 2025';
-
-      window._omiCalc = { minMq, maxMq, midMq: Math.round((minMq + maxMq) / 2) };
-      aggiornaDelta();
+    function leggiCampo(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
     }
 
-    function aggiornaDelta() {
-      const richiesto = parseFloat(document.getElementById('f_prezzo_richiesto').value);
-      if (!window._omiCalc || !richiesto) {
-        document.getElementById('deltaPrezzi').textContent = '—';
-        document.getElementById('deltaNote').textContent = 'Inserisci il €/mq richiesto per confrontare';
-        return;
-      }
-      const { minMq, maxMq, midMq } = window._omiCalc;
-      const delta = richiesto - midMq;
-      const perc = Math.round((delta / midMq) * 100);
-      const segno = delta > 0 ? '+' : '';
-      const col = richiesto <= maxMq ? '#27ae60' : '#c0392b';
-      const dentro = richiesto >= minMq && richiesto <= maxMq;
-      document.getElementById('deltaPrezzi').innerHTML = `<span style="color:${col}">${segno}${perc}% vs media</span>`;
-      document.getElementById('deltaNote').textContent = dentro
-        ? `In range OMI (${minMq.toLocaleString('it-IT')}–${maxMq.toLocaleString('it-IT')} €/mq) ✓`
-        : richiesto > maxMq
-          ? `Sopra il range OMI — da trattare`
-          : `Sotto il range OMI — ottimo segnale`;
-    }
+    async function salva() {
+      const nome = leggiCampo('h_nome');
+      if (!nome) { alert('Inserisci almeno il nome / descrizione dell\'immobile.'); return; }
 
-    /* ---- SALVA / CARICA ---- */
-    function raccogliDati() {
-      return {
-        id: window._schedaId || Date.now(),
-        data: document.getElementById('f_data').value,
-        proprietario: document.getElementById('f_proprietario').value,
-        contatto: document.getElementById('f_contatto').value,
-        indirizzo: document.getElementById('f_indirizzo').value,
-        valutazioniImmobile: { ...valutazioniImmobile },
-        noteImmobile: Object.fromEntries(PARAMETRI.map(p => [p.id, document.getElementById('nota_'+p.id)?.value || ''])),
-        valutazioniDomande: { ...valutazioniDomande },
-        noteDomande: Object.fromEntries(DOMANDE.map(d => [d.id, document.getElementById('dnota_'+d.id)?.value || ''])),
-        esito: esitoCorrente,
-        punti_aperti: document.getElementById('f_punti_aperti').value,
-        prossimo_step: document.getElementById('f_prossimo_step').value,
-        note: document.getElementById('f_note').value,
-        prezzo_richiesto: document.getElementById('f_prezzo_richiesto').value,
-        omi_comune: document.getElementById('omi_comune').value,
-        omi_tipo: document.getElementById('omi_tipo').value,
-        omi_mq: document.getElementById('omi_mq').value,
-        omi_stato: document.getElementById('omi_stato').value,
-        omi_calc: window._omiCalc || null,
-        aggiornato: new Date().toLocaleDateString('it-IT')
+      const record = {
+        nome,
+        indirizzo: leggiCampo('h_indirizzo'),
+        comune: leggiCampo('h_comune'),
+        zona: leggiCampo('h_zona'),
+        // qualifica
+        motivazione: leggiCampo('q_motivazione'),
+        urgenza: leggiCampo('q_urgenza'),
+        prezzo_richiesto: leggiCampo('q_prezzo'),
+        esclusiva: leggiCampo('q_esclusiva'),
+        documentazione: leggiCampo('q_documentazione'),
+        score: parseInt(document.getElementById('scoreNum').textContent) || 0,
+        esito: esitoSel,
+        prossimo_step: leggiCampo('q_prossimo_step'),
+        note_qualifica: leggiCampo('q_note_qualifica'),
+        // dati generali
+        tipologia: leggiCampo('t_tipologia'),
+        anno_costruzione: leggiCampo('t_anno_costruzione'),
+        stato_manutentivo: leggiCampo('t_stato_manutentivo'),
+        classe_energetica: leggiCampo('t_classe_energetica'),
+        ape_disponibile: chipState['t_ape_disponibile'] === 'si',
+        // dimensioni
+        mq_abitabili: leggiCampo('t_mq_abitabili'),
+        mq_totali: leggiCampo('t_mq_totali'),
+        piano: leggiCampo('t_piano'),
+        ascensore: chipState['t_ascensore'] === 'si',
+        n_locali: leggiCampo('t_n_locali'),
+        n_bagni: leggiCampo('t_n_bagni'),
+        balconi: chipState['t_balconi'] === 'si',
+        mq_balconi: leggiCampo('t_mq_balconi'),
+        giardino: leggiCampo('t_giardino'),
+        mq_giardino: leggiCampo('t_mq_giardino'),
+        garage: chipState['t_garage'] === 'si',
+        mq_garage: leggiCampo('t_mq_garage'),
+        posti_auto: chipState['t_posti_auto'] === 'si',
+        n_posti_auto: leggiCampo('t_n_posti_auto'),
+        // interne
+        riscaldamento: leggiCampo('t_riscaldamento'),
+        tipo_impianto: leggiCampo('t_tipo_impianto'),
+        aria_condizionata: chipState['t_aria_condizionata'] === 'si',
+        infissi: leggiCampo('t_infissi'),
+        pavimentazione: leggiCampo('t_pavimentazione'),
+        // impianti
+        impianti_certificati: chipState['t_impianti_certificati'] === 'si',
+        allarme: chipState['t_allarme'] === 'si',
+        fibra: chipState['t_fibra'] === 'si',
+        domotica: chipState['t_domotica'] === 'si',
+        videocitofono: chipState['t_videocitofono'] === 'si',
+        // urbanistica
+        proprietario: leggiCampo('t_proprietario'),
+        titolo_provenienza: leggiCampo('t_titolo_provenienza'),
+        conformita_urbanistica: leggiCampo('t_conformita_urbanistica'),
+        conformita_catastale: leggiCampo('t_conformita_catastale'),
+        vincoli: leggiCampo('t_vincoli'),
+        // vendita
+        trattabile: chipState['t_trattabile'] === 'si',
+        spese_condominiali: leggiCampo('t_spese_condominiali'),
+        disponibilita: leggiCampo('t_disponibilita'),
+        mutuo: chipState['t_mutuo'] === 'si',
+        mutuo_residuo: leggiCampo('t_mutuo_residuo'),
+        tempistiche: leggiCampo('t_tempistiche'),
+        // note
+        punti_forza: leggiCampo('t_punti_forza'),
+        lavori_eseguiti: leggiCampo('t_lavori_eseguiti'),
+        lavori_necessari: leggiCampo('t_lavori_necessari'),
+        note: leggiCampo('t_note'),
+        // referente
+        referente_nome: leggiCampo('t_referente_nome'),
+        referente_tel: leggiCampo('t_referente_tel'),
+        referente_email: leggiCampo('t_referente_email'),
+        caricato_amministrazione: document.getElementById('caricato_admin').checked
       };
+
+      let res;
+      if (schedaId) {
+        res = await fetch(`${SB_URL}/rest/v1/scheda_qualifica?id=eq.${schedaId}`, { method: 'PATCH', headers: SB_H, body: JSON.stringify(record) });
+      } else {
+        res = await fetch(`${SB_URL}/rest/v1/scheda_qualifica`, { method: 'POST', headers: SB_H, body: JSON.stringify(record) });
+        if (res.ok) {
+          const data = await res.json();
+          if (data[0]) { schedaId = data[0].id; history.replaceState(null,'',`?id=${schedaId}`); }
+        }
+      }
+
+      const msg = document.getElementById('salvaMsg');
+      if (res.ok) {
+        msg.textContent = 'Salvato ' + new Date().toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
+      } else {
+        msg.textContent = 'Errore nel salvataggio';
+      }
     }
 
-    function salvaAuto() {
-      const lista = JSON.parse(localStorage.getItem('incarichi') || '[]');
-      const dati = raccogliDati();
-      const i = lista.findIndex(x => x.id === dati.id);
-      if (i >= 0) lista[i] = dati; else lista.unshift(dati);
-      localStorage.setItem('incarichi', JSON.stringify(lista));
-      window._schedaId = dati.id;
-    }
+    // Autosave ogni 60 secondi se c'è un nome
+    setInterval(() => { if (leggiCampo('h_nome')) salva(); }, 60000);
 
-    function salva() {
-      salvaAuto();
-      aggiornaScore();
-      const btn = document.querySelector('.btn-salva-incarico');
-      btn.textContent = '✅ Salvata!'; btn.style.background = '#27ae60';
-      setTimeout(() => { btn.textContent = '💾 Salva scheda'; btn.style.background = ''; }, 1800);
-    }
-
-    function nuovaScheda() {
-      if (!confirm('Aprire una nuova scheda? Quella corrente è già salvata.')) return;
-      window._schedaId = null;
-      window._omiCalc = null;
-      esitoCorrente = null;
-      valutazioniImmobile = {};
-      valutazioniDomande = {};
-      ['f_data','f_proprietario','f_contatto','f_indirizzo','f_punti_aperti','f_prossimo_step','f_note','f_prezzo_richiesto','omi_mq'].forEach(id => { const el = document.getElementById(id); if (el) el.value = id === 'f_data' ? d.toISOString().split('T')[0] : ''; });
-      document.getElementById('omi_comune').value = '';
-      document.getElementById('omi_tipo').value = 'ville_villini';
-      document.getElementById('omi_stato').value = 'ottimo';
-      PARAMETRI.forEach(p => { const el = document.getElementById('nota_'+p.id); if (el) el.value = ''; ['ok','daverif','rischio'].forEach(v => document.getElementById(`chip_${p.id}_${v}`)?.classList.remove('sel')); });
-      DOMANDE.forEach(d => { const el = document.getElementById('dnota_'+d.id); if (el) el.value = ''; ['ok','rischio'].forEach(v => document.getElementById(`dchip_${d.id}_${v}`)?.classList.remove('sel')); });
-      ['verde','giallo','rosso'].forEach(v => document.getElementById(`esito_${v}`)?.classList.remove('sel'));
-      document.getElementById('prezzoOMI').textContent = '— €';
-      document.getElementById('deltaPrezzi').textContent = '—';
-      aggiornaScore();
-    }
-
-    /* ---- INIT ---- */
-    renderTabella();
-    renderDomande();
-    aggiornaScore();
+    aggiornaPunteggio();
   </script>
 
 </body>
