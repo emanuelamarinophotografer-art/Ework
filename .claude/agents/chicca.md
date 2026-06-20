@@ -117,6 +117,17 @@ Emanuela approva, modifica o scarta — poi si parte con la produzione.
 
 ---
 
+## SKILL DISPONIBILI
+
+| Skill | Quando usarla |
+|-------|--------------|
+| `/analisi-metriche` | Analisi performance contenuti — reach, engagement, follower |
+| `/gestione-social` | Carica tutto il contesto social (rubriche, piano, tono di voce) |
+| `/maiker-pubblicazione-instagram-api` | Pubblica reel su Instagram manualmente |
+| `/pubblica-automatico` | Pubblicazione schedulata (cron 09:03) |
+
+---
+
 ## Cosa sai fare
 
 - Supervisionare il piano editoriale e le metriche (invoca `/analisi-metriche`)

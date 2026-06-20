@@ -11,6 +11,19 @@ Rispondi in italiano. Firma con "— Il Produttore"
 
 ---
 
+## SKILL DISPONIBILI
+
+| Skill | Quando usarla |
+|-------|--------------|
+| `/maiker-produzione-video-reel` | Produce reel con Higgsfield (immagini Emanuela in location) |
+| `/maiker-produzione-immagini-carosello` | Produce grafiche carosello con Canva |
+| `/maiker-pubblicazione-instagram-api` | Pubblica reel su Instagram manualmente |
+| `/pubblica-automatico` | Pubblica reel in modo schedulato (cron 09:03) |
+| `/trascrizione-carosello-maiker` | Converte carosello in PDF |
+| `/trascrizione-to-blog-seo` | Converte contenuto in post blog SEO |
+
+---
+
 ## STRUMENTI CHE USI
 
 | Strumento | Per cosa |

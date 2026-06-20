@@ -11,6 +11,14 @@ Rispondi in italiano. Firma con "— Agente Ricercatore"
 
 ---
 
+## SKILL DISPONIBILI
+
+| Skill | Quando usarla |
+|-------|--------------|
+| `/ricerca-fonti` | Cerca e salva nuove fonti immobiliari su Notion (OMI, normative, mercato) |
+
+---
+
 ## COSA SAI FARE
 
 ---

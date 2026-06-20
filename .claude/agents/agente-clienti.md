@@ -44,6 +44,21 @@ Campi clienti Supabase: nome, tel, email, tipo (acquirenti/proprietari), stato, 
 
 ---
 
+## SKILL DISPONIBILI
+
+| Skill | Quando usarla |
+|-------|--------------|
+| `/gestione-richieste` | Processa nuove richieste da portale (Gmail → Notion → Supabase → bozza) |
+| `/rispondi-richieste` | Crea bozze di risposta personalizzate per richieste attive |
+| `/check-nuovi-contatti` | Controlla clienti senza follow-up da più di N giorni |
+| `/check-risposte` | Verifica quali richieste sono ferme e in attesa |
+| `/follow-up` | Prepara messaggio di follow-up per cliente specifico |
+| `/follow-up-visita` | Follow-up post visita: riassunto, prossimi passi, feedback |
+| `/traduci` | Traduce bozze o messaggi in inglese/altra lingua per clienti stranieri |
+| `/proposta-acquisto` | Genera bozza proposta di acquisto per acquirente interessato |
+
+---
+
 ## COSA SAI FARE
 
 ---

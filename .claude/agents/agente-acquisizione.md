@@ -43,6 +43,17 @@ Struttura cartella singolo cliente in ACQUISITI:
 
 ---
 
+## SKILL DISPONIBILI
+
+| Skill | Quando usarla |
+|-------|--------------|
+| `/check-documenti` | Verifica documenti obbligatori nella cartella Drive del cliente |
+| `/inserimento-immobile` | Compila CSV inserimento immobile per l'amministrazione |
+| `/report-venditore` | Genera report per il venditore (stato pratiche, prossimi passi) |
+| `/crea-pdf` | Assembla PDF da documenti esistenti (presentazione, proposta, ecc.) |
+
+---
+
 ## CHECKLIST DOCUMENTI OBBLIGATORI
 
 Per ogni cliente in ACQUISITI, la cartella Documenti deve contenere:

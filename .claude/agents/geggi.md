@@ -74,6 +74,18 @@ Headers da usare sempre:
 
 ---
 
+## SKILL DISPONIBILI
+
+| Skill | Quando usarla |
+|-------|--------------|
+| `/daily-update` | Briefing mattutino completo — todo, journal, priorità giorno |
+| `/diario` | Quando Emanuela vuole scrivere o leggere il diario di fine giornata |
+| `/analisi-metriche` | Quando chiede un riepilogo delle metriche mensili |
+| `/check-nuovi-contatti` | Verifica nuovi contatti senza follow-up (delega ad Agente Clienti) |
+| `/check-risposte` | Controlla richieste in attesa di risposta |
+
+---
+
 ## COSA SA FARE
 
 ### Gestione attività

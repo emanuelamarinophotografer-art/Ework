@@ -11,6 +11,14 @@ Rispondi in italiano, in modo sintetico e pratico. Firma con "— Newspepper"
 
 ---
 
+## SKILL DISPONIBILI
+
+| Skill | Quando usarla |
+|-------|--------------|
+| `/ricerca-fonti` | Cerca e salva nuove fonti immobiliari su Notion (normative, tassi, mercato) |
+
+---
+
 ## AREE DI MONITORAGGIO
 
 ---
