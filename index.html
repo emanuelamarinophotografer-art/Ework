@@ -235,7 +235,7 @@
 
           <!-- AGENDA -->
           <div class="col-card" style="margin-bottom:16px;">
-            <div class="col-card-title">📅 Agenda di oggi</div>
+            <div class="col-card-title">📅 Agenda di oggi <span id="calSyncBadge" style="font-size:0.6rem;font-weight:600;padding:2px 7px;border-radius:8px;background:#eafaf1;color:#27ae60;margin-left:6px;display:none">● Calendar</span></div>
             <div class="agenda-input-wrap">
               <input class="agenda-time" type="time" id="ag_ora" />
               <input class="agenda-input" type="text" id="ag_testo" placeholder="Aggiungi appuntamento…" />
@@ -481,7 +481,11 @@
       `).join('');
     }
 
-    // AGENDA
+    // AGENDA — localStorage + Supabase Calendar
+    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const SB_HEADERS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+
     function caricaAgenda() {
       const key = 'agenda_' + d.toDateString();
       return JSON.parse(localStorage.getItem(key) || '[]');
@@ -494,7 +498,7 @@
       const testo = document.getElementById('ag_testo').value.trim();
       if (!testo) return;
       const lista = caricaAgenda();
-      lista.push({ id: Date.now(), ora, testo });
+      lista.push({ id: Date.now(), ora, testo, fonte: 'manuale' });
       lista.sort((a, b) => a.ora.localeCompare(b.ora));
       salvaAgenda(lista);
       document.getElementById('ag_testo').value = '';
@@ -504,20 +508,48 @@
       salvaAgenda(caricaAgenda().filter(i => i.id !== id));
       renderAgenda();
     }
-    function renderAgenda() {
-      const lista = caricaAgenda();
+    function renderAgenda(eventiCal = []) {
+      const locali = caricaAgenda();
+      // Unisce eventi locali + calendario, ordina per ora
+      const tutti = [
+        ...locali.map(i => ({ ora: i.ora || '—', testo: i.testo, id: i.id, fonte: 'manuale' })),
+        ...eventiCal.map(e => {
+          const dt = new Date(e.data_inizio);
+          const ora = e.tutto_il_giorno ? 'tutto il giorno' : dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+          return { ora, testo: e.titolo, id: null, fonte: 'calendar', calendario: e.calendario };
+        })
+      ].sort((a, b) => {
+        if (a.ora === 'tutto il giorno') return -1;
+        if (b.ora === 'tutto il giorno') return 1;
+        return a.ora.localeCompare(b.ora);
+      });
       const el = document.getElementById('listaAgenda');
-      if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessun appuntamento oggi.</div>'; return; }
-      el.innerHTML = lista.map(i => `
+      if (tutti.length === 0) { el.innerHTML = '<div class="placeholder">Nessun appuntamento oggi.</div>'; return; }
+      el.innerHTML = tutti.map(i => `
         <div class="agenda-item">
-          <div class="agenda-ora">${i.ora || '—'}</div>
-          <div class="agenda-testo">${i.testo}</div>
-          <button class="agenda-del" onclick="eliminaAgenda(${i.id})">✕</button>
+          <div class="agenda-ora">${i.ora}</div>
+          <div class="agenda-testo">${i.testo}${i.fonte === 'calendar' ? ' <span style="font-size:0.62rem;color:#27ae60">📅</span>' : ''}</div>
+          ${i.fonte === 'manuale' ? `<button class="agenda-del" onclick="eliminaAgenda(${i.id})">✕</button>` : ''}
         </div>
       `).join('');
     }
     document.getElementById('ag_testo').addEventListener('keydown', e => { if (e.key === 'Enter') aggiungiAgenda(); });
-    renderAgenda();
+
+    // Carica eventi da Supabase (sincronizzati da Geggi)
+    async function caricaEventiCalendar() {
+      const oggi = d.toISOString().split('T')[0];
+      try {
+        const res = await fetch(`${SB_URL}/rest/v1/eventi_calendario?data_inizio=gte.${oggi}T00:00:00&data_inizio=lte.${oggi}T23:59:59&order=data_inizio.asc`, { headers: SB_HEADERS });
+        const eventi = await res.json();
+        if (eventi.length > 0) {
+          document.getElementById('calSyncBadge').style.display = 'inline';
+        }
+        renderAgenda(eventi);
+      } catch(e) {
+        renderAgenda([]);
+      }
+    }
+    caricaEventiCalendar();
 
     // METRICHE
     const campi = ['transazioni','incarichi_e','incarichi_ne','valutazioni','visita','coll_int','coll_ext','x_incarico','contatti','telefonate','ribassi','proposte_rit'];

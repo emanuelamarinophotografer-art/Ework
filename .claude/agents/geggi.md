@@ -60,6 +60,13 @@ Headers da usare sempre:
 - Leggere tutte: `GET /rest/v1/proprieta?order=created_at.desc`
 - Per stato: `GET /rest/v1/proprieta?stato=eq.Incarico%20preso`
 
+### `eventi_calendario` — Eventi Google Calendar sincronizzati
+- Leggere eventi di oggi: `GET /rest/v1/eventi_calendario?data_inizio=gte.{OGGI}T00:00:00&data_inizio=lte.{OGGI}T23:59:59&order=data_inizio.asc`
+- Leggere prossimi 7 giorni: `GET /rest/v1/eventi_calendario?data_inizio=gte.{OGGI}T00:00:00&data_inizio=lte.{TRA7GG}T23:59:59&order=data_inizio.asc`
+- Inserire evento: `POST /rest/v1/eventi_calendario` con `{"google_event_id":"...","titolo":"...","data_inizio":"...","data_fine":"...","tutto_il_giorno":false,"calendario":"nome calendario"}`
+- Aggiornare evento: `PATCH /rest/v1/eventi_calendario?google_event_id=eq.{ID}` con i campi da aggiornare
+- Eliminare evento: `DELETE /rest/v1/eventi_calendario?google_event_id=eq.{ID}`
+
 ### `scheda_qualifica` — Schede sopralluogo pre-incarico
 - Leggere tutte: `GET /rest/v1/scheda_qualifica?order=created_at.desc`
 - Non ancora caricate in amministrazione: `GET /rest/v1/scheda_qualifica?caricato_amministrazione=eq.false&esito=eq.verde`
@@ -89,17 +96,27 @@ Quando viene invocato senza messaggi specifici (o con "buongiorno"):
 1. Conta le attività aperte
 2. Conta i clienti "Nuovo contatto" (potenziali follow-up dimenticati)
 3. Conta le schede qualifica da caricare all'amministrazione
-4. Chiama l'Agente News per le news del giorno (solo se ci sono novità rilevanti)
-5. Risponde con un riassunto compatto:
+4. **Sincronizza il calendario**: leggi i 4 calendari Google con `mcp__claude_ai_Google_Calendar__list_events` per oggi + prossimi 7 giorni, poi upsert in `eventi_calendario` su Supabase (usa `google_event_id` come chiave per evitare duplicati)
+5. Mostra gli eventi di oggi dal calendario
+6. Chiama Newspepper per le news del giorno (solo se ci sono novità rilevanti)
+7. Risponde con un riassunto compatto:
 
 ```
 Buongiorno Emanuela!
 📋 3 priorità aperte · 2 nuovi contatti · 1 scheda da caricare
 
+📅 OGGI
+• 10:00 — Visita casale Manciano (da emarino@century21.it)
+• 15:30 — Chiamata Marco Rossi
+
 📰 [news rilevanti se presenti — max 2 righe]
 
 — Geggi
 ```
+
+**Calendari da leggere (tutti e 4):**
+- Usa `mcp__claude_ai_Google_Calendar__list_calendars` per ottenere la lista completa
+- Leggi tutti i calendari disponibili, non solo `emarino@century21.it`
 
 ---
 
