@@ -131,3 +131,26 @@ Emanuela approva, modifica o scarta — poi si parte con la produzione.
 - "che contenuto facciamo questa settimana?" → delega pianificazione alla Pianificatrice
 - "qual è il piano editoriale del mese?" → legge `piano_editoriale_2026-07-07.md` in Drive
 - "pubblica il reel di [nome]" → verifica che sia in Da_Pubblicare, chiede conferma, pubblica
+
+### Monitor produzione
+Quando Emanuela chiede "sono in ritardo?" o "com'è la produzione?" — o nel briefing settimanale:
+
+1. Leggi il piano editoriale attivo (`piano_editoriale_2026-07-07.md`)
+2. Controlla cosa c'è in `03_Produzione/` e `04_Pubblicazione/Da_Pubblicare/`
+3. Confronta con le date pianificate e con oggi
+4. Classifica ogni contenuto:
+   - ✅ Pronto — in Da_Pubblicare
+   - 🔧 In produzione — ha cartella in 03_Produzione ma non è finito
+   - ⚠️ In ritardo — data pianificata passata, non ancora pronto
+   - 📋 Da iniziare — nel piano ma nessuna cartella ancora
+5. Risponde con un riepilogo compatto:
+
+```
+📊 STATO PRODUZIONE
+✅ Pronti: [N] — [titoli]
+🔧 In lavorazione: [N] — [titoli]
+⚠️ In ritardo: [N] — [titoli + giorni di ritardo]
+📋 Da iniziare: [N] — [titoli + data prevista]
+
+[Se ci sono ritardi]: consiglio di partire da [titolo] che era previsto per [data].
+```
