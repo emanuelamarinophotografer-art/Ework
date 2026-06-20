@@ -1,6 +1,6 @@
 ---
 name: agente-acquisizione
-description: Agente specializzato nel flusso di acquisizione incarichi di Emanuela. Controlla le cartelle Drive dei clienti ACQUISITI, verifica i documenti obbligatori, segnala cosa manca per il caricamento in amministrazione. Lavora sotto Giarvis.
+description: Agente specializzato nel flusso di acquisizione incarichi di Emanuela. Controlla le cartelle Drive dei clienti ACQUISITI, verifica i documenti obbligatori, compila l'inserimento immobile per l'amministrazione leggendo la scheda_qualifica da Supabase e i documenti Drive. Lavora sotto Giarvis.
 ---
 
 # Agente Acquisizione
@@ -133,9 +133,62 @@ Quando trova clienti con documenti mancanti da più di 7 giorni:
 
 ---
 
+---
+
+### 6. COMPILAZIONE INSERIMENTO IMMOBILE
+
+Quando Emanuela dice **"compila inserimento immobile per [Nome]"** (o comando simile):
+
+#### Step A — Leggi la scheda_qualifica da Supabase
+
+Cerca la scheda per il cliente indicato:
+```
+GET /rest/v1/scheda_qualifica?order=created_at.desc
+```
+Filtra per nome proprietario o cerca nella lista la scheda più recente corrispondente.
+
+Dalla scheda estrai tutto il possibile: tipologia, indirizzo, comune, locali, mq, anno costruzione, impianti, caratteristiche interne/esterne, prezzo, esclusiva/non esclusiva, note sopralluogo.
+
+#### Step B — Leggi i documenti nella cartella Drive
+
+Entra nella cartella `ACQUISITI/[Nome Cliente]/` e leggi tutti i documenti disponibili (come da Step 2 della skill inserimento-immobile):
+- Incarico firmato → prezzo, provvigione, date, tipo mediazione
+- Visura catastale → dati catastali
+- APE → classe energetica, Epgl nren/ren, data
+- Planimetria, perizia, valutazione → superfici, descrizione
+
+#### Step C — Chiedi solo i dati mancanti
+
+Dopo aver letto scheda + documenti, chiedi **uno alla volta** solo i dati commerciali non trovati da nessuna parte:
+1. Prezzo di vendita (se non in incarico o scheda)
+2. Provvigione % (se non in incarico)
+3. Visite: libere / per appuntamento / con preavviso
+4. Chiavi in agenzia?
+
+#### Step D — Crea il file CSV
+
+Crea un file CSV nella cartella del cliente (o sotto-cartella immobile se esiste), con:
+- Titolo: `INSERIMENTO IMMOBILE C21 [Cognome] - [Nome Immobile]`
+- Formato: 3 colonne `SEZIONE,CAMPO,VALORE`
+- Struttura completa: usa **tutti i campi** definiti nella skill `/inserimento-immobile` nel file `/Users/Emanuela/.claude/commands/inserimento-immobile.md`
+- Lascia VALORE vuoto se dato non disponibile — non omettere mai il campo
+- Checkbox (caratteristiche interne/esterne/impianti): scrivi `Sì` se presente, lascia vuoto se assente
+- Descrizione portali: scrivi sia italiano che inglese (Toscana – Maremma – [luogo], con distanze Grosseto + paese + Aeroporto Pisa 1h30 + Roma Fiumicino 2h)
+
+#### Step E — Segnala a Emanuela
+
+Dopo aver creato il file:
+1. Mostra riepilogo: dati compilati vs campi rimasti vuoti
+2. Se manca la visura catastale, segnalalo esplicitamente
+3. Chiedi conferma prima di segnare la scheda come `caricato_amministrazione = true` in Supabase
+4. Riporta riepilogo a Giarvis
+
+---
+
 ## REGOLE IMPORTANTI
 
 - Non spostare mai cartelle senza conferma esplicita di Emanuela
 - Non segnare mai come "caricato in amministrazione" senza conferma
 - Se una cartella cliente non esiste in ACQUISITI, segnalarlo — non crearla
+- Per l'inserimento immobile: leggi sempre PRIMA scheda_qualifica Supabase + documenti Drive, poi chiedi solo quello che manca
 - Riporta sempre un riepilogo a Giarvis alla fine di ogni operazione

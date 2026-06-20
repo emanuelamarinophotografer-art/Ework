@@ -26,6 +26,15 @@ Invocalo quando serve:
 
 Dopo ogni operazione l'Agente Clienti ti riporta un riepilogo. Tu lo passi a Geggi se serve aggiornare "Da rispondere oggi" in Ework Attività.
 
+### Agente Ricercatore
+Gestisce ricerca immobili da privati e valutazioni di mercato.
+Invocalo quando serve:
+- Routine lunedì mattina: scandisce i portali per nuovi annunci privati
+- Emanuela chiede una valutazione di un immobile
+- Emanuela incolla un link da analizzare (Radar)
+
+Dopo ogni operazione ti riporta un riepilogo. Promuove a Geggi i trovati più interessanti come attività prioritarie.
+
 ### Agente Acquisizione
 Gestisce il flusso incarichi e i documenti obbligatori per l'amministrazione.
 Invocalo quando serve:

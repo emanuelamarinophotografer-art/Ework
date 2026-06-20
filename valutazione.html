@@ -115,7 +115,7 @@
     </nav>
     <nav class="nav-section c-contenuti">
       <div class="nav-label">Contenuti</div>
-      <a class="nav-item" href="#"><span class="icon">📸</span> Social</a>
+      <a class="nav-item" href="social.html"><span class="icon">📸</span> Social</a>
       <a class="nav-item" href="#"><span class="icon">🌿</span> Fonti</a>
     </nav>
     <div class="sidebar-bottom" id="dataOggi"></div>
@@ -266,22 +266,11 @@
           <div class="sezione">
             <div class="sezione-titolo">Specificità Maremmane</div>
 
-            <div class="form-row">
+            <div class="form-row-1">
               <div class="form-group">
-                <label>Terreno totale (ha)</label>
-                <input class="form-input" type="number" id="f_terreno_ha" placeholder="es. 2.5" step="0.1" min="0" />
-              </div>
-              <div class="form-group">
-                <label>Tipo terreno prevalente</label>
-                <select class="form-select" id="f_terreno_tipo">
-                  <option value="none">— nessuno / non applicabile —</option>
-                  <option value="oliveto">Oliveto</option>
-                  <option value="vigneto">Vigneto (DOC/IGT)</option>
-                  <option value="seminativo">Seminativo</option>
-                  <option value="bosco">Bosco / Macchia</option>
-                  <option value="misto">Misto (oliveto + seminativo)</option>
-                  <option value="orto">Orto / Frutteto</option>
-                </select>
+                <label>Tipi di terreno (inserisci quanti ne hai)</label>
+                <div id="terreni_lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+                <button type="button" onclick="aggiungiTerreno()" style="background:none;border:1px dashed var(--border);border-radius:7px;padding:7px 14px;font-size:0.82rem;font-family:inherit;color:var(--text-muted);cursor:pointer;width:100%">+ Aggiungi tipo terreno</button>
               </div>
             </div>
 
@@ -739,8 +728,44 @@
     // Coefficienti stato
     const COEFF_STATO = { ottimo: 1.0, buono: 0.87, discreto: 0.74, daristrutturare: 0.58 };
 
-    // Valore terreno €/mq
-    const TERRENO_MQ = { oliveto: 3.2, vigneto: 9.0, seminativo: 1.2, bosco: 0.5, misto: 2.5, orto: 2.0, none: 0 };
+    // Valore terreno €/mq per tipo
+    const TERRENO_MQ = { oliveto: 3.2, vigneto: 9.0, seminativo: 1.2, bosco: 0.5, orto: 2.0, uliveto_produttivo: 4.5, frutteto: 2.5, pascolo: 0.8, lago_stagno: 1.0, none: 0 };
+    const TERRENO_LABEL = { oliveto:'Oliveto', vigneto:'Vigneto (DOC/IGT)', seminativo:'Seminativo', bosco:'Bosco / Macchia', orto:'Orto / Frutteto', uliveto_produttivo:'Uliveto produttivo DOP', frutteto:'Frutteto', pascolo:'Pascolo', lago_stagno:'Lago / Stagno', none:'— nessuno —' };
+
+    let terreniCount = 0;
+
+    function aggiungiTerreno(tipo, ha) {
+      terreniCount++;
+      const id = 'terreno_' + terreniCount;
+      const div = document.createElement('div');
+      div.id = id;
+      div.style.cssText = 'display:grid;grid-template-columns:1fr 100px auto;gap:8px;align-items:center';
+      div.innerHTML = `
+        <select class="form-select">
+          ${Object.entries(TERRENO_LABEL).map(([v,l]) => `<option value="${v}" ${v===(tipo||'oliveto')?'selected':''}>${l}</option>`).join('')}
+        </select>
+        <input class="form-input" type="number" placeholder="ha" step="0.1" min="0" value="${ha||''}" style="text-align:center" />
+        <button type="button" onclick="document.getElementById('${id}').remove()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;color:var(--text-muted);font-size:0.8rem">✕</button>
+      `;
+      document.getElementById('terreni_lista').appendChild(div);
+    }
+
+    function getTerrenoTotale() {
+      let totale = 0;
+      let desc = [];
+      document.querySelectorAll('#terreni_lista > div').forEach(row => {
+        const tipo = row.querySelector('select').value;
+        const ha = parseFloat(row.querySelector('input').value) || 0;
+        if (ha > 0 && tipo !== 'none') {
+          totale += ha * 10000 * (TERRENO_MQ[tipo] || 0);
+          desc.push(`${ha} ha ${TERRENO_LABEL[tipo]}`);
+        }
+      });
+      return { valore: totale, desc };
+    }
+
+    // Aggiunge una riga terreno di default
+    aggiungiTerreno();
 
     // Stato toggle
     const toggleState = { stato: 'ottimo', vista: 'nessuna', piscina: 'no', accesso: 'comodo', classe: 'G' };
@@ -796,11 +821,10 @@
       const zona = document.getElementById('f_zona').value;
       const tipologia = document.getElementById('f_tipologia').value;
       const mq = parseFloat(document.getElementById('f_mq').value) || 0;
-      const terrenoHa = parseFloat(document.getElementById('f_terreno_ha').value) || 0;
-      const terrenoTipo = document.getElementById('f_terreno_tipo').value;
       const annesso = parseFloat(document.getElementById('f_annesso').value) || 0;
       const prezzoRichiesto = parseFloat(document.getElementById('f_prezzo_richiesto').value) || 0;
       const giorniMercato = parseFloat(document.getElementById('f_giorni_mercato').value) || 0;
+      const terreno = getTerrenoTotale();
 
       if (!comune || !zona || !mq) { alert('Compila almeno: comune, zona e superficie.'); return; }
 
@@ -816,9 +840,9 @@
       const annMin = annesso > 0 ? annesso * OMI[comune].prezzi[zona].rustico[0] * 0.5 * coeffStato : 0;
       const annMax = annesso > 0 ? annesso * OMI[comune].prezzi[zona].rustico[1] * 0.5 * coeffStato : 0;
 
-      // TERRENO
-      const mqTerreno = terrenoHa * 10000;
-      const valTerreno = mqTerreno * (TERRENO_MQ[terrenoTipo] || 0);
+      // TERRENO (multi-tipo)
+      const valTerreno = terreno.valore;
+      const terrenoHa = terreno.desc.reduce((sum, d) => sum + (parseFloat(d) || 0), 0);
 
       // PISCINA (nella sezione maremmane rimane)
       const valPiscina = plusAttivi.has('piscina') ? 22000 : 0;
@@ -935,7 +959,7 @@
         <div class="ris-breakdown">
           <div class="ris-row"><span class="r-label">${tipoLabel} (${mq} mq · ${statoLabel})</span><span class="r-val">${fmt(baseMin)} – ${fmt(baseMax)}</span></div>
           ${annesso > 0 ? `<div class="ris-row"><span class="r-label">Annesso (${annesso} mq)</span><span class="r-val">${fmt(annMin)} – ${fmt(annMax)}</span></div>` : ''}
-          ${valTerreno > 0 ? `<div class="ris-row"><span class="r-label">Terreno ${terrenoHa} ha (${document.getElementById('f_terreno_tipo').selectedOptions[0].text})</span><span class="r-val">${fmt(valTerreno)}</span></div>` : ''}
+          ${valTerreno > 0 ? `<div class="ris-row"><span class="r-label">Terreno: ${terreno.desc.join(' · ')}</span><span class="r-val">${fmt(valTerreno)}</span></div>` : ''}
           ${valPiscina > 0 ? `<div class="ris-row"><span class="r-label">Piscina</span><span class="r-val">+ ${fmt(valPiscina)}</span></div>` : ''}
           ${valPlus > 0 ? `<div class="ris-row"><span class="r-label">Plus impianti</span><span class="r-val">+ ${fmt(valPlus)}</span></div>` : ''}
           ${toggleState.vista !== 'nessuna' ? `<div class="ris-row"><span class="r-label">Vista</span><span class="r-val">${vistaLabel}</span></div>` : ''}
@@ -969,7 +993,7 @@
         mq, stato: toggleState.stato, statoLabel,
         classeEnergetica: toggleState.classe,
         prezzoRichiesto, giorniMercato,
-        terrenoHa, terrenoTipo: document.getElementById('f_terreno_tipo').selectedOptions[0].text,
+        terrenoDesc: terreno.desc.join(', '),
         annesso, vista: toggleState.vista, accesso: toggleState.accesso,
         plus: [...plusAttivi],
         totMin, totMax,

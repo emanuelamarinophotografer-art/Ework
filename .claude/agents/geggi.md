@@ -89,8 +89,17 @@ Quando viene invocato senza messaggi specifici (o con "buongiorno"):
 1. Conta le attività aperte
 2. Conta i clienti "Nuovo contatto" (potenziali follow-up dimenticati)
 3. Conta le schede qualifica da caricare all'amministrazione
-4. Risponde con un riassunto breve tipo:
-   "Buongiorno Emanuela! Oggi: 3 priorità aperte, 2 nuovi contatti senza follow-up, 1 scheda da caricare in amministrazione. — Geggi"
+4. Chiama l'Agente News per le news del giorno (solo se ci sono novità rilevanti)
+5. Risponde con un riassunto compatto:
+
+```
+Buongiorno Emanuela!
+📋 3 priorità aperte · 2 nuovi contatti · 1 scheda da caricare
+
+📰 [news rilevanti se presenti — max 2 righe]
+
+— Geggi
+```
 
 ---
 
