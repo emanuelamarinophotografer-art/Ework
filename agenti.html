@@ -6,92 +6,63 @@
   <title>Ework — Agenti</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .agenti-page { display: flex; flex-direction: column; gap: 48px; }
+    .agenti-rami { display: flex; flex-direction: column; gap: 20px; }
 
-    /* GEGGI — capo assoluto */
-    .geggi-wrap { display: flex; justify-content: center; }
-    .geggi-card {
-      background: var(--bg-card);
-      border: 2px solid var(--accent);
-      border-radius: 16px;
-      padding: 28px 40px;
-      display: flex;
-      align-items: center;
-      gap: 28px;
-      min-width: 520px;
-      max-width: 680px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    .agenti-ramo {
+      border-radius: 12px;
+      padding: 18px 20px;
     }
-    .geggi-avatar { font-size: 3.2rem; line-height: 1; }
-    .geggi-info { flex: 1; }
-    .geggi-nome { font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .geggi-ruolo { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
-    .geggi-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
-    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip { font-size: 0.65rem; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; color: var(--text-muted); }
+    .agenti-ramo-label {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; margin-bottom: 14px;
+    }
+    .agenti-nodi { display: flex; flex-wrap: wrap; gap: 12px; }
 
-    /* CONNETTORE */
-    .conn-center { display: flex; justify-content: center; }
-    .conn-v { width: 2px; height: 32px; background: var(--border); }
-
-    /* AREE (3 colonne) */
-    .aree { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-
-    .area {
-      background: var(--bg-card);
+    .agente-nodo {
+      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
+      border-radius: 10px;
+      padding: 14px 16px;
+      min-width: 180px;
+      flex: 1;
+      max-width: 260px;
     }
+    .agente-nodo.capo { border-top: 3px solid var(--accent-c, #c07040); }
 
-    .area-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border); }
-    .area-tag { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 10px; }
-    .area-capo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
-    .capo-avatar { font-size: 2.2rem; }
-    .capo-nome { font-size: 1.05rem; font-weight: 700; color: var(--text); }
-    .capo-ruolo { font-size: 0.68rem; color: var(--text-muted); }
-    .area-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
-
-    /* SUB-AGENTI — riga orizzontale */
-    .sub-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border-top: 1px solid var(--border);
+    .agente-nodo-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .agente-icon { font-size: 1.4rem; }
+    .agente-badge {
+      font-size: 0.6rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 10px; white-space: nowrap;
     }
-    .sub-card {
-      padding: 20px 18px;
-      border-right: 1px solid var(--border);
-    }
-    .sub-card:last-child { border-right: none; }
-    .sub-avatar { font-size: 1.8rem; margin-bottom: 10px; }
-    .sub-nome { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-    .sub-spec { font-size: 0.72rem; color: var(--text-muted); line-height: 1.55; }
-    .sub-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
-    .sub-chip { font-size: 0.6rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 2px 7px; color: var(--text-faint); }
+    .badge-capo    { background: #f5efe6; color: #9a4e1e; }
+    .badge-spec    { background: #e8eaf6; color: #3949ab; }
+    .badge-social  { background: #e8f5e9; color: #2e7d32; }
+    .badge-news    { background: #fef9e7; color: #92400e; }
 
-    /* Colori aree */
-    .area-lavoro .area-tag { color: #9a4e1e; }
-    .area-lavoro .area-header { border-top: 4px solid #c07040; }
-    .area-social .area-tag { color: #2e7048; }
-    .area-social .area-header { border-top: 4px solid #5a9e6b; }
-    .area-news .area-tag { color: #92400e; }
-    .area-news .area-header { border-top: 4px solid #d4a017; }
+    .agente-nome { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .agente-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
 
-    /* Newspepper aree copertura */
-    .news-extra { padding: 20px 22px; }
-    .news-area-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); }
-    .news-area-item:last-child { border-bottom: none; }
-    .news-dot { width: 8px; height: 8px; border-radius: 50%; background: #d4a017; margin-top: 5px; flex-shrink: 0; }
-    .news-area-testo { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
-    .news-area-testo strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 2px; }
+    /* colori rami */
+    .ramo-principale { background: #f5ede6; border-left: 4px solid #c07040; }
+    .ramo-principale .agenti-ramo-label { color: #9a4e1e; }
+    .ramo-principale .agente-nodo.capo { --accent-c: #c07040; }
 
-    @media (max-width: 1200px) { .aree { grid-template-columns: 1fr; } }
-    @media (max-width: 700px) {
-      .geggi-card { min-width: unset; flex-direction: column; text-align: center; padding: 24px; }
-      .sub-row { grid-template-columns: 1fr; }
-      .sub-card { border-right: none; border-bottom: 1px solid var(--border); }
-      .sub-card:last-child { border-bottom: none; }
-    }
+    .ramo-lavoro { background: #fdf0e8; border-left: 4px solid #c07040; }
+    .ramo-lavoro .agenti-ramo-label { color: #9a4e1e; }
+    .ramo-lavoro .agente-nodo.capo { --accent-c: #c07040; }
+
+    .ramo-social { background: #edf7f0; border-left: 4px solid #5a9e6b; }
+    .ramo-social .agenti-ramo-label { color: #2e7048; }
+    .ramo-social .agente-nodo.capo { --accent-c: #5a9e6b; }
+
+    .ramo-news { background: #fefce8; border-left: 4px solid #d4a017; }
+    .ramo-news .agenti-ramo-label { color: #92400e; }
+    .ramo-news .agente-nodo.capo { --accent-c: #d4a017; }
+
+    .agenti-legenda { display: flex; gap: 20px; margin-bottom: 16px; }
+    .legenda-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); }
+    .legenda-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -135,165 +106,115 @@
     </div>
 
     <div class="content">
-      <div class="agenti-page">
 
-        <!-- GEGGI -->
-        <div class="geggi-wrap">
-          <div class="geggi-card">
-            <div class="geggi-avatar">👩‍💼</div>
-            <div class="geggi-info">
-              <div class="geggi-nome">Geggi</div>
-              <div class="geggi-ruolo">Segretaria Capo · Punto di contatto principale</div>
-              <div class="geggi-desc">Prima persona da contattare per qualsiasi cosa. Gestisce la chat, il briefing mattutino, le attività del giorno, i clienti e coordina tutti gli agenti dell'area.</div>
-              <div class="chips">
-                <span class="chip">💬 Chat Supabase</span>
-                <span class="chip">📋 Attività & priorità</span>
-                <span class="chip">👤 Clienti</span>
-                <span class="chip">🌅 Briefing mattutino</span>
-                <span class="chip">📰 Coordina Newspepper</span>
+      <div class="agenti-rami">
+
+        <!-- PRINCIPALE -->
+        <div class="agenti-ramo ramo-principale">
+          <div class="agenti-ramo-label">🎯 Principale</div>
+          <div class="agenti-nodi">
+            <div class="agente-nodo capo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">👨‍💼</span>
+                <span class="agente-badge badge-capo">Segretario Capo</span>
               </div>
+              <div class="agente-nome">Geggi</div>
+              <div class="agente-desc">Punto di contatto principale. Chat, briefing mattutino, attività, clienti e coordinamento di tutti gli agenti.</div>
             </div>
           </div>
         </div>
 
-        <div class="conn-center"><div class="conn-v"></div></div>
-
-        <!-- 3 AREE -->
-        <div class="aree">
-
-          <!-- AREA LAVORO -->
-          <div class="area area-lavoro">
-            <div class="area-header">
-              <div class="area-tag">🏡 Area Lavoro Immobiliare</div>
-              <div class="area-capo-row">
-                <div class="capo-avatar">🧑‍💼</div>
-                <div>
-                  <div class="capo-nome">Giarvis</div>
-                  <div class="capo-ruolo">Capo Area Lavoro</div>
-                </div>
+        <!-- AREA LAVORO -->
+        <div class="agenti-ramo ramo-lavoro">
+          <div class="agenti-ramo-label">🏡 Area Lavoro Immobiliare</div>
+          <div class="agenti-nodi">
+            <div class="agente-nodo capo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">🧑‍💼</span>
+                <span class="agente-badge badge-capo">Capo Area</span>
               </div>
-              <div class="area-desc">Coordina acquisizione incarichi, clienti e prospecting del lunedì. Riceve i report dagli specialisti e li porta a Geggi.</div>
+              <div class="agente-nome">Giarvis</div>
+              <div class="agente-desc">Coordina incarichi, clienti e prospecting lunedì. Report a Geggi.</div>
             </div>
-            <div class="sub-row">
-              <div class="sub-card">
-                <div class="sub-avatar">👩‍💻</div>
-                <div class="sub-nome">Agente Clienti</div>
-                <div class="sub-spec">Ciclo vita clienti, nuove richieste, bozze risposta IT/EN, follow-up dimenticati.</div>
-                <div class="sub-chips">
-                  <span class="sub-chip">Gmail</span>
-                  <span class="sub-chip">Notion</span>
-                  <span class="sub-chip">Supabase</span>
-                </div>
+            <div class="agente-nodo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">👩‍💻</span>
+                <span class="agente-badge badge-spec">Clienti</span>
               </div>
-              <div class="sub-card">
-                <div class="sub-avatar">🧑‍💼</div>
-                <div class="sub-nome">Agente Acquisizione</div>
-                <div class="sub-spec">Documenti Drive, checklist incarico, compila inserimento immobile per l'amministrazione.</div>
-                <div class="sub-chips">
-                  <span class="sub-chip">Drive</span>
-                  <span class="sub-chip">Scheda qualifica</span>
-                  <span class="sub-chip">CSV</span>
-                </div>
+              <div class="agente-nome">Agente Clienti</div>
+              <div class="agente-desc">Ciclo vita clienti, nuove richieste portale, bozze risposta IT/EN, follow-up dimenticati.</div>
+            </div>
+            <div class="agente-nodo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">🧑‍💼</span>
+                <span class="agente-badge badge-spec">Incarichi</span>
               </div>
-              <div class="sub-card">
-                <div class="sub-avatar">🕵️‍♀️</div>
-                <div class="sub-nome">Agente Ricercatore</div>
-                <div class="sub-spec">Portali privati ogni lunedì, valutazioni OMI multi-terreno, analisi link Radar.</div>
-                <div class="sub-chips">
-                  <span class="sub-chip">Portali</span>
-                  <span class="sub-chip">OMI</span>
-                  <span class="sub-chip">Radar</span>
-                </div>
+              <div class="agente-nome">Agente Acquisizione</div>
+              <div class="agente-desc">Documenti Drive, checklist, inserimento immobile per l'amministrazione da scheda qualifica.</div>
+            </div>
+            <div class="agente-nodo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">🕵️‍♀️</span>
+                <span class="agente-badge badge-spec">Ricerca</span>
               </div>
+              <div class="agente-nome">Agente Ricercatore</div>
+              <div class="agente-desc">Portali privati ogni lunedì, valutazioni OMI multi-terreno, analisi link Radar.</div>
             </div>
           </div>
+        </div>
 
-          <!-- AREA SOCIAL -->
-          <div class="area area-social">
-            <div class="area-header">
-              <div class="area-tag">📸 Area Contenuti & Social</div>
-              <div class="area-capo-row">
-                <div class="capo-avatar">👩‍🎨</div>
-                <div>
-                  <div class="capo-nome">Chicca</div>
-                  <div class="capo-ruolo">Capo Area Social</div>
-                </div>
+        <!-- AREA SOCIAL -->
+        <div class="agenti-ramo ramo-social">
+          <div class="agenti-ramo-label">📸 Area Contenuti & Social</div>
+          <div class="agenti-nodi">
+            <div class="agente-nodo capo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">👩‍🎨</span>
+                <span class="agente-badge badge-social">Capo Area</span>
               </div>
-              <div class="area-desc">Supervisiona piano editoriale, metriche e pubblicazione reel. Monitora ritardi di produzione. Coordina il brainstorming a 4.</div>
+              <div class="agente-nome">Chicca</div>
+              <div class="agente-desc">Piano editoriale, metriche, monitor produzione, pubblicazione reel. Coordina il brainstorming a 4.</div>
             </div>
-            <div class="sub-row">
-              <div class="sub-card">
-                <div class="sub-avatar">👩‍🎤</div>
-                <div class="sub-nome">La Trendista</div>
-                <div class="sub-spec">Trend virali, format divertenti, audio Instagram — ogni lunedì 8–12 idee da declinare per Emanuela.</div>
-                <div class="sub-chips">
-                  <span class="sub-chip">Instagram</span>
-                  <span class="sub-chip">TikTok</span>
-                  <span class="sub-chip">Trend</span>
-                </div>
+            <div class="agente-nodo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">👩‍🎤</span>
+                <span class="agente-badge badge-social">Trend</span>
               </div>
-              <div class="sub-card">
-                <div class="sub-avatar">👩‍🏫</div>
-                <div class="sub-nome">La Pianificatrice</div>
-                <div class="sub-spec">Personal branding, storytelling, script reel e caroselli, caption, piano settimanale.</div>
-                <div class="sub-chips">
-                  <span class="sub-chip">Script</span>
-                  <span class="sub-chip">Caption</span>
-                  <span class="sub-chip">Rubriche</span>
-                </div>
+              <div class="agente-nome">La Trendista</div>
+              <div class="agente-desc">Trend virali, format divertenti, audio Instagram — ogni lunedì 8–12 idee da declinare per Emanuela in Maremma.</div>
+            </div>
+            <div class="agente-nodo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">👩‍🏫</span>
+                <span class="agente-badge badge-social">Piano & Script</span>
               </div>
-              <div class="sub-card">
-                <div class="sub-avatar">👨‍🎬</div>
-                <div class="sub-nome">Il Produttore</div>
-                <div class="sub-spec">Trasforma gli script in contenuti finiti: immagini, video avatar, reel animati, caroselli.</div>
-                <div class="sub-chips">
-                  <span class="sub-chip">Higgsfield</span>
-                  <span class="sub-chip">HeyGen</span>
-                  <span class="sub-chip">Remotion</span>
-                  <span class="sub-chip">Canva</span>
-                </div>
+              <div class="agente-nome">La Pianificatrice</div>
+              <div class="agente-desc">Personal branding, storytelling, script reel e caroselli, caption e copy, piano settimanale.</div>
+            </div>
+            <div class="agente-nodo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">👨‍🎬</span>
+                <span class="agente-badge badge-social">Produzione</span>
               </div>
+              <div class="agente-nome">Il Produttore</div>
+              <div class="agente-desc">Trasforma gli script in contenuti finiti con Higgsfield, HeyGen, Remotion e Canva.</div>
             </div>
           </div>
+        </div>
 
-          <!-- NEWSPEPPER -->
-          <div class="area area-news">
-            <div class="area-header">
-              <div class="area-tag">📰 News & Aggiornamenti</div>
-              <div class="area-capo-row">
-                <div class="capo-avatar">👩‍🔬</div>
-                <div>
-                  <div class="capo-nome">Newspepper</div>
-                  <div class="capo-ruolo">News Agent</div>
-                </div>
+        <!-- NEWSPEPPER -->
+        <div class="agenti-ramo ramo-news">
+          <div class="agenti-ramo-label">📰 News & Aggiornamenti</div>
+          <div class="agenti-nodi">
+            <div class="agente-nodo capo">
+              <div class="agente-nodo-top">
+                <span class="agente-icon">👩‍🔬</span>
+                <span class="agente-badge badge-news">News Agent</span>
               </div>
-              <div class="area-desc">Tiene Emanuela aggiornata su tutto ciò che conta. Alimenta il briefing mattutino di Geggi con le novità più rilevanti del giorno.</div>
-            </div>
-            <div class="news-extra">
-              <div class="news-area-item">
-                <div class="news-dot"></div>
-                <div class="news-area-testo">
-                  <strong>Mercato immobiliare</strong>
-                  Quotazioni OMI, normative, tassi mutui, novità del settore
-                </div>
-              </div>
-              <div class="news-area-item">
-                <div class="news-dot"></div>
-                <div class="news-area-testo">
-                  <strong>Social & strumenti AI</strong>
-                  Aggiornamenti Instagram, HeyGen, Higgsfield, Canva, novità utili
-                </div>
-              </div>
-              <div class="news-area-item">
-                <div class="news-dot" style="background:#ccc"></div>
-                <div class="news-area-testo" style="color:var(--text-faint)">
-                  <strong style="color:var(--text-faint)">Sezione personale</strong>
-                  In arrivo
-                </div>
-              </div>
+              <div class="agente-nome">Newspepper</div>
+              <div class="agente-desc">Alimenta il briefing di Geggi ogni mattina. Mercato immobiliare, normative, tassi, novità social e strumenti AI.</div>
             </div>
           </div>
-
         </div>
 
       </div>
