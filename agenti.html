@@ -6,63 +6,64 @@
   <title>Ework — Agenti</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    .agenti-rami { display: flex; flex-direction: column; gap: 20px; }
+    .agenti-rami { display: flex; flex-direction: column; gap: 24px; }
 
     .agenti-ramo {
       border-radius: 12px;
-      padding: 18px 20px;
+      padding: 16px 20px;
     }
     .agenti-ramo-label {
       font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.14em; margin-bottom: 14px;
+      letter-spacing: 0.14em; margin-bottom: 12px;
     }
-    .agenti-nodi { display: flex; flex-wrap: wrap; gap: 12px; }
 
-    .agente-nodo {
-      background: var(--bg);
+    /* RIGHE */
+    .agenti-nodi { display: flex; flex-direction: column; gap: 8px; }
+
+    .agente-riga {
+      background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
-      min-width: 180px;
-      flex: 1;
-      max-width: 260px;
+      border-radius: 8px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
-    .agente-nodo.capo { border-top: 3px solid var(--accent-c, #c07040); }
+    .agente-riga.capo {
+      border-left: 4px solid var(--accent-c, #c07040);
+    }
 
-    .agente-nodo-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .agente-icon { font-size: 1.4rem; }
+    .agente-icon { font-size: 1.3rem; flex-shrink: 0; width: 28px; text-align: center; }
     .agente-badge {
       font-size: 0.6rem; font-weight: 700; padding: 2px 8px;
-      border-radius: 10px; white-space: nowrap;
+      border-radius: 10px; white-space: nowrap; flex-shrink: 0;
     }
     .badge-capo    { background: #8aaec4; color: #1a3a50; }
+    .badge-coord   { background: #b4a4c8; color: #2a1a42; }
     .badge-spec    { background: #3a5a78; color: #e8f0f6; }
     .badge-social  { background: #6a8a62; color: #e8f0e4; }
     .badge-news    { background: #d4c8b4; color: #3e3020; }
+    .badge-strat   { background: #7a9870; color: #1a2e14; }
 
-    .agente-nome { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .agente-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+    .agente-nome { font-size: 0.88rem; font-weight: 700; color: var(--text); min-width: 140px; flex-shrink: 0; }
+    .agente-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; flex: 1; }
 
     /* colori rami */
     .ramo-principale { background: #d4b4b4; border-left: 5px solid #9a5858; }
     .ramo-principale .agenti-ramo-label { color: #5a2828; }
-    .ramo-principale .agente-nodo.capo { --accent-c: #9a5858; }
+    .ramo-principale .agente-riga.capo { --accent-c: #9a5858; }
 
     .ramo-lavoro { background: #dcc0a0; border-left: 5px solid #a06030; }
     .ramo-lavoro .agenti-ramo-label { color: #5a3010; }
-    .ramo-lavoro .agente-nodo.capo { --accent-c: #b07840; }
+    .ramo-lavoro .agente-riga.capo { --accent-c: #b07840; }
 
     .ramo-social { background: #c4d0bc; border-left: 5px solid #7a9870; }
     .ramo-social .agenti-ramo-label { color: #2a3e24; }
-    .ramo-social .agente-nodo.capo { --accent-c: #5e8054; }
+    .ramo-social .agente-riga.capo { --accent-c: #5e8054; }
 
     .ramo-news { background: #c2cedc; border-left: 5px solid #4a6882; }
     .ramo-news .agenti-ramo-label { color: #1a2e42; }
-    .ramo-news .agente-nodo.capo { --accent-c: #3a5a78; }
-
-    .agenti-legenda { display: flex; gap: 20px; margin-bottom: 16px; }
-    .legenda-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); }
-    .legenda-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .ramo-news .agente-riga.capo { --accent-c: #3a5a78; }
   </style>
 </head>
 <body>
@@ -111,28 +112,29 @@
     </div>
 
     <div class="content">
-
       <div class="agenti-rami">
 
         <!-- PRINCIPALE -->
         <div class="agenti-ramo ramo-principale">
-          <div class="agenti-ramo-label">🎯 Principale</div>
+          <div class="agenti-ramo-label">🎯 Principale — Coordinamento</div>
           <div class="agenti-nodi">
-            <div class="agente-nodo capo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">👨‍💼</span>
-                <span class="agente-badge badge-capo">Segretario Capo</span>
-              </div>
+            <div class="agente-riga capo">
+              <span class="agente-icon">👨‍💼</span>
+              <span class="agente-badge badge-capo">Coordinatore</span>
               <div class="agente-nome">Geggi</div>
-              <div class="agente-desc">Punto di contatto principale. Chat, briefing mattutino, attività, clienti e coordinamento di tutti gli agenti.</div>
+              <div class="agente-desc">Punto di contatto principale. Briefing mattutino, attività, clienti, scadenze. Coordina tutti gli agenti — Lavoro, Social, Analisi & News.</div>
             </div>
-            <div class="agente-nodo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">📊</span>
-                <span class="agente-badge badge-capo">Analista</span>
-              </div>
+            <div class="agente-riga">
+              <span class="agente-icon">📊</span>
+              <span class="agente-badge badge-capo">Analista</span>
               <div class="agente-nome">Mara</div>
-              <div class="agente-desc">Analisi trasversale: conversioni funnel richieste, metriche lavoro vs goal, performance social per rubrica, calcoli immobiliari (ROI, rendita, gap prezzo/mercato), proiezioni fine mese. Output sempre con numeri chiave + interpretazione + 1 azione prioritaria.</div>
+              <div class="agente-desc">Analisi trasversale: funnel richieste, metriche lavoro vs goal, performance social, calcoli immobiliari (ROI, rendita, gap OMI), finanze. Output: numeri chiave → significato → 1 azione prioritaria.</div>
+            </div>
+            <div class="agente-riga">
+              <span class="agente-icon">📰</span>
+              <span class="agente-badge badge-news">News</span>
+              <div class="agente-nome">Newspepper</div>
+              <div class="agente-desc">Alimenta il briefing di Geggi ogni mattina. Mercato immobiliare, normative, tassi mutui, novità social e strumenti AI per il lavoro di Emanuela.</div>
             </div>
           </div>
         </div>
@@ -141,37 +143,23 @@
         <div class="agenti-ramo ramo-lavoro">
           <div class="agenti-ramo-label">🏡 Area Lavoro Immobiliare</div>
           <div class="agenti-nodi">
-            <div class="agente-nodo capo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">🧑‍💼</span>
-                <span class="agente-badge badge-capo">Capo Area</span>
-              </div>
-              <div class="agente-nome">Giarvis</div>
-              <div class="agente-desc">Coordina incarichi, clienti e prospecting lunedì. Report a Geggi.</div>
-            </div>
-            <div class="agente-nodo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">👩‍💻</span>
-                <span class="agente-badge badge-spec">Clienti</span>
-              </div>
+            <div class="agente-riga">
+              <span class="agente-icon">👩‍💻</span>
+              <span class="agente-badge badge-spec">Clienti</span>
               <div class="agente-nome">Agente Clienti</div>
-              <div class="agente-desc">Ciclo vita clienti, nuove richieste portale (silver@c21), bozze risposta IT/EN, follow-up dimenticati. Scrive su Notion + Supabase in parallelo. Skill: <code>/rispondi-richieste</code></div>
+              <div class="agente-desc">Richieste da portale (Gmail → Notion → Supabase), bozze risposta IT/EN, follow-up dimenticati, conversione acquirente → proprietario.</div>
             </div>
-            <div class="agente-nodo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">🧑‍💼</span>
-                <span class="agente-badge badge-spec">Incarichi</span>
-              </div>
+            <div class="agente-riga">
+              <span class="agente-icon">🧑‍💼</span>
+              <span class="agente-badge badge-spec">Incarichi</span>
               <div class="agente-nome">Agente Acquisizione</div>
-              <div class="agente-desc">Documenti Drive, checklist, inserimento immobile per l'amministrazione da scheda qualifica.</div>
+              <div class="agente-desc">Documenti Drive per ogni cliente ACQUISITO, checklist obbligatoria, inserimento immobile per l'amministrazione da scheda qualifica Supabase.</div>
             </div>
-            <div class="agente-nodo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">🕵️‍♀️</span>
-                <span class="agente-badge badge-spec">Ricerca</span>
-              </div>
+            <div class="agente-riga">
+              <span class="agente-icon">🕵️</span>
+              <span class="agente-badge badge-spec">Ricerca</span>
               <div class="agente-nome">Agente Ricercatore</div>
-              <div class="agente-desc">Portali privati ogni lunedì, valutazioni OMI multi-terreno, analisi link Radar.</div>
+              <div class="agente-desc">Portali privati ogni lunedì (Idealista, Immobiliare.it, Subito, Bakeca, Facebook). Valutazioni OMI multi-terreno. Analisi link Radar.</div>
             </div>
           </div>
         </div>
@@ -180,52 +168,29 @@
         <div class="agenti-ramo ramo-social">
           <div class="agenti-ramo-label">📸 Area Contenuti & Social</div>
           <div class="agenti-nodi">
-            <div class="agente-nodo capo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">👩‍🎨</span>
-                <span class="agente-badge badge-social">Capo Area</span>
-              </div>
+            <div class="agente-riga capo">
+              <span class="agente-icon">👩‍🎨</span>
+              <span class="agente-badge badge-strat">Strategista</span>
               <div class="agente-nome">Chicca</div>
-              <div class="agente-desc">Piano editoriale, metriche, monitor produzione, pubblicazione reel. Coordina il brainstorming a 4.</div>
+              <div class="agente-desc">Posizionamento "Visione Abitata", tono di voce, buyer persona, direzione property funding. Check coerenza su tutto. Coordina Trendista, Pianificatrice e Produttore.</div>
             </div>
-            <div class="agente-nodo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">👩‍🎤</span>
-                <span class="agente-badge badge-social">Trend</span>
-              </div>
+            <div class="agente-riga">
+              <span class="agente-icon">👩‍🎤</span>
+              <span class="agente-badge badge-social">Trend</span>
               <div class="agente-nome">La Trendista</div>
-              <div class="agente-desc">Trend virali, format divertenti, audio Instagram — ogni lunedì 8–12 idee da declinare per Emanuela in Maremma.</div>
+              <div class="agente-desc">Trend da luxury real estate internazionale e account lifestyle top. Ogni lunedì: 8–12 idee adattate al brand di Emanuela, salvate in Drive.</div>
             </div>
-            <div class="agente-nodo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">👩‍🏫</span>
-                <span class="agente-badge badge-social">Piano & Script</span>
-              </div>
+            <div class="agente-riga">
+              <span class="agente-icon">✍️</span>
+              <span class="agente-badge badge-social">Copywriter</span>
               <div class="agente-nome">La Pianificatrice</div>
-              <div class="agente-desc">Personal branding, storytelling, script reel e caroselli, caption e copy, piano settimanale.</div>
+              <div class="agente-desc">Piano settimanale, script reel con punteggiatura espressiva per HeyGen, copy caroselli slide per slide, caption. Tono autentico di Emanuela — niente template.</div>
             </div>
-            <div class="agente-nodo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">👨‍🎬</span>
-                <span class="agente-badge badge-social">Produzione</span>
-              </div>
+            <div class="agente-riga">
+              <span class="agente-icon">🎬</span>
+              <span class="agente-badge badge-social">Produzione</span>
               <div class="agente-nome">Il Produttore</div>
-              <div class="agente-desc">Trasforma gli script in contenuti finiti con Higgsfield, HeyGen, Remotion e Canva.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- NEWSPEPPER -->
-        <div class="agenti-ramo ramo-news">
-          <div class="agenti-ramo-label">📰 News & Aggiornamenti</div>
-          <div class="agenti-nodi">
-            <div class="agente-nodo capo">
-              <div class="agente-nodo-top">
-                <span class="agente-icon">👩‍🔬</span>
-                <span class="agente-badge badge-news">News Agent</span>
-              </div>
-              <div class="agente-nome">Newspepper</div>
-              <div class="agente-desc">Alimenta il briefing di Geggi ogni mattina. Mercato immobiliare, normative, tassi, novità social e strumenti AI.</div>
+              <div class="agente-desc">Esperto Higgsfield (soul, animazioni, before/after, motion) · HeyGen (script e video avatar voce clonata) · Canva (grafica brand top: caroselli, post, infografiche).</div>
             </div>
           </div>
         </div>
