@@ -138,8 +138,8 @@
           <div>Cliente</div>
           <div>Immobile</div>
           <div>Stato</div>
+          <div>Arrivo richiesta</div>
           <div>Ult. contatto</div>
-          <div>Prossimo follow</div>
           <div></div>
         </div>
         <div id="listaRichieste"><div class="empty-state">Caricamento…</div></div>
@@ -310,7 +310,7 @@
 
     async function carica() {
       const [rR, rP] = await Promise.all([
-        fetch(`${SB_URL}/rest/v1/richieste?order=created_at.desc&limit=300`, { headers: SB_H }),
+        fetch(`${SB_URL}/rest/v1/richieste?order=data_richiesta.desc&limit=300`, { headers: SB_H }),
         fetch(`${SB_URL}/rest/v1/proprieta?select=id,ref,titolo&order=ref.asc&limit=200`, { headers: SB_H })
       ]);
       _tutte = await rR.json();
@@ -343,8 +343,8 @@
             <div class="ric-sub">${r.interesse || ''}</div>
           </div>
           <div><span class="stato-pill ${classeStato[r.stato_cliente] || ''}">${r.stato_cliente || '—'}</span></div>
+          <div class="data-prossima">${fmt(r.data_richiesta)}</div>
           <div class="data-prossima">${fmt(r.ultimo_contatto)}</div>
-          <div class="data-prossima ${isUrgente(r.prossimo_follow) ? 'urgente' : ''}">${fmt(r.prossimo_follow)}</div>
           <div><span class="n-follow-badge">${r.n_follow || 0}×</span></div>
         </div>`).join('');
     }
