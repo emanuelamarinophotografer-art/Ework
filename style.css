@@ -100,6 +100,12 @@ body {
 .nav-section.c-contenuti .nav-item:hover { background: #b4c4ac; }
 .nav-section.c-contenuti .nav-item.active { color: #2a3e24; border-left-color: #6a8862; background: #a4b89c; }
 
+.nav-section.c-analisi { background: #c2cedc; border-radius: 6px; margin: 0 8px 4px; }
+.nav-section.c-analisi .nav-label { color: #1a2e42; }
+.nav-section.c-analisi .nav-item { border-radius: 5px; }
+.nav-section.c-analisi .nav-item:hover { background: #b0c0d4; }
+.nav-section.c-analisi .nav-item.active { color: #1a2e42; border-left-color: #3a5a78; background: #9ab0c8; }
+
 .nav-item {
   display: flex;
   align-items: center;
