@@ -271,7 +271,7 @@
       const el = document.getElementById('propGrid');
       if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessuna proprietà trovata.</div>'; return; }
       el.innerHTML = lista.map(p => `
-        <div class="prop-card" onclick="void(0)">
+        <div class="prop-card" onclick="location.href='proprieta-detail.html?id=${p.id}'">
           <div>
             ${p.ref ? '<div class="prop-ref">' + p.ref + '</div>' : ''}
             <div class="prop-titolo">${p.titolo || p.nome || '—'}</div>

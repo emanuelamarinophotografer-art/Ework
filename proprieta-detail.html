@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ework — Scheda Proprietà</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .btn-back { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; font-family: inherit; font-weight: 600; cursor: pointer; color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-ghost { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; font-family: inherit; font-weight: 600; cursor: pointer; color: var(--text-muted); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* HEADER */
+    .scheda-header { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin-bottom: 18px; }
+    .scheda-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .scheda-rif { font-size: 0.72rem; font-weight: 700; color: #c0392b; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .scheda-titolo { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .scheda-localita { font-size: 0.88rem; color: var(--text-muted); }
+    .scheda-actions { display: flex; gap: 8px; align-items: flex-start; flex-shrink: 0; }
+
+    .scheda-numeri { display: flex; gap: 28px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--border); }
+    .numero-item { display: flex; flex-direction: column; gap: 2px; }
+    .numero-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .numero-val { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+    .numero-val.prezzo { color: var(--accent); }
+
+    /* STATO BADGE */
+    .stato-badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.04em; }
+    .flag-badge { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); }
+    .stato-valutazione { background: #e8f4fd; color: #2980b9; }
+    .stato-incarico { background: #fef9e7; color: #d4a017; }
+    .stato-portale { background: #f0eaff; color: #7b4ccc; }
+    .stato-trattativa { background: #fdf2e9; color: #e67e22; }
+    .stato-venduto { background: #eafaf1; color: #27ae60; }
+    .stato-ritirato { background: #fdedec; color: #c0392b; }
+
+    /* CORPO */
+    .scheda-body { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+    .info-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; }
+    .info-card.full { grid-column: 1 / -1; }
+    .info-card-title { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; font-weight: 700; }
+    .info-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; gap: 12px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .label { color: var(--text-muted); flex-shrink: 0; }
+    .info-row .val { color: var(--text); font-weight: 500; text-align: right; }
+    .info-row .val.red { color: #c0392b; font-weight: 600; }
+
+    /* ANALISI */
+    .analisi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .analisi-item { background: var(--bg); border-radius: 8px; padding: 12px 14px; }
+    .analisi-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+    .analisi-val { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .analisi-val.positivo { color: #27ae60; }
+    .analisi-val.negativo { color: #c0392b; }
+    .analisi-val.neutro { color: #e67e22; }
+
+    /* MODAL EDIT */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg-card); border-radius: 12px; padding: 28px; width: 560px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+    .modal h3 { font-size: 1rem; font-weight: 600; margin-bottom: 20px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .form-input, .form-select, .form-textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 9px 12px; font-size: 0.9rem; font-family: inherit; font-weight: 500; color: var(--text); outline: none; width: 100%; box-sizing: border-box; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+    .form-textarea { resize: vertical; min-height: 70px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-annulla { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; color: var(--text-muted); }
+    .btn-salva { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 9px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+
+    @media (max-width: 760px) { .scheda-body { grid-template-columns: 1fr; } .analisi-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html"><h1>Ework</h1></a>
+      <div class="sub">Centro operativo</div>
+    </div>
+    <nav class="nav-section c-principale">
+      <div class="nav-label">Principale</div>
+      <a class="nav-item" href="index.html"><span class="icon">🎯</span> Centro di comando</a>
+    </nav>
+    <nav class="nav-section c-operativo">
+      <div class="nav-label">Operativo</div>
+      <a class="nav-item" href="attivita.html"><span class="icon">📅</span> Attività</a>
+      <a class="nav-item" href="agenti.html"><span class="icon">🤖</span> Agenti</a>
+      <a class="nav-item" href="chat.html"><span class="icon">💬</span> Chat</a>
+    </nav>
+    <nav class="nav-section c-lavoro">
+      <div class="nav-label">Lavoro</div>
+      <a class="nav-item" href="clienti.html"><span class="icon">👤</span> Clienti</a>
+      <a class="nav-item active" href="proprieta.html"><span class="icon">🏡</span> Proprietà</a>
+      <a class="nav-item" href="valutazione.html"><span class="icon">🧮</span> Valutazione</a>
+      <a class="nav-item" href="ricerca.html"><span class="icon">🔍</span> Ricerca Immobili</a>
+      <a class="nav-item" href="radar.html"><span class="icon">📡</span> Radar Lunedì</a>
+      <a class="nav-item" href="incarico.html"><span class="icon">📋</span> Scheda Incarico</a>
+    </nav>
+    <nav class="nav-section c-contenuti">
+      <div class="nav-label">Contenuti</div>
+      <a class="nav-item" href="social.html"><span class="icon">📸</span> Social</a>
+      <a class="nav-item" href="fonti.html"><span class="icon">🌿</span> Fonti</a>
+    </nav>
+    <div class="sidebar-bottom" id="dataOggi"></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h2 id="topbarNome">Scheda Proprietà</h2>
+      <div class="date" id="dataEstesa"></div>
+    </div>
+    <div class="content" id="contenuto">
+      <div class="placeholder">Caricamento…</div>
+    </div>
+  </main>
+
+  <!-- MODAL MODIFICA -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3>Modifica Proprietà</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Titolo</label>
+          <input class="form-input" type="text" id="f_titolo" />
+        </div>
+        <div class="form-group">
+          <label>Riferimento</label>
+          <input class="form-input" type="text" id="f_ref" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipologia</label>
+          <select class="form-select" id="f_tipo">
+            <option>Rustico / Casale</option><option>Villa / Villetta</option>
+            <option>Appartamento</option><option>Terreno</option>
+            <option>Locale commerciale</option><option>Altro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stato</label>
+          <select class="form-select" id="f_stato">
+            <option>Attivo</option><option>Non Attivo</option><option>In trattativa</option><option>Venduto</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Zona / Comune</label>
+          <input class="form-input" type="text" id="f_zona" />
+        </div>
+        <div class="form-group">
+          <label>Indirizzo</label>
+          <input class="form-input" type="text" id="f_indirizzo" />
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label>Prezzo (€)</label>
+          <input class="form-input" type="number" id="f_prezzo" />
+        </div>
+        <div class="form-group">
+          <label>Superficie mq</label>
+          <input class="form-input" type="number" id="f_mq" />
+        </div>
+        <div class="form-group">
+          <label>Scadenza</label>
+          <input class="form-input" type="date" id="f_scadenza" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Proprietario</label>
+          <input class="form-input" type="text" id="f_proprietario" />
+        </div>
+        <div class="form-group">
+          <label>Tel Proprietario</label>
+          <input class="form-input" type="tel" id="f_tel_proprietario" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Note</label>
+          <textarea class="form-textarea" id="f_note"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-annulla" onclick="chiudiModal()">Annulla</button>
+        <button type="button" class="btn-salva" onclick="salva()">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const d = new Date();
+    const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+    const mesi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+    document.getElementById('dataOggi').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()];
+    document.getElementById('dataEstesa').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()] + ' ' + d.getFullYear();
+
+    const classeStato = { 'Valutazione':'stato-valutazione','Incarico preso':'stato-incarico','In portale':'stato-portale','In trattativa':'stato-trattativa','Venduto':'stato-venduto','Ritirato':'stato-ritirato' };
+
+    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
+    const propId = parseInt(new URLSearchParams(location.search).get('id'));
+    let _prop = null;
+
+    function fmt(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('it-IT', {day:'2-digit',month:'short',year:'numeric'}); }
+    function fmtEuro(n) { if (!n) return '—'; return '€ ' + Number(n).toLocaleString('it-IT'); }
+
+    function scartoClasse(s) {
+      if (s === null || s === undefined) return 'neutro';
+      if (s < -10) return 'positivo';
+      if (s > 20) return 'negativo';
+      return 'neutro';
+    }
+
+    async function render() {
+      const res = await fetch(`${SB_URL}/rest/v1/proprieta?id=eq.${propId}`, { headers: SB_H });
+      const lista = await res.json();
+      _prop = lista[0];
+      if (!_prop) { document.getElementById('contenuto').innerHTML = '<div class="placeholder">Proprietà non trovata.</div>'; return; }
+
+      const p = _prop;
+      document.getElementById('topbarNome').textContent = p.ref || p.titolo || p.nome || 'Scheda Proprietà';
+
+      const scarto = p.scarto_pct !== null && p.scarto_pct !== undefined ? p.scarto_pct : null;
+
+      document.getElementById('contenuto').innerHTML = `
+        <div class="scheda-header">
+          <div class="scheda-top">
+            <div>
+              ${p.ref ? `<div class="scheda-rif">${p.ref}</div>` : ''}
+              <div class="scheda-titolo">${p.titolo || p.nome || '—'}</div>
+              <div class="scheda-localita">📍 ${p.indirizzo || p.zona || p.comune || '—'}</div>
+            </div>
+            <div class="scheda-actions">
+              <span class="stato-badge ${classeStato[p.stato] || ''}">${p.stato || ''}</span>
+              ${p.flag_mercato ? `<span class="flag-badge">${p.flag_mercato}</span>` : ''}
+              <button type="button" class="btn-ghost" onclick="apriModal()">✏️ Modifica</button>
+              <a class="btn-back" href="proprieta.html">← Torna</a>
+            </div>
+          </div>
+          <div class="scheda-numeri">
+            ${p.prezzo ? `<div class="numero-item"><div class="numero-label">Prezzo</div><div class="numero-val prezzo">${fmtEuro(p.prezzo)}</div></div>` : ''}
+            ${p.mq ? `<div class="numero-item"><div class="numero-label">Superficie</div><div class="numero-val">${p.mq} mq</div></div>` : ''}
+            ${p.tipologia ? `<div class="numero-item"><div class="numero-label">Tipologia</div><div class="numero-val" style="font-size:0.95rem">${p.tipologia}</div></div>` : ''}
+            ${p.scadenza ? `<div class="numero-item"><div class="numero-label">Scadenza incarico</div><div class="numero-val" style="font-size:0.9rem">${fmt(p.scadenza)}</div></div>` : ''}
+          </div>
+        </div>
+
+        <div class="scheda-body">
+          <div class="info-card">
+            <div class="info-card-title">Dettagli immobile</div>
+            ${p.ref ? `<div class="info-row"><span class="label">Riferimento</span><span class="val red">${p.ref}</span></div>` : ''}
+            ${p.zona || p.comune ? `<div class="info-row"><span class="label">Zona</span><span class="val">${p.zona || p.comune}</span></div>` : ''}
+            ${p.indirizzo ? `<div class="info-row"><span class="label">Indirizzo</span><span class="val">${p.indirizzo}</span></div>` : ''}
+            ${p.tipologia ? `<div class="info-row"><span class="label">Tipologia</span><span class="val">${p.tipologia}</span></div>` : ''}
+            ${p.mq ? `<div class="info-row"><span class="label">Superficie</span><span class="val">${p.mq} mq</span></div>` : ''}
+            ${p.inserimento ? `<div class="info-row"><span class="label">Data inserimento</span><span class="val">${fmt(p.inserimento)}</span></div>` : ''}
+            ${p.scadenza ? `<div class="info-row"><span class="label">Scadenza incarico</span><span class="val">${fmt(p.scadenza)}</span></div>` : ''}
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">Proprietario</div>
+            ${p.proprietario ? `<div class="info-row"><span class="label">Nome</span><span class="val">👤 ${p.proprietario}</span></div>` : ''}
+            ${p.tel_proprietario ? `<div class="info-row"><span class="label">Telefono</span><span class="val"><a href="tel:${p.tel_proprietario}" style="color:var(--accent)">${p.tel_proprietario}</a></span></div>` : ''}
+            ${!p.proprietario ? '<div style="font-size:0.82rem;color:var(--text-faint);font-style:italic">Nessun proprietario collegato.</div>' : ''}
+            ${p.note ? `<div style="margin-top:14px"><div class="info-card-title">Note</div><div style="font-size:0.85rem;color:var(--text);line-height:1.6;white-space:pre-wrap">${p.note}</div></div>` : ''}
+          </div>
+        </div>
+
+        <div class="info-card full" style="margin-bottom:18px">
+          <div class="info-card-title">Analisi di mercato</div>
+          <div class="analisi-grid">
+            <div class="analisi-item">
+              <div class="analisi-label">Benchmark €/mq</div>
+              <div class="analisi-val">${p.benchmark_mq ? fmtEuro(p.benchmark_mq) : '—'}</div>
+            </div>
+            <div class="analisi-item">
+              <div class="analisi-label">Scarto dal mercato</div>
+              <div class="analisi-val ${scartoClasse(scarto)}">${scarto !== null ? scarto + '%' : '—'}</div>
+            </div>
+            <div class="analisi-item">
+              <div class="analisi-label">Prezzo terreno stimato</div>
+              <div class="analisi-val">${p.prezzo_terreno_stimato ? fmtEuro(p.prezzo_terreno_stimato) : '—'}</div>
+            </div>
+            <div class="analisi-item">
+              <div class="analisi-label">Ettari terreno</div>
+              <div class="analisi-val">${p.ettari_terreno ? p.ettari_terreno + ' ha' : '—'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function apriModal() {
+      const p = _prop;
+      document.getElementById('f_titolo').value = p.titolo || p.nome || '';
+      document.getElementById('f_ref').value = p.ref || '';
+      document.getElementById('f_tipo').value = p.tipologia || 'Rustico / Casale';
+      document.getElementById('f_stato').value = p.stato || 'Attivo';
+      document.getElementById('f_zona').value = p.zona || p.comune || '';
+      document.getElementById('f_indirizzo').value = p.indirizzo || '';
+      document.getElementById('f_prezzo').value = p.prezzo || '';
+      document.getElementById('f_mq').value = p.mq || '';
+      document.getElementById('f_scadenza').value = p.scadenza || '';
+      document.getElementById('f_proprietario').value = p.proprietario || '';
+      document.getElementById('f_tel_proprietario').value = p.tel_proprietario || '';
+      document.getElementById('f_note').value = p.note || '';
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function chiudiModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+    async function salva() {
+      const obj = {
+        titolo: document.getElementById('f_titolo').value.trim(),
+        nome: document.getElementById('f_titolo').value.trim(),
+        ref: document.getElementById('f_ref').value.trim(),
+        tipologia: document.getElementById('f_tipo').value,
+        stato: document.getElementById('f_stato').value,
+        zona: document.getElementById('f_zona').value.trim(),
+        comune: document.getElementById('f_zona').value.trim(),
+        indirizzo: document.getElementById('f_indirizzo').value.trim(),
+        prezzo: parseFloat(document.getElementById('f_prezzo').value) || null,
+        mq: parseInt(document.getElementById('f_mq').value) || null,
+        scadenza: document.getElementById('f_scadenza').value || null,
+        proprietario: document.getElementById('f_proprietario').value.trim(),
+        tel_proprietario: document.getElementById('f_tel_proprietario').value.trim(),
+        note: document.getElementById('f_note').value.trim(),
+      };
+      await fetch(`${SB_URL}/rest/v1/proprieta?id=eq.${propId}`, { method: 'PATCH', headers: SB_H, body: JSON.stringify(obj) });
+      chiudiModal();
+      render();
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) chiudiModal(); });
+    render();
+  </script>
+
+</body>
+</html>
