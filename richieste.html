@@ -34,6 +34,12 @@
     .s-chiuso     { background: #f1f8e9; color: #33691e; }
     .s-richiamare { background: #fff9c4; color: #827717; }
 
+    /* PILLS PROPRIETÀ */
+    .prop-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .prop-pill { display: inline-flex; align-items: center; gap: 5px; background: #c4d8e6; color: #1e3e52; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+    .prop-pill-x { cursor: pointer; font-size: 0.85rem; line-height: 1; color: #1e3e52; background: none; border: none; padding: 0; font-family: inherit; }
+    .prop-pill-x:hover { color: #c62828; }
+
     /* AUTOCOMPLETE */
     .ac-wrap { position: relative; }
     .ac-list { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-card); border: 1px solid var(--accent); border-radius: 0 0 8px 8px; z-index: 200; max-height: 200px; overflow-y: auto; display: none; }
@@ -179,13 +185,12 @@
           <input class="form-input" type="text" id="f_immobile" placeholder="es. 33541050-137" />
         </div>
         <div class="form-group">
-          <label>Proprietà collegata (rif.)</label>
+          <label>Proprietà proposte (multipla)</label>
           <div class="ac-wrap">
-            <input class="form-input" type="text" id="f_proprieta_cerca" placeholder="Scrivi il riferimento…" autocomplete="off" />
+            <input class="form-input" type="text" id="f_proprieta_cerca" placeholder="Scrivi ref o titolo…" autocomplete="off" />
             <div class="ac-list" id="f_proprieta_list"></div>
           </div>
-          <div class="ac-selected" id="f_proprieta_sel"></div>
-          <input type="hidden" id="f_proprieta_id" />
+          <div id="f_proprieta_pills" class="prop-pills"></div>
         </div>
       </div>
       <div class="form-row">
@@ -288,6 +293,7 @@
     let _filtroAttivo = '';
     let _editId = null;
     let _proprieta = [];
+    let _selProprieta = []; // [{id, label}]
 
     const classeStato = {
       'Nuova richiesta': 's-nuova', 'Risposto': 's-risposto', 'In attesa risposta': 's-attesa',
@@ -359,8 +365,50 @@
       renderLista();
     });
 
+    function renderPills() {
+      const el = document.getElementById('f_proprieta_pills');
+      el.innerHTML = _selProprieta.map(p => `
+        <span class="prop-pill">
+          ${p.label}
+          <button class="prop-pill-x" onclick="rimuoviProp(${p.id})">✕</button>
+        </span>`).join('');
+    }
+
+    function rimuoviProp(id) {
+      _selProprieta = _selProprieta.filter(p => p.id !== id);
+      renderPills();
+    }
+
+    function initAcMulti() {
+      const inp = document.getElementById('f_proprieta_cerca');
+      const list = document.getElementById('f_proprieta_list');
+      inp.oninput = () => {
+        const q = inp.value.trim().toLowerCase();
+        if (!q) { list.classList.remove('open'); list.innerHTML = ''; return; }
+        const hits = _proprieta
+          .filter(p => !_selProprieta.find(s => s.id === p.id))
+          .filter(p => (p.ref || p.titolo || '').toLowerCase().includes(q))
+          .slice(0, 10);
+        if (!hits.length) { list.classList.remove('open'); return; }
+        list.innerHTML = hits.map(p => `<div class="ac-item" data-id="${p.id}" data-label="${p.ref || p.titolo}">${p.ref || p.titolo}</div>`).join('');
+        list.classList.add('open');
+      };
+      list.addEventListener('click', e => {
+        const item = e.target.closest('.ac-item');
+        if (!item) return;
+        _selProprieta.push({ id: parseInt(item.dataset.id), label: item.dataset.label });
+        inp.value = '';
+        list.classList.remove('open');
+        renderPills();
+      });
+      document.addEventListener('click', e => {
+        if (!inp.contains(e.target) && !list.contains(e.target)) list.classList.remove('open');
+      });
+    }
+
     function nuovaRichiesta() {
       _editId = null;
+      _selProprieta = [];
       document.getElementById('modalTitolo').textContent = 'Nuova richiesta';
       document.getElementById('btnElimina').style.display = 'none';
       ['f_nome','f_telefono','f_email','f_immobile','f_interesse','f_obiezioni','f_mess_follow_ai','f_note'].forEach(id => document.getElementById(id).value = '');
@@ -369,14 +417,16 @@
       document.getElementById('f_stato_follow').value = 'Nessuno';
       document.getElementById('f_ultimo_contatto').value = new Date().toISOString().split('T')[0];
       document.getElementById('f_prossimo_follow').value = '';
-      popolaSelectProprieta(null);
+      document.getElementById('f_proprieta_cerca').value = '';
+      renderPills();
       document.getElementById('modalOverlay').classList.add('open');
     }
 
-    function apriModal(id) {
+    async function apriModal(id) {
       const r = _tutte.find(x => x.id === id);
       if (!r) return;
       _editId = id;
+      _selProprieta = [];
       document.getElementById('modalTitolo').textContent = r.nome_cliente || 'Richiesta';
       document.getElementById('btnElimina').style.display = '';
       document.getElementById('f_nome').value = r.nome_cliente || '';
@@ -392,40 +442,13 @@
       document.getElementById('f_obiezioni').value = r.obiezioni || '';
       document.getElementById('f_mess_follow_ai').value = r.mess_follow_ai || '';
       document.getElementById('f_note').value = r.note || '';
-      popolaSelectProprieta(r.proprieta_id);
+      document.getElementById('f_proprieta_cerca').value = '';
+      // carica proprietà collegate dalla tabella ponte
+      const res = await fetch(`${SB_URL}/rest/v1/richieste_proprieta?richiesta_id=eq.${id}&select=proprieta_id,proprieta(id,ref,titolo)`, { headers: SB_H });
+      const links = await res.json();
+      _selProprieta = links.map(l => ({ id: l.proprieta_id, label: l.proprieta?.ref || l.proprieta?.titolo || l.proprieta_id }));
+      renderPills();
       document.getElementById('modalOverlay').classList.add('open');
-    }
-
-    function initAc(inputId, listId, hiddenId, selId, items, labelFn) {
-      const inp = document.getElementById(inputId);
-      const list = document.getElementById(listId);
-      const hidden = document.getElementById(hiddenId);
-      const sel = document.getElementById(selId);
-      inp.oninput = () => {
-        const q = inp.value.trim().toLowerCase();
-        if (!q) { list.classList.remove('open'); list.innerHTML = ''; return; }
-        const hits = items.filter(it => labelFn(it).toLowerCase().includes(q)).slice(0, 10);
-        if (!hits.length) { list.classList.remove('open'); return; }
-        list.innerHTML = hits.map(it => `<div class="ac-item" data-id="${it.id}" data-label="${labelFn(it)}">${labelFn(it)}</div>`).join('');
-        list.classList.add('open');
-      };
-      list.addEventListener('click', e => {
-        const item = e.target.closest('.ac-item');
-        if (!item) return;
-        hidden.value = item.dataset.id;
-        inp.value = item.dataset.label;
-        sel.textContent = '✓ ' + item.dataset.label;
-        list.classList.remove('open');
-      });
-      document.addEventListener('click', e => { if (!inp.contains(e.target) && !list.contains(e.target)) list.classList.remove('open'); }, { once: false });
-    }
-
-    function popolaSelectProprieta(selId) {
-      const p = selId ? _proprieta.find(x => x.id === selId) : null;
-      document.getElementById('f_proprieta_id').value = selId || '';
-      document.getElementById('f_proprieta_cerca').value = p ? (p.ref || p.titolo) : '';
-      document.getElementById('f_proprieta_sel').textContent = p ? '✓ ' + (p.ref || p.titolo) : '';
-      initAc('f_proprieta_cerca', 'f_proprieta_list', 'f_proprieta_id', 'f_proprieta_sel', _proprieta, p => p.ref || p.titolo || '');
     }
 
     function chiudiModal() { document.getElementById('modalOverlay').classList.remove('open'); _editId = null; }
@@ -445,19 +468,32 @@
         obiezioni: document.getElementById('f_obiezioni').value.trim(),
         mess_follow_ai: document.getElementById('f_mess_follow_ai').value.trim(),
         note: document.getElementById('f_note').value.trim(),
-        proprieta_id: document.getElementById('f_proprieta_id').value ? parseInt(document.getElementById('f_proprieta_id').value) : null,
       };
 
+      let richiestaId = _editId;
       if (_editId) {
-        // incrementa n_follow se cambia stato verso follow-up
         const r = _tutte.find(x => x.id === _editId);
         if (r && obj.stato_cliente.startsWith('Follow-up') && r.stato_cliente !== obj.stato_cliente) {
           obj.n_follow = (r.n_follow || 0) + 1;
         }
         await fetch(`${SB_URL}/rest/v1/richieste?id=eq.${_editId}`, { method: 'PATCH', headers: SB_H, body: JSON.stringify(obj) });
       } else {
-        await fetch(`${SB_URL}/rest/v1/richieste`, { method: 'POST', headers: SB_H, body: JSON.stringify(obj) });
+        const res = await fetch(`${SB_URL}/rest/v1/richieste`, { method: 'POST', headers: SB_H, body: JSON.stringify({ ...obj, data_richiesta: new Date().toISOString().split('T')[0], n_follow: 0 }) });
+        const created = await res.json();
+        richiestaId = created[0]?.id;
       }
+
+      // sincronizza tabella ponte richieste_proprieta
+      if (richiestaId) {
+        await fetch(`${SB_URL}/rest/v1/richieste_proprieta?richiesta_id=eq.${richiestaId}`, { method: 'DELETE', headers: SB_H });
+        if (_selProprieta.length) {
+          await fetch(`${SB_URL}/rest/v1/richieste_proprieta`, {
+            method: 'POST', headers: SB_H,
+            body: JSON.stringify(_selProprieta.map(p => ({ richiesta_id: richiestaId, proprieta_id: p.id })))
+          });
+        }
+      }
+
       chiudiModal();
       carica();
     }
@@ -470,6 +506,7 @@
     }
 
     document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) chiudiModal(); });
+    initAcMulti();
     carica();
   </script>
 
