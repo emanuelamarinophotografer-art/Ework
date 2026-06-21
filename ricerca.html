@@ -310,9 +310,16 @@
       const lista = carica();
       const i = lista.findIndex(x => x.id === idSelezionato);
       if (i >= 0) {
+        const vecchioStato = lista[i].stato_scheda;
         lista[i].stato_scheda = nuovoStato;
         salva(lista);
-        if (nuovoStato === 'incarico') promuoviIncarico(idSelezionato, true);
+        if (nuovoStato === 'incarico') {
+          promuoviIncarico(idSelezionato, true);
+        } else if (vecchioStato === 'incarico') {
+          // Rimuovi dalla lista Proprietà se si torna indietro
+          const proprieta = JSON.parse(localStorage.getItem('proprieta') || '[]');
+          localStorage.setItem('proprieta', JSON.stringify(proprieta.filter(p => p.id !== idSelezionato)));
+        }
       }
       document.getElementById('modalStato').classList.remove('open');
       render();
