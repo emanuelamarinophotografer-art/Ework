@@ -6,54 +6,51 @@
   <title>Ework — Mara Analytics</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* HEADER MARA */
     .mara-header {
       background: linear-gradient(135deg, #1a2e42 0%, #2a4a6a 100%);
-      border-radius: 12px; padding: 20px 24px; margin-bottom: 20px;
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 16px;
       display: flex; align-items: center; gap: 16px;
     }
-    .mara-avatar {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: #4a8aae; display: flex; align-items: center;
-      justify-content: center; font-size: 1.4rem; flex-shrink: 0;
-    }
+    .mara-avatar { width: 48px; height: 48px; border-radius: 50%; background: #4a8aae; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
     .mara-title { font-size: 1.1rem; font-weight: 700; color: #e8f0f6; }
     .mara-sub { font-size: 0.75rem; color: #8aaec4; margin-top: 3px; }
     .mara-update { margin-left: auto; font-size: 0.7rem; color: #8aaec4; text-align: right; }
 
-    /* GRIGLIA DASHBOARD */
-    .mara-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .mara-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .mara-full { margin-bottom: 16px; }
-
-    /* KPI CARDS */
-    .kpi-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
-    .kpi-card {
-      flex: 1; min-width: 100px; background: var(--bg); border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px 14px; text-align: center;
+    /* TAB BAR */
+    .mara-tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+    .mara-tab {
+      padding: 8px 20px; font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      background: none; border: none; border-bottom: 2px solid transparent;
+      color: var(--text-muted); cursor: pointer; margin-bottom: -2px; transition: all 0.15s;
     }
+    .mara-tab.active { color: #1a2e42; border-bottom-color: #1a2e42; }
+    .mara-tab:hover:not(.active) { color: var(--text); }
+    .mara-panel { display: none; }
+    .mara-panel.active { display: block; }
+
+    /* KPI */
+    .kpi-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .kpi-card { flex: 1; min-width: 100px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-align: center; }
     .kpi-val { font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
-    .kpi-val.verde { color: #27ae60; }
-    .kpi-val.arancio { color: #c07040; }
-    .kpi-val.rosso { color: #c0392b; }
-    .kpi-val.blu { color: #2980b9; }
+    .kpi-val.verde { color: #27ae60; } .kpi-val.arancio { color: #c07040; } .kpi-val.rosso { color: #c0392b; } .kpi-val.blu { color: #2980b9; }
     .kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 5px; font-weight: 600; }
+
+    /* GRIGLIA */
+    .mara-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .mara-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 
     /* FUNNEL */
     .funnel-wrap { display: flex; flex-direction: column; gap: 8px; }
-    .funnel-step {
-      display: flex; align-items: center; gap: 12px;
-    }
-    .funnel-bar-wrap { flex: 1; }
+    .funnel-step { display: flex; align-items: center; gap: 12px; }
     .funnel-label { font-size: 0.78rem; color: var(--text); font-weight: 600; min-width: 120px; }
+    .funnel-bar-wrap { flex: 1; }
     .funnel-track { background: var(--border); border-radius: 20px; height: 10px; overflow: hidden; }
     .funnel-fill { height: 100%; border-radius: 20px; background: var(--accent); transition: width 0.5s; }
     .funnel-num { font-size: 0.8rem; font-weight: 700; color: var(--text); min-width: 32px; text-align: right; }
     .funnel-pct { font-size: 0.68rem; color: var(--text-muted); min-width: 44px; text-align: right; }
 
-    /* GOAL BARS */
+    /* GOAL */
     .goal-section { display: flex; flex-direction: column; gap: 10px; }
-    .goal-item { }
     .goal-header { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px; }
     .goal-nome { font-weight: 600; color: var(--text); }
     .goal-num { color: var(--text-muted); }
@@ -61,56 +58,6 @@
     .goal-fill { height: 100%; border-radius: 20px; background: var(--accent); transition: width 0.4s; }
     .goal-fill.ok { background: #27ae60; }
     .goal-proiezione { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; font-style: italic; }
-
-    /* FINANZE */
-    .fin-sezione { margin-bottom: 16px; }
-    .fin-sezione-label { font-size: 0.67rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; font-weight: 600; }
-    .fin-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
-    .fin-item label { display: block; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
-    .fin-input {
-      width: 100%; box-sizing: border-box; background: var(--bg); border: 1px solid var(--border);
-      border-radius: 6px; padding: 8px 10px; font-size: 0.95rem; font-family: inherit;
-      font-weight: 600; color: var(--text); outline: none; text-align: center;
-    }
-    .fin-input:focus { border-color: var(--accent); }
-    .fin-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-    .fin-autosave { font-size: 0.72rem; color: var(--text-muted); font-style: italic; }
-    .btn-fin { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; font-family: inherit; font-weight: 600; cursor: pointer; }
-    .btn-fin:hover { opacity: 0.85; }
-    .fin-storico-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
-    .fin-storico-data { font-size: 0.8rem; font-weight: 600; color: var(--text); min-width: 80px; }
-    .fin-storico-desc { flex: 1; font-size: 0.82rem; color: var(--text-muted); }
-    .fin-storico-importo { font-size: 0.95rem; font-weight: 700; }
-    .fin-storico-importo.entrata { color: #27ae60; }
-    .fin-storico-importo.spesa { color: #c0392b; }
-    .fin-storico-tipo { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 8px; }
-    .tipo-provv { background: #eafaf1; color: #27ae60; }
-    .tipo-spesa { background: #fdedec; color: #c0392b; }
-    .tipo-altro { background: #fef9e7; color: #b7860b; }
-    .btn-del-fin { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 0.8rem; padding: 2px 6px; }
-    .btn-del-fin:hover { color: var(--danger); }
-    .aggiungi-fin-form { background: var(--bg-card); border: 1px dashed var(--border); border-radius: 10px; padding: 14px 16px; margin-top: 10px; }
-    .aggiungi-fin-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-    .aggiungi-fin-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
-    .fin-field { display: flex; flex-direction: column; gap: 4px; }
-    .fin-field label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
-    .fin-field input, .fin-field select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; }
-    .fin-field input:focus, .fin-field select:focus { border-color: var(--accent); }
-    .fin-field.wide input { width: 200px; }
-    .fin-field.sm input { width: 110px; }
-
-    /* INTERPRETAZIONE MARA */
-    .mara-insight {
-      background: #1a2e42; border-radius: 10px; padding: 14px 16px; margin-top: 12px;
-    }
-    .mara-insight-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #8aaec4; font-weight: 700; margin-bottom: 8px; }
-    .mara-insight-text { font-size: 0.82rem; color: #c8daea; line-height: 1.6; }
-    .mara-insight-action { margin-top: 8px; font-size: 0.82rem; color: #8aaec4; }
-    .mara-insight-action strong { color: #e8f0f6; }
-
-    /* PORTAFOGLIO IMMOBILI */
-    .port-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-    .port-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
 
     /* SOCIAL */
     .social-rubrica-row { display: flex; flex-direction: column; gap: 8px; }
@@ -122,17 +69,83 @@
     .rubrica-fill { height: 100%; border-radius: 20px; }
     .rubrica-count { font-size: 0.75rem; color: var(--text-muted); min-width: 50px; text-align: right; }
 
-    /* MESE FINANZE */
-    .saldo-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
-      padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
-    }
+    /* PORTAFOGLIO */
+    .port-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+    /* FINANZE */
+    .saldo-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
     .saldo-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); font-weight: 600; }
     .saldo-val { font-size: 1.6rem; font-weight: 700; }
-    .saldo-val.positivo { color: #27ae60; }
-    .saldo-val.negativo { color: #c0392b; }
+    .saldo-val.positivo { color: #27ae60; } .saldo-val.negativo { color: #c0392b; }
+    .fin-sezione { margin-bottom: 20px; }
+    .fin-sezione-label { font-size: 0.67rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; font-weight: 600; }
+    .fin-input { width: 100%; box-sizing: border-box; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 0.95rem; font-family: inherit; font-weight: 600; color: var(--text); outline: none; text-align: center; }
+    .fin-input:focus { border-color: var(--accent); }
+    .btn-fin { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .btn-fin:hover { opacity: 0.85; }
+    .fin-storico-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
+    .fin-storico-data { font-size: 0.8rem; font-weight: 600; color: var(--text); min-width: 80px; }
+    .fin-storico-desc { flex: 1; font-size: 0.82rem; color: var(--text-muted); }
+    .fin-storico-importo { font-size: 0.95rem; font-weight: 700; }
+    .fin-storico-importo.entrata { color: #27ae60; } .fin-storico-importo.spesa { color: #c0392b; }
+    .fin-storico-tipo { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 8px; }
+    .tipo-provv { background: #eafaf1; color: #27ae60; } .tipo-spesa { background: #fdedec; color: #c0392b; } .tipo-altro { background: #fef9e7; color: #b7860b; }
+    .btn-del-fin { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 0.8rem; padding: 2px 6px; }
+    .btn-del-fin:hover { color: var(--danger); }
+    .aggiungi-fin-form { background: var(--bg-card); border: 1px dashed var(--border); border-radius: 10px; padding: 14px 16px; margin-top: 10px; }
+    .aggiungi-fin-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .aggiungi-fin-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+    .fin-field { display: flex; flex-direction: column; gap: 4px; }
+    .fin-field label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+    .fin-field input, .fin-field select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; }
+    .fin-field.wide input { width: 200px; }
+    .fin-field.sm input { width: 110px; }
+    .fin-sb-note { font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; font-style: italic; }
 
-    @media (max-width: 960px) { .mara-grid { grid-template-columns: 1fr; } .mara-grid-3 { grid-template-columns: 1fr; } .fin-row { grid-template-columns: repeat(2,1fr); } }
+    /* MERCATO */
+    .tab-row { display: flex; gap: 6px; margin-bottom: 16px; }
+    .tab-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-muted); font-size: 0.8rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .report-list { display: flex; flex-direction: column; gap: 10px; }
+    .report-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 16px; }
+    .report-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .report-info { flex: 1; }
+    .report-code { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .report-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .report-decisione { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
+    .dec-monitorare { background: #eaf4fb; color: #1565C0; } .dec-ottimizzare { background: #fff3e0; color: #E65100; }
+    .dec-intervenire { background: #ffebee; color: #C62828; } .dec-performante { background: #e8f5e9; color: #2E7D32; }
+    .report-actions { display: flex; gap: 6px; }
+    .btn-report { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; font-size: 0.75rem; font-family: inherit; color: var(--text-muted); cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+    .btn-report:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-report.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .form-aggiungi { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; display: none; }
+    .form-aggiungi.aperta { display: block; }
+    .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+    .form-field label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+    .form-field input, .form-field select { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; }
+    .form-field.wide input { width: 220px; } .form-field.sm input, .form-field.sm select { width: 130px; }
+    .mercato-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .mercato-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .mercato-zona { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px; }
+    .mercato-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 4px 0; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+    .mercato-row:last-child { border-bottom: none; }
+    .mercato-row .val { font-weight: 600; color: var(--text); }
+    .mercato-trend { font-size: 0.68rem; color: #27ae60; font-weight: 700; }
+    .skill-box { background: var(--bg-card); border: 1px dashed var(--border); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; }
+    .skill-cmd { display: inline-block; background: #1a2e42; color: #8aaec4; font-family: monospace; font-size: 0.85rem; padding: 3px 10px; border-radius: 6px; }
+    .skill-steps { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .skill-step { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 0.72rem; color: var(--text-muted); }
+    .skill-step-num { font-weight: 700; color: var(--accent); margin-right: 4px; }
+    .empty-state { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 0.85rem; }
+
+    /* INSIGHT */
+    .mara-insight { background: #1a2e42; border-radius: 10px; padding: 14px 16px; margin-top: 12px; }
+    .mara-insight-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #8aaec4; font-weight: 700; margin-bottom: 8px; }
+    .mara-insight-text { font-size: 0.82rem; color: #c8daea; line-height: 1.6; }
+
+    @media (max-width: 960px) { .mara-grid { grid-template-columns: 1fr; } .mara-grid-3 { grid-template-columns: 1fr; } .mercato-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -170,7 +183,6 @@
     <nav class="nav-section c-analisi">
       <div class="nav-label">Analisi</div>
       <a class="nav-item active" href="mara.html"><span class="icon">📊</span> Mara Analytics</a>
-      <a class="nav-item" href="osservatorio.html"><span class="icon">🔭</span> Osservatorio</a>
     </nav>
     <div class="sidebar-bottom" id="dataOggi"></div>
   </aside>
@@ -183,91 +195,82 @@
 
     <div class="content">
 
-      <!-- HEADER MARA -->
+      <!-- HEADER -->
       <div class="mara-header">
         <div class="mara-avatar">📊</div>
         <div>
           <div class="mara-title">Mara — Analista Trasversale</div>
-          <div class="mara-sub">Funnel richieste · Metriche lavoro · Portafoglio immobili · Social · Finanze</div>
+          <div class="mara-sub">Lavoro · Finanze · Mercato & Report</div>
         </div>
         <div class="mara-update" id="maraUpdate"></div>
       </div>
 
-      <!-- RIGA 1: KPI VELOCI -->
-      <div class="blocco mara-full">
+      <!-- KPI COLPO D'OCCHIO (sempre visibile) -->
+      <div class="blocco" style="margin-bottom:16px">
         <div class="blocco-header">Colpo d'occhio</div>
-        <div class="kpi-row" id="kpiRow">
+        <div class="kpi-row">
           <div class="kpi-card"><div class="kpi-val blu" id="kpi_richieste">—</div><div class="kpi-label">Richieste attive</div></div>
           <div class="kpi-card"><div class="kpi-val arancio" id="kpi_followscad">—</div><div class="kpi-label">Follow scaduti</div></div>
-          <div class="kpi-card"><div class="kpi-val" id="kpi_contatti">—</div><div class="kpi-label">Contatti settimana</div></div>
+          <div class="kpi-card"><div class="kpi-val" id="kpi_contatti">—</div><div class="kpi-label">Contatti mese</div></div>
           <div class="kpi-card"><div class="kpi-val" id="kpi_incarichi">—</div><div class="kpi-label">Incarichi mese</div></div>
-          <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_attesa">—</div><div class="kpi-label">Provv. attesa (€)</div></div>
-          <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_incassata">—</div><div class="kpi-label">Provv. incassata (€)</div></div>
-          <div class="kpi-card"><div class="kpi-val" id="kpi_immobili">—</div><div class="kpi-label">Immobili portafoglio</div></div>
+          <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_attesa">—</div><div class="kpi-label">Provv. attesa</div></div>
+          <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_incassata">—</div><div class="kpi-label">Provv. incassata</div></div>
+          <div class="kpi-card"><div class="kpi-val" id="kpi_immobili">—</div><div class="kpi-label">Portafoglio</div></div>
         </div>
       </div>
 
-      <!-- RIGA 2: FUNNEL + GOAL LAVORO -->
-      <div class="mara-grid">
-
-        <!-- FUNNEL RICHIESTE -->
-        <div class="blocco">
-          <div class="blocco-header">Funnel richieste</div>
-          <div class="funnel-wrap" id="funnelWrap">
-            <div class="placeholder">Caricamento…</div>
-          </div>
-          <div class="mara-insight" id="funnelInsight" style="display:none">
-            <div class="mara-insight-label">— Mara 📊</div>
-            <div class="mara-insight-text" id="funnelInsightText"></div>
-          </div>
-        </div>
-
-        <!-- GOAL LAVORO -->
-        <div class="blocco">
-          <div class="blocco-header">Goal mensili — <span id="meseLavoro"></span></div>
-          <div class="goal-section" id="goalSection">
-            <div class="placeholder">Nessuna metrica inserita questa settimana.</div>
-          </div>
-          <div class="mara-insight" id="goalInsight" style="display:none">
-            <div class="mara-insight-label">— Mara 📊</div>
-            <div class="mara-insight-text" id="goalInsightText"></div>
-          </div>
-        </div>
-
+      <!-- TAB BAR -->
+      <div class="mara-tabs">
+        <button type="button" class="mara-tab active" onclick="switchTab('lavoro', this)">📋 Lavoro</button>
+        <button type="button" class="mara-tab" onclick="switchTab('finanze', this)">💰 Finanze</button>
+        <button type="button" class="mara-tab" onclick="switchTab('mercato', this)">🔭 Mercato & Report</button>
       </div>
 
-      <!-- RIGA 3: PORTAFOGLIO IMMOBILI + SOCIAL -->
-      <div class="mara-grid">
+      <!-- ═══════ TAB LAVORO ═══════ -->
+      <div class="mara-panel active" id="panel-lavoro">
 
-        <!-- PORTAFOGLIO -->
-        <div class="blocco">
-          <div class="blocco-header">Portafoglio immobili</div>
-          <div class="kpi-row" id="portKpi"></div>
-          <div id="portInsight">
-            <div class="placeholder">Nessuna scheda in ricerca immobili.</div>
+        <div class="mara-grid">
+          <div class="blocco">
+            <div class="blocco-header">Funnel richieste</div>
+            <div class="funnel-wrap" id="funnelWrap"><div class="placeholder">Caricamento…</div></div>
+            <div class="mara-insight" id="funnelInsight" style="display:none">
+              <div class="mara-insight-label">— Mara 📊</div>
+              <div class="mara-insight-text" id="funnelInsightText"></div>
+            </div>
+          </div>
+          <div class="blocco">
+            <div class="blocco-header">Goal mensili — <span id="meseLavoro"></span></div>
+            <div class="goal-section" id="goalSection"><div class="placeholder">Nessuna metrica inserita.</div></div>
+            <div class="mara-insight" id="goalInsight" style="display:none">
+              <div class="mara-insight-label">— Mara 📊</div>
+              <div class="mara-insight-text" id="goalInsightText"></div>
+            </div>
           </div>
         </div>
 
-        <!-- SOCIAL -->
-        <div class="blocco">
-          <div class="blocco-header">Piano social — distribuzione rubriche</div>
-          <div class="social-rubrica-row" id="socialRubriche">
-            <div class="placeholder">Nessun post nel piano social.</div>
+        <div class="mara-grid">
+          <div class="blocco">
+            <div class="blocco-header">Portafoglio immobili</div>
+            <div class="kpi-row" id="portKpi"></div>
+            <div id="portInsight"><div class="placeholder">Nessuna scheda in ricerca immobili.</div></div>
           </div>
-          <div class="mara-insight" id="socialInsight" style="display:none">
-            <div class="mara-insight-label">— Mara 📊</div>
-            <div class="mara-insight-text" id="socialInsightText"></div>
+          <div class="blocco">
+            <div class="blocco-header">Piano social — distribuzione rubriche</div>
+            <div class="social-rubrica-row" id="socialRubriche"><div class="placeholder">Nessun post nel piano social.</div></div>
+            <div class="mara-insight" id="socialInsight" style="display:none">
+              <div class="mara-insight-label">— Mara 📊</div>
+              <div class="mara-insight-text" id="socialInsightText"></div>
+            </div>
           </div>
         </div>
 
       </div>
 
-      <!-- FINANZE -->
-      <div class="blocco mara-full">
-        <div class="blocco-header">Finanze</div>
+      <!-- ═══════ TAB FINANZE ═══════ -->
+      <div class="mara-panel" id="panel-finanze">
 
         <!-- SALDI -->
-        <div class="mara-grid-3" id="saldiCards">
+        <div class="mara-grid-3" style="margin-bottom:20px">
           <div class="saldo-card">
             <div><div class="saldo-label">Provvigioni incassate</div><div class="saldo-val positivo" id="fin_tot_entrate">€ 0</div></div>
             <span style="font-size:1.8rem">💰</span>
@@ -283,57 +286,162 @@
         </div>
 
         <!-- GOAL ANNUO -->
-        <div class="fin-sezione">
+        <div class="blocco" style="margin-bottom:16px">
           <div class="fin-sezione-label">Goal annuo provvigioni</div>
-          <div class="fin-row" style="grid-template-columns: 1fr 1fr; max-width: 400px;">
-            <div class="fin-item">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;margin-bottom:10px">
+            <div class="fin-field">
               <label>Goal annuo (€)</label>
               <input type="number" class="fin-input" id="fin_goal_annuo" placeholder="es. 40000" oninput="salvaFinGoal()" />
             </div>
-            <div class="fin-item">
+            <div class="fin-field">
               <label>% raggiunto</label>
               <input type="text" class="fin-input" id="fin_goal_pct" readonly style="background:var(--bg-card);color:var(--accent)" />
             </div>
           </div>
-          <div class="goal-track" style="margin-top:8px;height:12px">
+          <div class="goal-track" style="height:12px">
             <div class="goal-fill ok" id="fin_goal_bar" style="width:0%"></div>
           </div>
         </div>
 
         <!-- STORICO MOVIMENTI -->
-        <div class="fin-sezione">
-          <div class="fin-sezione-label">Movimenti <span id="contMovimenti"></span></div>
+        <div class="blocco">
+          <div class="blocco-header" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Movimenti <span id="contMovimenti"></span></span>
+            <span id="fin_sb_status" class="fin-sb-note"></span>
+          </div>
           <div id="finStorico"></div>
-
-          <!-- AGGIUNGI MOVIMENTO -->
           <div class="aggiungi-fin-form">
             <div class="aggiungi-fin-title">+ Aggiungi movimento</div>
             <div class="aggiungi-fin-row">
-              <div class="fin-field wide">
-                <label>Descrizione</label>
-                <input type="text" id="fin_desc" placeholder="es. Provvigione villa Scansano" />
-              </div>
-              <div class="fin-field sm">
-                <label>Importo (€)</label>
-                <input type="number" id="fin_importo" placeholder="0" />
-              </div>
+              <div class="fin-field wide"><label>Descrizione</label><input type="text" id="fin_desc" placeholder="es. Provvigione villa Scansano" /></div>
+              <div class="fin-field sm"><label>Importo (€)</label><input type="number" id="fin_importo" placeholder="0" /></div>
               <div class="fin-field">
                 <label>Tipo</label>
                 <select id="fin_tipo">
                   <option value="provvigione">💰 Provvigione</option>
                   <option value="spesa">📤 Spesa</option>
-                  <option value="altro">📋 Altro entrata</option>
+                  <option value="altro">📋 Altra entrata</option>
                 </select>
               </div>
-              <div class="fin-field sm">
-                <label>Data</label>
-                <input type="date" id="fin_data" />
-              </div>
+              <div class="fin-field sm"><label>Data</label><input type="date" id="fin_data" /></div>
               <div class="fin-field" style="justify-content:flex-end">
                 <label>&nbsp;</label>
                 <button type="button" class="btn-fin" onclick="aggiungiMovimento()">Aggiungi</button>
               </div>
             </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════ TAB MERCATO ═══════ -->
+      <div class="mara-panel" id="panel-mercato">
+
+        <!-- SKILL BOX -->
+        <div class="skill-box">
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">Per generare un report immobile usa <span class="skill-cmd">/analisi-mercato</span> in Claude Code. Mara legge i dati portali + CRM + OMI e salva il file in Drive automaticamente.</div>
+          <div class="skill-steps">
+            <div class="skill-step"><span class="skill-step-num">1</span> Dai i dati portali a Mara</div>
+            <div class="skill-step"><span class="skill-step-num">2</span> Mara legge CRM + Drive</div>
+            <div class="skill-step"><span class="skill-step-num">3</span> Genera HTML → Drive</div>
+            <div class="skill-step"><span class="skill-step-num">4</span> Aggiungi il link qui sotto</div>
+          </div>
+        </div>
+
+        <!-- REPORT SALVATI -->
+        <div class="blocco" style="margin-bottom:16px">
+          <div class="blocco-header" style="display:flex;justify-content:space-between;align-items:center">
+            <span>📁 Report salvati</span>
+            <button type="button" class="btn-small" onclick="toggleFormAggiungi()">+ Aggiungi</button>
+          </div>
+
+          <div class="form-aggiungi" id="formAggiungi">
+            <div class="aggiungi-fin-title">Nuovo report</div>
+            <div class="form-row">
+              <div class="form-field"><label>Codice immobile</label><input type="text" id="inp-codice" placeholder="es. 33541050-144" /></div>
+              <div class="form-field wide"><label>Tipologia + Comune</label><input type="text" id="inp-tipo" placeholder="es. Villa bifamiliare · Grosseto" /></div>
+              <div class="form-field sm">
+                <label>Decisione Mara</label>
+                <select id="inp-decisione">
+                  <option value="monitorare">↗ Monitorare</option>
+                  <option value="ottimizzare">⚠ Ottimizzare</option>
+                  <option value="intervenire">🔴 Intervenire</option>
+                  <option value="performante">✅ Performante</option>
+                </select>
+              </div>
+              <div class="form-field wide"><label>Link Drive</label><input type="text" id="inp-link" placeholder="https://drive.google.com/..." /></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button type="button" class="btn-small" onclick="salvaReport()">Salva</button>
+              <button type="button" class="btn-small" style="background:var(--bg);color:var(--text-muted);border:1px solid var(--border)" onclick="toggleFormAggiungi()">Annulla</button>
+            </div>
+          </div>
+
+          <div class="tab-row">
+            <button type="button" class="tab-btn active" onclick="filtraReport('tutti', this)">Tutti</button>
+            <button type="button" class="tab-btn" onclick="filtraReport('monitorare', this)">↗ Monitorare</button>
+            <button type="button" class="tab-btn" onclick="filtraReport('ottimizzare', this)">⚠ Ottimizzare</button>
+            <button type="button" class="tab-btn" onclick="filtraReport('intervenire', this)">🔴 Intervenire</button>
+            <button type="button" class="tab-btn" onclick="filtraReport('performante', this)">✅ Performante</button>
+          </div>
+
+          <div class="report-list" id="reportList"></div>
+        </div>
+
+        <!-- DATI MERCATO OMI -->
+        <div class="blocco">
+          <div class="blocco-header">📈 Dati mercato Maremma (OMI H1 2026)</div>
+          <div class="mercato-grid">
+            <div class="mercato-card">
+              <div class="mercato-zona">🌊 Costa Luxury</div>
+              <div class="mercato-row"><span>Monte Argentario</span><span class="val">€ 4.724/mq <span class="mercato-trend">+69% richieste</span></span></div>
+              <div class="mercato-row"><span>Castiglione Pescaia</span><span class="val">€ 4.624/mq</span></div>
+              <div class="mercato-row"><span>Capalbio</span><span class="val">€ 3.736/mq</span></div>
+              <div class="mercato-row"><span>Orbetello</span><span class="val">€ 3.184/mq</span></div>
+              <div class="mercato-row"><span>Budget acquirente</span><span class="val">€ 600k – €5M+</span></div>
+            </div>
+            <div class="mercato-card">
+              <div class="mercato-zona">🏙 Collina / Intermedia</div>
+              <div class="mercato-row"><span>Follonica</span><span class="val">€ 3.302/mq</span></div>
+              <div class="mercato-row"><span>Grosseto Marina</span><span class="val">€ 2.800/mq</span></div>
+              <div class="mercato-row"><span>Grosseto città</span><span class="val">€ 2.393/mq <span class="mercato-trend">+8%</span></span></div>
+              <div class="mercato-row"><span>Budget acquirente</span><span class="val">€ 150k – €700k</span></div>
+            </div>
+            <div class="mercato-card">
+              <div class="mercato-zona">🌿 Entroterra Value</div>
+              <div class="mercato-row"><span>Manciano</span><span class="val">€ 1.961/mq</span></div>
+              <div class="mercato-row"><span>Roccastrada</span><span class="val">€ 1.705/mq <span class="mercato-trend">+18%</span></span></div>
+              <div class="mercato-row"><span>Scansano</span><span class="val">€ 1.652/mq</span></div>
+              <div class="mercato-row"><span>Cinigiano</span><span class="val">€ 1.315/mq <span class="mercato-trend">+6%</span></span></div>
+              <div class="mercato-row"><span>Budget acquirente</span><span class="val">€ 100k – €500k</span></div>
+            </div>
+            <div class="mercato-card">
+              <div class="mercato-zona">🏔 Entroterra Deep</div>
+              <div class="mercato-row"><span>Semproniano</span><span class="val">€ 1.037/mq</span></div>
+              <div class="mercato-row"><span>Arcidosso</span><span class="val">€ 974/mq</span></div>
+              <div class="mercato-row"><span>Budget acquirente</span><span class="val">€ 50k – €200k</span></div>
+              <div class="mercato-row"><span>Rendimento locativo</span><span class="val mercato-trend">7,5–10,6%</span></div>
+            </div>
+            <div class="mercato-card">
+              <div class="mercato-zona">🌍 Acquirenti stranieri</div>
+              <div class="mercato-row"><span>🇺🇸 Americani</span><span class="val">€ 3,3M · 29,9%</span></div>
+              <div class="mercato-row"><span>🇨🇦 Canadesi</span><span class="val">€ 3,7M <span class="mercato-trend">+28,6%</span></span></div>
+              <div class="mercato-row"><span>🇧🇪 Belgi</span><span class="val">€ 3,5M <span class="mercato-trend">+36,7%</span></span></div>
+              <div class="mercato-row"><span>🇩🇪 Tedeschi</span><span class="val">€ 3,1M <span class="mercato-trend">+17,2%</span></span></div>
+              <div class="mercato-row"><span>🇨🇭 Svizzeri</span><span class="val">€ 3,4M <span class="mercato-trend">+24,5%</span></span></div>
+            </div>
+            <div class="mercato-card">
+              <div class="mercato-zona">📐 Parametri vendibilità 90-120 gg</div>
+              <div class="mercato-row"><span>Metratura minima</span><span class="val">120 mq (ideale 150–300)</span></div>
+              <div class="mercato-row"><span>Pronto uso</span><span class="val">81,6% richiesto</span></div>
+              <div class="mercato-row"><span>Giardino</span><span class="val">68% lo vuole</span></div>
+              <div class="mercato-row"><span>Piscina</span><span class="val">23% (in crescita)</span></div>
+              <div class="mercato-row"><span>Fibra/4G</span><span class="val">70% under 55</span></div>
+            </div>
+          </div>
+          <div class="mara-insight">
+            <div class="mara-insight-label">📊 Lettura Mara — Giugno 2026</div>
+            <div class="mara-insight-text">Il mercato Maremma è a due velocità: la costa luxury continua ad accelerare (+69% richieste su Argentario), trainata da americani e svizzeri con budget sopra €3M. L'entroterra value (Roccastrada +18%, Cinigiano +6%) sta recuperando terreno. Il profilo dominante vuole pronto uso con giardino — chi ha un rustico da ristrutturare deve posizionarlo sul segmento investimento, non su uso immediato.</div>
           </div>
         </div>
 
@@ -350,323 +458,281 @@
     document.getElementById('dataEstesa').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesiNomi[d.getMonth()] + ' ' + d.getFullYear();
     document.getElementById('meseLavoro').textContent = mesiNomi[d.getMonth()] + ' ' + d.getFullYear();
     document.getElementById('maraUpdate').innerHTML = 'Aggiornato alle<br>' + new Date().toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
-
-    // Pre-imposta data di oggi nel form finanze
     document.getElementById('fin_data').value = d.toISOString().split('T')[0];
 
-    // SUPABASE
-    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
-    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
-    const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+    const SB = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
 
     function fmtEur(n) { return '€ ' + Math.round(n).toLocaleString('it-IT'); }
     function pct(a, b) { return b > 0 ? Math.round((a/b)*100) : 0; }
+    function fmtData(s) { if (!s) return ''; const [y,mo,dd] = s.split('-'); return dd + '/' + mo + '/' + y; }
 
-    // ═══════════════════════════════════════
-    // FUNNEL RICHIESTE (Supabase)
-    // ═══════════════════════════════════════
+    // ── TAB ──
+    function switchTab(name, btn) {
+      document.querySelectorAll('.mara-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.mara-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // ── FUNNEL (Supabase) ──
     async function caricaFunnel() {
       const oggi = new Date().toISOString().split('T')[0];
-      const res = await fetch(`${SB_URL}/rest/v1/richieste?select=stato_follow,stato_cliente,prossimo_follow`, { headers: SB_H });
+      const res = await fetch(`${SB}/rest/v1/richieste?select=stato_follow,stato_cliente,prossimo_follow`, { headers: H });
       const lista = await res.json();
-
       const tot = lista.length;
       const attive = lista.filter(r => !['Annullato','Perso','Venduto'].includes(r.stato_cliente)).length;
-      const risposte = lista.filter(r => !['Da generare'].includes(r.stato_follow)).length;
+      const risposte = lista.filter(r => r.stato_follow !== 'Da generare').length;
       const inVisita = lista.filter(r => ['Visita fissata','Visita effettuata'].includes(r.stato_follow)).length;
       const followScad = lista.filter(r => r.prossimo_follow && r.prossimo_follow <= oggi && !['Annullato','Perso','Venduto'].includes(r.stato_cliente)).length;
-
       document.getElementById('kpi_richieste').textContent = attive;
       document.getElementById('kpi_followscad').textContent = followScad;
-
       const steps = [
         { label: 'Richieste totali', val: tot, ref: tot },
         { label: 'Richieste attive', val: attive, ref: tot },
         { label: 'Risposte inviate', val: risposte, ref: tot },
         { label: 'In visita / da visitare', val: inVisita, ref: tot },
       ];
-
-      const el = document.getElementById('funnelWrap');
-      el.innerHTML = steps.map(s => {
+      document.getElementById('funnelWrap').innerHTML = steps.map(s => {
         const p = pct(s.val, s.ref);
-        return `<div class="funnel-step">
-          <div class="funnel-label">${s.label}</div>
-          <div class="funnel-bar-wrap">
-            <div class="funnel-track"><div class="funnel-fill" style="width:${p}%"></div></div>
-          </div>
-          <div class="funnel-num">${s.val}</div>
-          <div class="funnel-pct">${p}%</div>
-        </div>`;
+        return `<div class="funnel-step"><div class="funnel-label">${s.label}</div><div class="funnel-bar-wrap"><div class="funnel-track"><div class="funnel-fill" style="width:${p}%"></div></div></div><div class="funnel-num">${s.val}</div><div class="funnel-pct">${p}%</div></div>`;
       }).join('');
-
-      // Insight Mara
       const convPct = pct(risposte, tot);
-      let insight = '';
-      if (followScad > 3) insight = `${followScad} follow-up scaduti — priorità alta. Il tasso di risposta è al ${convPct}%.`;
-      else if (convPct < 70) insight = `Solo il ${convPct}% delle richieste ha ricevuto risposta. Verifica le bozze da inviare.`;
-      else insight = `Funnel in salute: ${convPct}% di risposta su ${tot} richieste totali.`;
-
+      let insight = followScad > 3 ? `${followScad} follow-up scaduti — priorità alta. Tasso risposta: ${convPct}%.`
+        : convPct < 70 ? `Solo il ${convPct}% ha ricevuto risposta. Verifica le bozze da inviare.`
+        : `Funnel in salute: ${convPct}% di risposta su ${tot} richieste totali.`;
       if (followScad > 0) {
-        const ins = document.getElementById('funnelInsight');
         document.getElementById('funnelInsightText').textContent = insight;
-        ins.style.display = '';
+        document.getElementById('funnelInsight').style.display = '';
       }
     }
 
-    // ═══════════════════════════════════════
-    // GOAL LAVORO (localStorage)
-    // ═══════════════════════════════════════
+    // ── GOAL (localStorage) ──
     function caricaGoal() {
       const corrente = JSON.parse(localStorage.getItem('metrica_corrente') || '{}');
       const storico  = JSON.parse(localStorage.getItem('metriche_storico') || '[]');
       const campi = ['transazioni','incarichi_e','incarichi_ne','contatti'];
-      const etichette = { transazioni:'Transazioni', incarichi_e:'Incarichi esclusiva', incarichi_ne:'Incarichi non escl.', contatti:'Contatti presi' };
-      const goal = { contatti: 16, incarichi_e: 1, incarichi_ne: 1, transazioni: 1 };
-
+      const goal = { contatti:16, incarichi_e:1, incarichi_ne:1, transazioni:1 };
       const totali = {};
-      campi.forEach(c => { totali[c] = (corrente[c] || 0) + storico.reduce((s,r) => s + (r[c]||0), 0); });
-
-      const inc_tot = (totali.incarichi_e || 0) + (totali.incarichi_ne || 0);
+      campi.forEach(c => { totali[c] = (corrente[c]||0) + storico.reduce((s,r) => s+(r[c]||0), 0); });
+      const inc_tot = (totali.incarichi_e||0) + (totali.incarichi_ne||0);
       document.getElementById('kpi_contatti').textContent = totali.contatti || 0;
       document.getElementById('kpi_incarichi').textContent = inc_tot;
-
       const el = document.getElementById('goalSection');
-      if (!corrente.dataInizio && storico.length === 0) {
-        el.innerHTML = '<div class="placeholder">Nessuna metrica inserita. Vai su Attività per inserirle.</div>';
-        return;
-      }
-
-      // Proiezione: settimane trascorse nel mese
+      if (!corrente.dataInizio && storico.length === 0) { el.innerHTML = '<div class="placeholder">Nessuna metrica inserita. Vai su Attività.</div>'; return; }
       const giornoMese = d.getDate();
       const giorniTotali = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
       const avanzamento = giornoMese / giorniTotali;
-
       const items = [
-        { nome: 'Contatti presi', valore: totali.contatti, goal: goal.contatti },
-        { nome: 'Incarichi (E.+N.E.)', valore: inc_tot, goal: goal.incarichi_e + goal.incarichi_ne },
-        { nome: 'Transazioni', valore: totali.transazioni, goal: goal.transazioni },
+        { nome:'Contatti presi', valore:totali.contatti, goal:goal.contatti },
+        { nome:'Incarichi (E.+N.E.)', valore:inc_tot, goal:goal.incarichi_e+goal.incarichi_ne },
+        { nome:'Transazioni', valore:totali.transazioni, goal:goal.transazioni },
       ];
-
       el.innerHTML = items.map(item => {
         const p = Math.min(pct(item.valore, item.goal), 100);
         const ok = item.valore >= item.goal;
         const proiez = avanzamento > 0 ? Math.round(item.valore / avanzamento) : item.valore;
         const onTrack = proiez >= item.goal;
-        return `<div class="goal-item">
-          <div class="goal-header">
-            <span class="goal-nome">${item.nome}</span>
-            <span class="goal-num">${item.valore} / ${item.goal} ${ok ? '✅' : ''}</span>
-          </div>
-          <div class="goal-track"><div class="goal-fill ${ok?'ok':''}" style="width:${p}%"></div></div>
-          <div class="goal-proiezione">${onTrack ? '✅' : '⚠️'} A fine mese proietti: ${proiez} ${ok ? '— obiettivo raggiunto' : '— obiettivo: '+item.goal}</div>
-        </div>`;
+        return `<div class="goal-item"><div class="goal-header"><span class="goal-nome">${item.nome}</span><span class="goal-num">${item.valore} / ${item.goal} ${ok?'✅':''}</span></div><div class="goal-track"><div class="goal-fill ${ok?'ok':''}" style="width:${p}%"></div></div><div class="goal-proiezione">${onTrack?'✅':'⚠️'} A fine mese proietti: ${proiez} ${ok ? '— obiettivo raggiunto' : '— obiettivo: '+item.goal}</div></div>`;
       }).join('');
-
-      const goalIns = document.getElementById('goalInsight');
-      const goalInsText = document.getElementById('goalInsightText');
-      const onTrackCount = items.filter(i => {
-        const p = avanzamento > 0 ? Math.round(i.valore / avanzamento) : i.valore;
-        return p >= i.goal;
-      }).length;
+      const onTrackCount = items.filter(i => (avanzamento > 0 ? Math.round(i.valore/avanzamento) : i.valore) >= i.goal).length;
       if (onTrackCount < items.length) {
-        goalInsText.textContent = `${items.length - onTrackCount} obiettivi a rischio con il ritmo attuale. Siamo al ${Math.round(avanzamento*100)}% del mese.`;
-        goalIns.style.display = '';
+        document.getElementById('goalInsightText').textContent = `${items.length-onTrackCount} obiettivi a rischio. Siamo al ${Math.round(avanzamento*100)}% del mese.`;
+        document.getElementById('goalInsight').style.display = '';
       }
     }
 
-    // ═══════════════════════════════════════
-    // PORTAFOGLIO IMMOBILI (localStorage)
-    // ═══════════════════════════════════════
+    // ── PORTAFOGLIO (localStorage) ──
     function caricaPortafoglio() {
       const lista = JSON.parse(localStorage.getItem('ricerca_immobili') || '[]');
       document.getElementById('kpi_immobili').textContent = lista.length;
-
-      const stati = { in_valutazione: 0, contattato: 0, incarico: 0, archiviato: 0 };
-      let prezzoTot = 0; let conPrezzo = 0;
-      lista.forEach(s => {
-        if (stati[s.stato_scheda] !== undefined) stati[s.stato_scheda]++;
-        if (s.prezzoRichiesto > 0) { prezzoTot += s.prezzoRichiesto; conPrezzo++; }
-      });
-
-      const provvAttesa = lista
-        .filter(s => s.stato_scheda === 'incarico' && s.prezzoRichiesto > 0)
-        .reduce((sum, s) => sum + s.prezzoRichiesto * 0.03, 0);
+      const stati = { in_valutazione:0, contattato:0, incarico:0, archiviato:0 };
+      let prezzoTot = 0, conPrezzo = 0;
+      lista.forEach(s => { if (stati[s.stato_scheda]!==undefined) stati[s.stato_scheda]++; if (s.prezzoRichiesto>0){prezzoTot+=s.prezzoRichiesto;conPrezzo++;} });
+      const provvAttesa = lista.filter(s=>s.stato_scheda==='incarico'&&s.prezzoRichiesto>0).reduce((sum,s)=>sum+s.prezzoRichiesto*0.03,0);
       document.getElementById('kpi_provv_attesa').textContent = fmtEur(provvAttesa);
-
-      if (lista.length === 0) return;
-
+      if (lista.length===0) return;
       const colori = { in_valutazione:'#2980b9', contattato:'#b7860b', incarico:'#27ae60', archiviato:'#888' };
-      const label = { in_valutazione:'In valutazione', contattato:'Contattato', incarico:'Incarico preso', archiviato:'Archiviato' };
-
+      const label  = { in_valutazione:'In valutazione', contattato:'Contattato', incarico:'Incarico', archiviato:'Archiviato' };
       document.getElementById('portKpi').innerHTML = Object.entries(stati).map(([k,v]) =>
-        `<div class="kpi-card"><div class="kpi-val" style="color:${colori[k]};font-size:1.4rem">${v}</div><div class="kpi-label">${label[k]}</div></div>`
-      ).join('');
-
-      const prezzoMedio = conPrezzo > 0 ? prezzoTot / conPrezzo : 0;
-      const fuoriMercato = lista.filter(s => s.prezzoRichiesto > 0 && s.totMax > 0 && s.prezzoRichiesto > s.totMax * 1.15).length;
-
-      let insightHtml = `<div class="mara-insight"><div class="mara-insight-label">— Mara 📊</div><div class="mara-insight-text">`;
-      insightHtml += `Portafoglio: ${lista.length} schede · prezzo medio richiesto ${fmtEur(prezzoMedio)}.`;
-      if (fuoriMercato > 0) insightHtml += ` <strong style="color:#f4a460">⚠️ ${fuoriMercato} immobil${fuoriMercato>1?'i':'e'} con prezzo >15% sopra stima OMI.</strong>`;
-      if (provvAttesa > 0) insightHtml += ` Provvigione potenziale dagli incarichi attivi: ${fmtEur(provvAttesa)} (stima 3%).`;
-      insightHtml += `</div></div>`;
-      document.getElementById('portInsight').innerHTML = insightHtml;
+        `<div class="kpi-card"><div class="kpi-val" style="color:${colori[k]};font-size:1.4rem">${v}</div><div class="kpi-label">${label[k]}</div></div>`).join('');
+      const prezzoMedio = conPrezzo>0 ? prezzoTot/conPrezzo : 0;
+      const fuoriMercato = lista.filter(s=>s.prezzoRichiesto>0&&s.totMax>0&&s.prezzoRichiesto>s.totMax*1.15).length;
+      let ins = `<div class="mara-insight"><div class="mara-insight-label">— Mara 📊</div><div class="mara-insight-text">Portafoglio: ${lista.length} schede · prezzo medio ${fmtEur(prezzoMedio)}.`;
+      if (fuoriMercato>0) ins += ` <strong style="color:#f4a460">⚠️ ${fuoriMercato} immobil${fuoriMercato>1?'i':'e'} >15% sopra stima OMI.</strong>`;
+      if (provvAttesa>0) ins += ` Provvigione potenziale: ${fmtEur(provvAttesa)} (3%).`;
+      ins += `</div></div>`;
+      document.getElementById('portInsight').innerHTML = ins;
     }
 
-    // ═══════════════════════════════════════
-    // SOCIAL (localStorage)
-    // ═══════════════════════════════════════
+    // ── SOCIAL (localStorage) ──
     function caricaSocial() {
       const posts = JSON.parse(localStorage.getItem('social_posts') || '[]');
-      const el = document.getElementById('socialRubriche');
-
-      if (posts.length === 0) return;
-
-      const rubriche = {
-        proprieta:    { nome: 'Proprietà', colore: '#222', count: 0 },
-        personal:     { nome: 'Personal Brand', colore: '#f5f5f5', count: 0 },
-        territorio:   { nome: 'Territorio', colore: '#c9a84c', count: 0 },
-        educativo:    { nome: 'Educativo', colore: '#888', count: 0 },
-      };
-
+      if (posts.length===0) return;
+      const rubriche = { proprieta:{nome:'Proprietà',colore:'#222',count:0}, personal:{nome:'Personal Brand',colore:'#aaa',count:0}, territorio:{nome:'Territorio',colore:'#c9a84c',count:0}, educativo:{nome:'Educativo',colore:'#888',count:0} };
       posts.forEach(p => {
-        const cat = p.categoria || p.cat || '';
+        const cat = p.categoria||p.cat||'';
         if (rubriche[cat]) rubriche[cat].count++;
-        else {
-          // fallback su colore se non c'è categoria
-          if (p.colore === 'nero' || p.tipo === 'proprieta') rubriche.proprieta.count++;
-          else if (p.colore === 'bianco' || p.tipo === 'personal') rubriche.personal.count++;
-          else if (p.colore === 'oro' || p.tipo === 'territorio') rubriche.territorio.count++;
-          else if (p.colore === 'grigio' || p.tipo === 'educativo') rubriche.educativo.count++;
-        }
+        else if (p.colore==='nero'||p.tipo==='proprieta') rubriche.proprieta.count++;
+        else if (p.colore==='bianco'||p.tipo==='personal') rubriche.personal.count++;
+        else if (p.colore==='oro'||p.tipo==='territorio') rubriche.territorio.count++;
+        else if (p.colore==='grigio'||p.tipo==='educativo') rubriche.educativo.count++;
       });
-
-      const max = Math.max(...Object.values(rubriche).map(r => r.count), 1);
-      const target = posts.length / 4; // 25% ciascuna
-
-      el.innerHTML = Object.entries(rubriche).map(([k, r]) => {
-        const p = Math.round((r.count / max) * 100);
-        const pct25 = Math.round((r.count / posts.length) * 100);
-        const ok = Math.abs(pct25 - 25) <= 10;
-        return `<div class="rubrica-item">
-          <div class="rubrica-dot" style="background:${r.colore};border:1px solid var(--border)"></div>
-          <div class="rubrica-nome">${r.nome}</div>
-          <div class="rubrica-bar-wrap">
-            <div class="rubrica-track"><div class="rubrica-fill" style="width:${p}%;background:${r.colore};border:1px solid var(--border)"></div></div>
-          </div>
-          <div class="rubrica-count">${r.count} post (${pct25}%) ${ok?'✅':'⚠️'}</div>
-        </div>`;
+      const max = Math.max(...Object.values(rubriche).map(r=>r.count),1);
+      document.getElementById('socialRubriche').innerHTML = Object.entries(rubriche).map(([k,r]) => {
+        const p = Math.round((r.count/max)*100);
+        const pct25 = Math.round((r.count/posts.length)*100);
+        const ok = Math.abs(pct25-25)<=10;
+        return `<div class="rubrica-item"><div class="rubrica-dot" style="background:${r.colore};border:1px solid var(--border)"></div><div class="rubrica-nome">${r.nome}</div><div class="rubrica-bar-wrap"><div class="rubrica-track"><div class="rubrica-fill" style="width:${p}%;background:${r.colore};border:1px solid var(--border)"></div></div></div><div class="rubrica-count">${r.count} (${pct25}%) ${ok?'✅':'⚠️'}</div></div>`;
       }).join('');
-
-      const sbilanciati = Object.values(rubriche).filter(r => {
-        const p = Math.round((r.count / posts.length) * 100);
-        return Math.abs(p - 25) > 10;
-      });
-      if (sbilanciati.length > 0) {
-        const ins = document.getElementById('socialInsight');
-        document.getElementById('socialInsightText').textContent =
-          `${sbilanciati.map(r=>r.nome).join(', ')} ${sbilanciati.length>1?'sono sbilanciate':'è sbilanciata'} rispetto al mix target 25/25/25/25. Riequilibra il piano editoriale.`;
-        ins.style.display = '';
+      const sbilanciati = Object.values(rubriche).filter(r=>Math.abs(Math.round((r.count/posts.length)*100)-25)>10);
+      if (sbilanciati.length>0) {
+        document.getElementById('socialInsightText').textContent = `${sbilanciati.map(r=>r.nome).join(', ')} ${sbilanciati.length>1?'sono sbilanciate':'è sbilanciata'} rispetto al mix 25/25/25/25.`;
+        document.getElementById('socialInsight').style.display='';
       }
     }
 
-    // ═══════════════════════════════════════
-    // FINANZE (localStorage)
-    // ═══════════════════════════════════════
-    function caricaFinGoal() {
-      const g = localStorage.getItem('fin_goal_annuo') || '';
-      document.getElementById('fin_goal_annuo').value = g;
+    // ── FINANZE (Supabase) ──
+    async function caricaMovimenti() {
+      try {
+        const res = await fetch(`${SB}/rest/v1/movimenti?order=data.desc`, { headers: H });
+        if (!res.ok) throw new Error('tabella non trovata');
+        return await res.json();
+      } catch(e) {
+        document.getElementById('fin_sb_status').textContent = '⚠️ Tabella movimenti non ancora creata — vedi istruzioni SQL';
+        return [];
+      }
+    }
+
+    async function aggiungiMovimento() {
+      const descrizione = document.getElementById('fin_desc').value.trim();
+      const importo = parseFloat(document.getElementById('fin_importo').value) || 0;
+      const tipo = document.getElementById('fin_tipo').value;
+      const data = document.getElementById('fin_data').value;
+      if (!descrizione || importo <= 0) return;
+      await fetch(`${SB}/rest/v1/movimenti`, { method:'POST', headers: H, body: JSON.stringify({ descrizione, importo, tipo, data }) });
+      document.getElementById('fin_desc').value = '';
+      document.getElementById('fin_importo').value = '';
+      await renderMovimenti();
+    }
+
+    async function eliminaMovimento(id) {
+      if (!confirm('Eliminare questo movimento?')) return;
+      await fetch(`${SB}/rest/v1/movimenti?id=eq.${id}`, { method:'DELETE', headers: H });
+      await renderMovimenti();
     }
 
     function salvaFinGoal() {
       localStorage.setItem('fin_goal_annuo', document.getElementById('fin_goal_annuo').value);
-      aggiornaFinSaldi();
+      aggiornaFinSaldi([]);
     }
 
-    function caricaMovimenti() { return JSON.parse(localStorage.getItem('fin_movimenti') || '[]'); }
-    function salvaMovimenti(lista) { localStorage.setItem('fin_movimenti', JSON.stringify(lista)); }
-
-    function aggiornaFinSaldi() {
-      const lista = caricaMovimenti();
-      const entrate = lista.filter(m => m.tipo !== 'spesa').reduce((s,m) => s + (m.importo||0), 0);
-      const spese   = lista.filter(m => m.tipo === 'spesa').reduce((s,m) => s + (m.importo||0), 0);
+    function aggiornaFinSaldi(lista) {
+      const entrate = lista.filter(m=>m.tipo!=='spesa').reduce((s,m)=>s+(m.importo||0),0);
+      const spese   = lista.filter(m=>m.tipo==='spesa').reduce((s,m)=>s+(m.importo||0),0);
       const saldo   = entrate - spese;
-
       document.getElementById('fin_tot_entrate').textContent = fmtEur(entrate);
       document.getElementById('fin_tot_spese').textContent   = fmtEur(spese);
       const saldoEl = document.getElementById('fin_saldo');
       saldoEl.textContent = fmtEur(saldo);
-      saldoEl.className = 'saldo-val ' + (saldo >= 0 ? 'positivo' : 'negativo');
-
+      saldoEl.className = 'saldo-val ' + (saldo>=0?'positivo':'negativo');
       document.getElementById('kpi_provv_incassata').textContent = fmtEur(entrate);
-
-      const goal = parseFloat(document.getElementById('fin_goal_annuo').value) || 0;
-      if (goal > 0) {
-        const p = Math.min(pct(entrate, goal), 100);
-        document.getElementById('fin_goal_pct').value = p + '%';
-        document.getElementById('fin_goal_bar').style.width = p + '%';
+      const goal = parseFloat(localStorage.getItem('fin_goal_annuo')) || 0;
+      if (goal>0) {
+        const p = Math.min(pct(entrate,goal),100);
+        document.getElementById('fin_goal_pct').value = p+'%';
+        document.getElementById('fin_goal_bar').style.width = p+'%';
       } else {
         document.getElementById('fin_goal_pct').value = '—';
       }
     }
 
-    function renderMovimenti() {
-      const lista = caricaMovimenti().slice().sort((a,b) => b.data.localeCompare(a.data));
-      document.getElementById('contMovimenti').textContent = lista.length > 0 ? `(${lista.length})` : '';
+    async function renderMovimenti() {
+      const lista = await caricaMovimenti();
+      document.getElementById('contMovimenti').textContent = lista.length>0 ? `(${lista.length})` : '';
       const el = document.getElementById('finStorico');
-      if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessun movimento registrato.</div>'; return; }
-
+      if (lista.length===0) { el.innerHTML='<div class="placeholder">Nessun movimento registrato.</div>'; aggiornaFinSaldi([]); return; }
       const tipoCls = { provvigione:'tipo-provv', spesa:'tipo-spesa', altro:'tipo-altro' };
       const tipoLabel = { provvigione:'Provvigione', spesa:'Spesa', altro:'Altra entrata' };
-
-      el.innerHTML = lista.map(m => `
+      el.innerHTML = lista.map(m=>`
         <div class="fin-storico-item">
           <div class="fin-storico-data">${fmtData(m.data)}</div>
-          <div class="fin-storico-desc">${m.desc}</div>
+          <div class="fin-storico-desc">${m.descrizione}</div>
           <span class="fin-storico-tipo ${tipoCls[m.tipo]||'tipo-altro'}">${tipoLabel[m.tipo]||m.tipo}</span>
           <div class="fin-storico-importo ${m.tipo==='spesa'?'spesa':'entrata'}">${m.tipo==='spesa'?'-':'+'} ${fmtEur(m.importo)}</div>
-          <button type="button" class="btn-del-fin" onclick="eliminaMovimento(${m.id})">✕</button>
-        </div>
-      `).join('');
+          <button type="button" class="btn-del-fin" onclick="eliminaMovimento('${m.id}')">✕</button>
+        </div>`).join('');
+      aggiornaFinSaldi(lista);
     }
 
-    function fmtData(s) {
-      if (!s) return '';
-      const [y,mo,dd] = s.split('-');
-      return dd + '/' + mo + '/' + y;
+    // ── REPORT (localStorage) ──
+    const RPT_KEY = 'osservatorio_report';
+    let filtroReport = 'tutti';
+
+    function toggleFormAggiungi() { document.getElementById('formAggiungi').classList.toggle('aperta'); }
+
+    function salvaReport() {
+      const codice = document.getElementById('inp-codice').value.trim();
+      if (!codice) { alert('Inserisci il codice immobile'); return; }
+      const lista = JSON.parse(localStorage.getItem(RPT_KEY)||'[]');
+      lista.unshift({ id: Date.now(), codice, tipo: document.getElementById('inp-tipo').value.trim(), decisione: document.getElementById('inp-decisione').value, link: document.getElementById('inp-link').value.trim(), data: new Date().toLocaleDateString('it-IT') });
+      localStorage.setItem(RPT_KEY, JSON.stringify(lista));
+      document.getElementById('inp-codice').value=''; document.getElementById('inp-tipo').value=''; document.getElementById('inp-link').value='';
+      document.getElementById('formAggiungi').classList.remove('aperta');
+      renderReport(filtroReport);
     }
 
-    function aggiungiMovimento() {
-      const desc    = document.getElementById('fin_desc').value.trim();
-      const importo = parseFloat(document.getElementById('fin_importo').value) || 0;
-      const tipo    = document.getElementById('fin_tipo').value;
-      const data    = document.getElementById('fin_data').value;
-      if (!desc || importo <= 0) return;
-      const lista = caricaMovimenti();
-      lista.push({ id: Date.now(), desc, importo, tipo, data });
-      salvaMovimenti(lista);
-      document.getElementById('fin_desc').value = '';
-      document.getElementById('fin_importo').value = '';
-      renderMovimenti();
-      aggiornaFinSaldi();
+    function eliminaReport(id) {
+      if (!confirm('Eliminare?')) return;
+      localStorage.setItem(RPT_KEY, JSON.stringify(JSON.parse(localStorage.getItem(RPT_KEY)||'[]').filter(r=>r.id!==id)));
+      renderReport(filtroReport);
     }
 
-    function eliminaMovimento(id) {
-      salvaMovimenti(caricaMovimenti().filter(m => m.id !== id));
-      renderMovimenti();
-      aggiornaFinSaldi();
+    function filtraReport(cat, btn) {
+      filtroReport = cat;
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderReport(cat);
     }
 
-    // ═══════════════════════════════════════
-    // INIT
-    // ═══════════════════════════════════════
+    const decLabel = { monitorare:'↗ Monitorare', ottimizzare:'⚠ Ottimizzare', intervenire:'🔴 Intervenire', performante:'✅ Performante' };
+    const decClass = { monitorare:'dec-monitorare', ottimizzare:'dec-ottimizzare', intervenire:'dec-intervenire', performante:'dec-performante' };
+
+    function renderReport(cat) {
+      const el = document.getElementById('reportList');
+      let lista = JSON.parse(localStorage.getItem(RPT_KEY)||'[]');
+      if (cat!=='tutti') lista = lista.filter(r=>r.decisione===cat);
+      if (lista.length===0) { el.innerHTML='<div class="empty-state">Nessun report salvato. Usa <strong>/analisi-mercato</strong> e aggiungi il link con +.</div>'; return; }
+      el.innerHTML = lista.map(r=>`
+        <div class="report-card">
+          <div class="report-icon">📄</div>
+          <div class="report-info"><div class="report-code">${r.codice}</div><div class="report-meta">${r.tipo||'—'} · ${r.data}</div></div>
+          <span class="report-decisione ${decClass[r.decisione]||''}">${decLabel[r.decisione]||r.decisione}</span>
+          <div class="report-actions">
+            ${r.link?`<a class="btn-report primary" href="${r.link}" target="_blank">📂 Drive</a>`:''}
+            <button type="button" class="btn-report" onclick="eliminaReport(${r.id})">🗑</button>
+          </div>
+        </div>`).join('');
+    }
+
+    // Precarica report esempio
+    function precaricaEsempio() {
+      if (JSON.parse(localStorage.getItem(RPT_KEY)||'[]').length>0) return;
+      localStorage.setItem(RPT_KEY, JSON.stringify([{ id:1750000000000, codice:'33541050-144', tipo:'Villa bifamiliare · Grosseto', decisione:'monitorare', link:'https://drive.google.com/file/d/1n34jwq4NqNTT_xw0DsGZvGxsQw2vBox7/view', data:'17/06/2026' }]));
+    }
+
+    // ── INIT ──
+    const finGoal = localStorage.getItem('fin_goal_annuo') || '';
+    document.getElementById('fin_goal_annuo').value = finGoal;
+
     caricaFunnel();
     caricaGoal();
     caricaPortafoglio();
     caricaSocial();
-    caricaFinGoal();
     renderMovimenti();
-    aggiornaFinSaldi();
+    precaricaEsempio();
+    renderReport('tutti');
   </script>
 
 </body>
