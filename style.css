@@ -10,8 +10,8 @@
   --text: #2a2a2a;
   --text-muted: #888;
   --text-faint: #bbb;
-  --accent: #8a6a3a;
-  --accent-bg: #f5efe6;
+  --accent: #4a5568;
+  --accent-bg: #eef0f3;
   --danger: #8b3a3a;
 }
 
@@ -89,10 +89,10 @@ body {
 .nav-section.c-operativo .nav-item.active { color: #2e6080; border-left-color: #4a7fa5; background: #9dbdd1; }
 
 .nav-section.c-lavoro { background: #f0d8c4; border-radius: 6px; margin: 0 8px 4px; }
-.nav-section.c-lavoro .nav-label { color: #9a4e1e; }
+.nav-section.c-lavoro .nav-label { color: #4a5568; }
 .nav-section.c-lavoro .nav-item { border-radius: 5px; }
 .nav-section.c-lavoro .nav-item:hover { background: #e4c4a8; }
-.nav-section.c-lavoro .nav-item.active { color: #9a4e1e; border-left-color: #c07040; background: #d4aa88; }
+.nav-section.c-lavoro .nav-item.active { color: #4a5568; border-left-color: #4a5568; background: #d8dce3; }
 
 .nav-section.c-contenuti { background: #c8e8d4; border-radius: 6px; margin: 0 8px 4px; }
 .nav-section.c-contenuti .nav-label { color: #2e7048; }
