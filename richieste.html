@@ -553,7 +553,35 @@
 
     document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) chiudiModal(); });
     initAcMulti();
-    carica();
+    carica().then(() => {
+      // se arrivati da cliente.html con ?cliente_id=X apri modal precompilato
+      const params = new URLSearchParams(location.search);
+      if (params.get('cliente_id')) {
+        _clienteId = parseInt(params.get('cliente_id'));
+        _editId = null;
+        _selProprieta = [];
+        document.getElementById('modalTitolo').textContent = 'Nuova richiesta';
+        document.getElementById('btnElimina').style.display = 'none';
+        document.getElementById('f_nome').value = params.get('nome') || '';
+        document.getElementById('f_telefono').value = params.get('tel') || '';
+        document.getElementById('f_email').value = params.get('email') || '';
+        document.getElementById('f_immobile').value = '';
+        document.getElementById('f_interesse').value = '';
+        document.getElementById('f_obiezioni').value = '';
+        document.getElementById('f_mess_follow_ai').value = '';
+        document.getElementById('f_note').value = '';
+        document.getElementById('f_tipo_cliente').value = 'Acquirente';
+        document.getElementById('f_stato_cliente').value = 'Nuova richiesta';
+        document.getElementById('f_stato_follow').value = 'Nessuno';
+        document.getElementById('f_ultimo_contatto').value = new Date().toISOString().split('T')[0];
+        document.getElementById('f_prossimo_follow').value = '';
+        document.getElementById('f_proprieta_cerca').value = '';
+        renderPills();
+        aggiornaClienteLink();
+        document.getElementById('modalOverlay').classList.add('open');
+        history.replaceState({}, '', 'richieste.html');
+      }
+    });
   </script>
 
 </body>
