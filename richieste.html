@@ -34,6 +34,12 @@
     .s-chiuso     { background: #f1f8e9; color: #33691e; }
     .s-richiamare { background: #fff9c4; color: #827717; }
 
+    .form-section-row { display: flex; align-items: center; justify-content: space-between; }
+    .btn-crea-cliente { background: none; border: 1px solid var(--accent); border-radius: 6px; padding: 3px 10px; font-size: 0.72rem; font-family: inherit; color: var(--accent); cursor: pointer; font-weight: 600; }
+    .btn-crea-cliente:hover { background: var(--accent-bg); }
+    .link-cliente { font-size: 0.75rem; color: var(--accent); text-decoration: none; font-weight: 600; }
+    .link-cliente:hover { text-decoration: underline; }
+
     /* PILLS PROPRIETÀ */
     .prop-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
     .prop-pill { display: inline-flex; align-items: center; gap: 5px; background: #c4d8e6; color: #1e3e52; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
@@ -162,7 +168,10 @@
         <button class="modal-close" onclick="chiudiModal()">✕</button>
       </div>
 
-      <div class="form-section">Cliente</div>
+      <div class="form-section form-section-row">
+        <span>Cliente</span>
+        <span id="clienteLink"></span>
+      </div>
       <div class="form-row">
         <div class="form-group full">
           <label>Nome cliente</label>
@@ -294,6 +303,7 @@
     let _editId = null;
     let _proprieta = [];
     let _selProprieta = []; // [{id, label}]
+    let _clienteId = null;
 
     const classeStato = {
       'Nuova richiesta': 's-nuova', 'Risposto': 's-risposto', 'In attesa risposta': 's-attesa',
@@ -406,9 +416,41 @@
       });
     }
 
+    function aggiornaClienteLink() {
+      const el = document.getElementById('clienteLink');
+      if (_clienteId) {
+        el.innerHTML = `<a class="link-cliente" href="cliente.html?id=${_clienteId}" target="_blank">👤 Vai alla scheda cliente →</a>`;
+      } else if (_editId) {
+        el.innerHTML = `<button class="btn-crea-cliente" onclick="creaCliente()">+ Crea scheda cliente</button>`;
+      } else {
+        el.innerHTML = '';
+      }
+    }
+
+    async function creaCliente() {
+      const nome = document.getElementById('f_nome').value.trim();
+      if (!nome) { alert('Inserisci prima il nome del cliente.'); return; }
+      const body = {
+        nome,
+        tel: document.getElementById('f_telefono').value.trim() || null,
+        email: document.getElementById('f_email').value.trim() || null,
+        tipo: 'Acquirente',
+        stato_follow: 'Nuovo',
+      };
+      const res = await fetch(`${SB_URL}/rest/v1/clienti`, { method: 'POST', headers: SB_H, body: JSON.stringify(body) });
+      const created = await res.json();
+      _clienteId = created[0]?.id;
+      if (_clienteId && _editId) {
+        await fetch(`${SB_URL}/rest/v1/richieste?id=eq.${_editId}`, { method: 'PATCH', headers: SB_H, body: JSON.stringify({ cliente_id: _clienteId }) });
+        _tutte.find(x => x.id === _editId).cliente_id = _clienteId;
+      }
+      aggiornaClienteLink();
+    }
+
     function nuovaRichiesta() {
       _editId = null;
       _selProprieta = [];
+      _clienteId = null;
       document.getElementById('modalTitolo').textContent = 'Nuova richiesta';
       document.getElementById('btnElimina').style.display = 'none';
       ['f_nome','f_telefono','f_email','f_immobile','f_interesse','f_obiezioni','f_mess_follow_ai','f_note'].forEach(id => document.getElementById(id).value = '');
@@ -419,6 +461,7 @@
       document.getElementById('f_prossimo_follow').value = '';
       document.getElementById('f_proprieta_cerca').value = '';
       renderPills();
+      aggiornaClienteLink();
       document.getElementById('modalOverlay').classList.add('open');
     }
 
@@ -427,6 +470,7 @@
       if (!r) return;
       _editId = id;
       _selProprieta = [];
+      _clienteId = r.cliente_id || null;
       document.getElementById('modalTitolo').textContent = r.nome_cliente || 'Richiesta';
       document.getElementById('btnElimina').style.display = '';
       document.getElementById('f_nome').value = r.nome_cliente || '';
@@ -448,6 +492,7 @@
       const links = await res.json();
       _selProprieta = links.map(l => ({ id: l.proprieta_id, label: l.proprieta?.ref || l.proprieta?.titolo || l.proprieta_id }));
       renderPills();
+      aggiornaClienteLink();
       document.getElementById('modalOverlay').classList.add('open');
     }
 
@@ -468,6 +513,7 @@
         obiezioni: document.getElementById('f_obiezioni').value.trim(),
         mess_follow_ai: document.getElementById('f_mess_follow_ai').value.trim(),
         note: document.getElementById('f_note').value.trim(),
+        cliente_id: _clienteId || null,
       };
 
       let richiestaId = _editId;
