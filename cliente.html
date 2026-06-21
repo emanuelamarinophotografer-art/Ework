@@ -197,6 +197,8 @@
 
     function fmt(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('it-IT', {day:'2-digit',month:'short',year:'numeric'}); }
 
+    let _immobiliCollegati = [];
+
     async function render() {
       const [resC, resA] = await Promise.all([
         fetch(`${SB_URL}/rest/v1/clienti?id=eq.${clienteId}`, { headers: SB_H }),
@@ -209,6 +211,13 @@
 
       const c = _cliente;
       const isProp = c.tipo === 'proprietari';
+
+      // Se è un proprietario, carica gli immobili collegati
+      _immobiliCollegati = [];
+      if (isProp) {
+        const resI = await fetch(`${SB_URL}/rest/v1/proprieta?proprietario_id=eq.${clienteId}&select=id,ref,titolo,stato,prezzo&order=ref.asc`, { headers: SB_H });
+        _immobiliCollegati = await resI.json();
+      }
       document.getElementById('topbarNome').textContent = c.nome;
 
       document.getElementById('contenuto').innerHTML = `
@@ -236,14 +245,24 @@
 
         <div class="scheda-body">
           <div class="info-card">
-            <div class="info-card-title">${isProp ? 'Proprietà e incarico' : 'Ricerca'}</div>
-            ${isProp && c.immobile ? `<div class="info-row"><span class="label">Immobile</span><span class="val rif">${c.immobile}</span></div>` : ''}
+            <div class="info-card-title">${isProp ? 'Immobili collegati' : 'Ricerca'}</div>
+            ${isProp ? (_immobiliCollegati.length > 0
+              ? _immobiliCollegati.map(im => `
+                <div class="info-row" style="cursor:pointer" onclick="location.href='proprieta-detail.html?id=${im.id}'">
+                  <span class="label rif" style="color:#c0392b;font-weight:600">${im.ref || '—'}</span>
+                  <span class="val" style="text-align:right">
+                    <span style="font-size:0.8rem;color:var(--text-muted)">${im.stato || ''}</span>
+                    ${im.prezzo ? `<span style="font-size:0.78rem;color:var(--accent);margin-left:8px">€ ${Number(im.prezzo).toLocaleString('it-IT')}</span>` : ''}
+                    <span style="color:var(--accent);margin-left:6px">→</span>
+                  </span>
+                </div>`).join('')
+              : `<div style="font-size:0.82rem;color:var(--text-faint);font-style:italic;padding-top:4px">Nessun immobile collegato.<br><small>Apri la scheda dell'immobile e assegna questo proprietario.</small></div>`)
+            : ''}
             ${!isProp && c.budget ? `<div class="info-row"><span class="label">Budget</span><span class="val">💰 ${c.budget}</span></div>` : ''}
             ${!isProp && c.zona ? `<div class="info-row"><span class="label">Zona cercata</span><span class="val">📍 ${c.zona}</span></div>` : ''}
             ${c.aggiornato ? `<div class="info-row"><span class="label">Aggiornato</span><span class="val">${fmt(c.aggiornato)}</span></div>` : ''}
             ${c.prossimo_follow ? `<div class="info-row"><span class="label">Prossimo follow-up</span><span class="val">${fmt(c.prossimo_follow)}</span></div>` : ''}
             ${!isProp && !c.budget && !c.zona ? '<div style="font-size:0.82rem;color:var(--text-faint);font-style:italic;padding-top:4px">Nessun dettaglio di ricerca.</div>' : ''}
-            ${isProp && !c.immobile ? '<div style="font-size:0.82rem;color:var(--text-faint);font-style:italic;padding-top:4px">Nessun immobile collegato.</div>' : ''}
           </div>
           <div class="info-card">
             <div class="info-card-title">Note</div>

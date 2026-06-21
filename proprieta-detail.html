@@ -174,13 +174,11 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group">
+        <div class="form-group full">
           <label>Proprietario</label>
-          <input class="form-input" type="text" id="f_proprietario" />
-        </div>
-        <div class="form-group">
-          <label>Tel Proprietario</label>
-          <input class="form-input" type="tel" id="f_tel_proprietario" />
+          <select class="form-select" id="f_proprietario_id">
+            <option value="">— nessun proprietario —</option>
+          </select>
         </div>
       </div>
       <div class="form-row">
@@ -211,6 +209,8 @@
 
     const propId = parseInt(new URLSearchParams(location.search).get('id'));
     let _prop = null;
+    let _propCliente = null;
+    let _tuttiProprietari = [];
 
     function fmt(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('it-IT', {day:'2-digit',month:'short',year:'numeric'}); }
     function fmtEuro(n) { if (!n) return '—'; return '€ ' + Number(n).toLocaleString('it-IT'); }
@@ -230,6 +230,14 @@
 
       const p = _prop;
       document.getElementById('topbarNome').textContent = p.ref || p.titolo || p.nome || 'Scheda Proprietà';
+
+      // Carica il proprietario collegato (relazione reale)
+      _propCliente = null;
+      if (p.proprietario_id) {
+        const rc = await fetch(`${SB_URL}/rest/v1/clienti?id=eq.${p.proprietario_id}&select=id,nome,tel,email`, { headers: SB_H });
+        const arr = await rc.json();
+        _propCliente = arr[0] || null;
+      }
 
       const scarto = p.scarto_pct !== null && p.scarto_pct !== undefined ? p.scarto_pct : null;
 
@@ -269,9 +277,14 @@
           </div>
           <div class="info-card">
             <div class="info-card-title">Proprietario</div>
-            ${p.proprietario ? `<div class="info-row"><span class="label">Nome</span><span class="val">👤 ${p.proprietario}</span></div>` : ''}
-            ${p.tel_proprietario ? `<div class="info-row"><span class="label">Telefono</span><span class="val"><a href="tel:${p.tel_proprietario}" style="color:var(--accent)">${p.tel_proprietario}</a></span></div>` : ''}
-            ${!p.proprietario ? '<div style="font-size:0.82rem;color:var(--text-faint);font-style:italic">Nessun proprietario collegato.</div>' : ''}
+            ${_propCliente ? `
+              <div class="info-row"><span class="label">Nome</span><span class="val"><a href="cliente.html?id=${_propCliente.id}" style="color:var(--accent);text-decoration:none;font-weight:600">👤 ${_propCliente.nome}</a></span></div>
+              ${_propCliente.tel ? `<div class="info-row"><span class="label">Telefono</span><span class="val"><a href="tel:${_propCliente.tel}" style="color:var(--accent)">${_propCliente.tel}</a></span></div>` : ''}
+              ${_propCliente.email ? `<div class="info-row"><span class="label">Email</span><span class="val"><a href="mailto:${_propCliente.email}" style="color:var(--accent)">${_propCliente.email}</a></span></div>` : ''}
+            ` : p.proprietario ? `
+              <div class="info-row"><span class="label">Nome</span><span class="val">👤 ${p.proprietario}</span></div>
+              ${p.tel_proprietario ? `<div class="info-row"><span class="label">Telefono</span><span class="val"><a href="tel:${p.tel_proprietario}" style="color:var(--accent)">${p.tel_proprietario}</a></span></div>` : ''}
+            ` : '<div style="font-size:0.82rem;color:var(--text-faint);font-style:italic">Nessun proprietario collegato. Clicca Modifica per assegnarne uno.</div>'}
             ${p.note ? `<div style="margin-top:14px"><div class="info-card-title">Note</div><div style="font-size:0.85rem;color:var(--text);line-height:1.6;white-space:pre-wrap">${p.note}</div></div>` : ''}
           </div>
         </div>
@@ -300,7 +313,7 @@
       `;
     }
 
-    function apriModal() {
+    async function apriModal() {
       const p = _prop;
       document.getElementById('f_titolo').value = p.titolo || p.nome || '';
       document.getElementById('f_ref').value = p.ref || '';
@@ -311,15 +324,22 @@
       document.getElementById('f_prezzo').value = p.prezzo || '';
       document.getElementById('f_mq').value = p.mq || '';
       document.getElementById('f_scadenza').value = p.scadenza || '';
-      document.getElementById('f_proprietario').value = p.proprietario || '';
-      document.getElementById('f_tel_proprietario').value = p.tel_proprietario || '';
       document.getElementById('f_note').value = p.note || '';
+      // Carica lista proprietari per select
+      if (_tuttiProprietari.length === 0) {
+        const rp = await fetch(`${SB_URL}/rest/v1/clienti?tipo=eq.proprietari&select=id,nome&order=nome.asc&limit=300`, { headers: SB_H });
+        _tuttiProprietari = await rp.json();
+      }
+      const sel = document.getElementById('f_proprietario_id');
+      sel.innerHTML = '<option value="">— nessun proprietario —</option>' +
+        _tuttiProprietari.map(c => `<option value="${c.id}" ${p.proprietario_id === c.id ? 'selected' : ''}>${c.nome}</option>`).join('');
       document.getElementById('modalOverlay').classList.add('open');
     }
 
     function chiudiModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
     async function salva() {
+      const selPropId = document.getElementById('f_proprietario_id').value;
       const obj = {
         titolo: document.getElementById('f_titolo').value.trim(),
         nome: document.getElementById('f_titolo').value.trim(),
@@ -332,8 +352,7 @@
         prezzo: parseFloat(document.getElementById('f_prezzo').value) || null,
         mq: parseInt(document.getElementById('f_mq').value) || null,
         scadenza: document.getElementById('f_scadenza').value || null,
-        proprietario: document.getElementById('f_proprietario').value.trim(),
-        tel_proprietario: document.getElementById('f_tel_proprietario').value.trim(),
+        proprietario_id: selPropId ? parseInt(selPropId) : null,
         note: document.getElementById('f_note').value.trim(),
       };
       await fetch(`${SB_URL}/rest/v1/proprieta?id=eq.${propId}`, { method: 'PATCH', headers: SB_H, body: JSON.stringify(obj) });

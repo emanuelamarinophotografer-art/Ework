@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ework — Richieste</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .filtri { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .filtro-btn { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 0.78rem; font-family: inherit; cursor: pointer; color: var(--text-muted); font-weight: 500; transition: all 0.15s; }
+    .filtro-btn:hover, .filtro-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+
+    .richieste-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .ric-header { display: grid; grid-template-columns: 2fr 1.8fr 1.4fr 1fr 1fr auto; gap: 14px; padding: 10px 18px; background: var(--bg); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+    .ric-row { display: grid; grid-template-columns: 2fr 1.8fr 1.4fr 1fr 1fr auto; gap: 14px; padding: 13px 18px; background: var(--bg-card); border-bottom: 1px solid var(--border); align-items: center; cursor: pointer; transition: background 0.12s; }
+    .ric-row:last-child { border-bottom: none; }
+    .ric-row:hover { background: var(--bg); }
+    .ric-nome { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .ric-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .ric-immobile { font-size: 0.82rem; color: #c0392b; font-weight: 500; }
+
+    /* STATI pipeline */
+    .stato-pill { display: inline-block; font-size: 0.67rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+    .s-nuova      { background: #e3f2fd; color: #1565c0; }
+    .s-risposto   { background: #e8f5e9; color: #2e7d32; }
+    .s-attesa     { background: #fff8e1; color: #e65100; }
+    .s-followup   { background: #fff3e0; color: #bf360c; }
+    .s-visita-p   { background: #ede7f6; color: #6a1b9a; }
+    .s-visita-f   { background: #e8eaf6; color: #283593; }
+    .s-visita-e   { background: #e0f2f1; color: #00695c; }
+    .s-interessato{ background: #fce4ec; color: #880e4f; }
+    .s-non-int    { background: #f5f5f5; color: #757575; }
+    .s-perso      { background: #ffebee; color: #c62828; }
+    .s-chiuso     { background: #f1f8e9; color: #33691e; }
+    .s-richiamare { background: #fff9c4; color: #827717; }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg-card); border-radius: 14px; padding: 30px; width: 620px; max-width: 95vw; max-height: 92vh; overflow-y: auto; }
+    .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 6px; }
+    .modal-close:hover { background: var(--bg); }
+    .form-section { font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin: 18px 0 10px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .form-input, .form-select, .form-textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 9px 12px; font-size: 0.9rem; font-family: inherit; font-weight: 500; color: var(--text); outline: none; width: 100%; box-sizing: border-box; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+    .form-textarea { resize: vertical; min-height: 72px; }
+    .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .btn-elimina { background: none; border: 1px solid #c0392b; color: #c0392b; border-radius: 8px; padding: 8px 16px; font-size: 0.84rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .btn-elimina:hover { background: #fdedec; }
+    .btn-salva { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 9px 22px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .btn-annulla { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 18px; font-size: 0.88rem; font-family: inherit; font-weight: 600; cursor: pointer; color: var(--text-muted); }
+    .btns-right { display: flex; gap: 10px; }
+
+    .btn-nuova { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 9px 18px; font-size: 0.84rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .btn-nuova:hover { opacity: 0.85; }
+
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-faint); font-style: italic; font-size: 0.9rem; }
+
+    .n-follow-badge { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; font-size: 0.72rem; padding: 2px 8px; color: var(--text-muted); }
+    .data-prossima { font-size: 0.78rem; color: var(--text-muted); }
+    .data-prossima.urgente { color: #c0392b; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html"><h1>Ework</h1></a>
+      <div class="sub">Centro operativo</div>
+    </div>
+    <nav class="nav-section c-principale">
+      <div class="nav-label">Principale</div>
+      <a class="nav-item" href="index.html"><span class="icon">🎯</span> Centro di comando</a>
+    </nav>
+    <nav class="nav-section c-operativo">
+      <div class="nav-label">Operativo</div>
+      <a class="nav-item" href="attivita.html"><span class="icon">📅</span> Attività</a>
+      <a class="nav-item" href="agenti.html"><span class="icon">🤖</span> Agenti</a>
+      <a class="nav-item" href="chat.html"><span class="icon">💬</span> Chat</a>
+    </nav>
+    <nav class="nav-section c-lavoro">
+      <div class="nav-label">Lavoro</div>
+      <a class="nav-item" href="clienti.html"><span class="icon">👤</span> Clienti</a>
+      <a class="nav-item active" href="richieste.html"><span class="icon">📞</span> Richieste</a>
+      <a class="nav-item" href="proprieta.html"><span class="icon">🏡</span> Proprietà</a>
+      <a class="nav-item" href="valutazione.html"><span class="icon">🧮</span> Valutazione</a>
+      <a class="nav-item" href="ricerca.html"><span class="icon">🔍</span> Ricerca Immobili</a>
+      <a class="nav-item" href="radar.html"><span class="icon">📡</span> Radar Lunedì</a>
+      <a class="nav-item" href="incarico.html"><span class="icon">📋</span> Scheda Incarico</a>
+    </nav>
+    <nav class="nav-section c-contenuti">
+      <div class="nav-label">Contenuti</div>
+      <a class="nav-item" href="social.html"><span class="icon">📸</span> Social</a>
+      <a class="nav-item" href="fonti.html"><span class="icon">🌿</span> Fonti</a>
+    </nav>
+    <div class="sidebar-bottom" id="dataOggi"></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h2>📞 Richieste</h2>
+      <div class="date" id="dataEstesa"></div>
+    </div>
+    <div class="content">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="blocco-header" style="margin:0">Pipeline acquirenti <span class="count" id="totCount">0</span></div>
+        <button class="btn-nuova" onclick="nuovaRichiesta()">+ Nuova richiesta</button>
+      </div>
+
+      <div class="filtri" id="filtriStato">
+        <button class="filtro-btn active" data-stato="">Tutte</button>
+        <button class="filtro-btn" data-stato="Nuova richiesta">🆕 Nuove</button>
+        <button class="filtro-btn" data-stato="In attesa risposta">⏳ In attesa</button>
+        <button class="filtro-btn" data-stato="Follow-up 1|Follow-up 2|Follow-up 3">🔁 Follow-up</button>
+        <button class="filtro-btn" data-stato="Visita proposta|Visita fissata|Visita effettuata">🏡 Visite</button>
+        <button class="filtro-btn" data-stato="Interessato">🔴 Interessati</button>
+        <button class="filtro-btn" data-stato="Da richiamare">📲 Da richiamare</button>
+        <button class="filtro-btn" data-stato="Perso|Non interessato|Chiuso">✗ Chiusi</button>
+      </div>
+
+      <div class="richieste-grid">
+        <div class="ric-header">
+          <div>Cliente</div>
+          <div>Immobile</div>
+          <div>Stato</div>
+          <div>Ult. contatto</div>
+          <div>Prossimo follow</div>
+          <div></div>
+        </div>
+        <div id="listaRichieste"><div class="empty-state">Caricamento…</div></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-title">
+        <span id="modalTitolo">Nuova richiesta</span>
+        <button class="modal-close" onclick="chiudiModal()">✕</button>
+      </div>
+
+      <div class="form-section">Cliente</div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label>Nome cliente</label>
+          <input class="form-input" type="text" id="f_nome" placeholder="Nome e cognome" />
+        </div>
+        <div class="form-group">
+          <label>Telefono</label>
+          <input class="form-input" type="tel" id="f_telefono" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input class="form-input" type="email" id="f_email" />
+        </div>
+      </div>
+
+      <div class="form-section">Interesse</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Immobile (rif. o descrizione)</label>
+          <input class="form-input" type="text" id="f_immobile" placeholder="es. 33541050-137" />
+        </div>
+        <div class="form-group">
+          <label>Proprietà collegata</label>
+          <select class="form-select" id="f_proprieta_id">
+            <option value="">— nessuna —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo cliente</label>
+          <select class="form-select" id="f_tipo_cliente">
+            <option>Acquirente</option>
+            <option>Alta</option>
+            <option>Media</option>
+            <option>Bassa</option>
+            <option>Inutile</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Interesse</label>
+          <input class="form-input" type="text" id="f_interesse" placeholder="Es. casale con terreno, max 200k" />
+        </div>
+      </div>
+
+      <div class="form-section">Pipeline</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Stato cliente</label>
+          <select class="form-select" id="f_stato_cliente">
+            <option>Nuova richiesta</option>
+            <option>Risposto</option>
+            <option>In attesa risposta</option>
+            <option>Follow-up 1</option>
+            <option>Follow-up 2</option>
+            <option>Follow-up 3</option>
+            <option>Visita proposta</option>
+            <option>Visita fissata</option>
+            <option>Visita effettuata</option>
+            <option>Interessato</option>
+            <option>Non interessato</option>
+            <option>Perso</option>
+            <option>Chiuso</option>
+            <option>Da richiamare</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stato follow AI</label>
+          <select class="form-select" id="f_stato_follow">
+            <option>Nessuno</option>
+            <option>Da generare</option>
+            <option>Generato</option>
+            <option>Inviato</option>
+            <option>Risposto</option>
+            <option>Non procedere</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Ultimo contatto</label>
+          <input class="form-input" type="date" id="f_ultimo_contatto" />
+        </div>
+        <div class="form-group">
+          <label>Prossimo follow-up</label>
+          <input class="form-input" type="date" id="f_prossimo_follow" />
+        </div>
+      </div>
+
+      <div class="form-section">Note e obiezioni</div>
+      <div class="form-group full" style="margin-bottom:10px">
+        <label>Obiezioni</label>
+        <input class="form-input" type="text" id="f_obiezioni" placeholder="Es. prezzo troppo alto, troppo da ristrutturare" />
+      </div>
+      <div class="form-group full" style="margin-bottom:10px">
+        <label>Messaggio follow-up AI</label>
+        <textarea class="form-textarea" id="f_mess_follow_ai" placeholder="Bozza messaggio generata da AI…"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Note</label>
+        <textarea class="form-textarea" id="f_note"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-elimina" id="btnElimina" onclick="elimina()" style="display:none">Elimina</button>
+        <div class="btns-right">
+          <button class="btn-annulla" onclick="chiudiModal()">Annulla</button>
+          <button class="btn-salva" onclick="salva()">Salva</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const d = new Date();
+    const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+    const mesi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+    document.getElementById('dataOggi').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()];
+    document.getElementById('dataEstesa').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesi[d.getMonth()] + ' ' + d.getFullYear();
+
+    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
+    let _tutte = [];
+    let _filtroAttivo = '';
+    let _editId = null;
+    let _proprieta = [];
+
+    const classeStato = {
+      'Nuova richiesta': 's-nuova', 'Risposto': 's-risposto', 'In attesa risposta': 's-attesa',
+      'Follow-up 1': 's-followup', 'Follow-up 2': 's-followup', 'Follow-up 3': 's-followup',
+      'Visita proposta': 's-visita-p', 'Visita fissata': 's-visita-f', 'Visita effettuata': 's-visita-e',
+      'Interessato': 's-interessato', 'Non interessato': 's-non-int',
+      'Perso': 's-perso', 'Chiuso': 's-chiuso', 'Da richiamare': 's-richiamare'
+    };
+
+    function fmt(str) {
+      if (!str) return '—';
+      const dt = new Date(str);
+      return dt.toLocaleDateString('it-IT', { day:'2-digit', month:'short' });
+    }
+
+    function isUrgente(str) {
+      if (!str) return false;
+      return new Date(str) <= new Date();
+    }
+
+    async function carica() {
+      const [rR, rP] = await Promise.all([
+        fetch(`${SB_URL}/rest/v1/richieste?order=created_at.desc&limit=300`, { headers: SB_H }),
+        fetch(`${SB_URL}/rest/v1/proprieta?select=id,ref,titolo&order=ref.asc&limit=200`, { headers: SB_H })
+      ]);
+      _tutte = await rR.json();
+      _proprieta = await rP.json();
+      renderLista();
+    }
+
+    function renderLista() {
+      const filtro = _filtroAttivo;
+      const lista = filtro
+        ? _tutte.filter(r => filtro.split('|').includes(r.stato_cliente))
+        : _tutte;
+
+      document.getElementById('totCount').textContent = lista.length;
+      const el = document.getElementById('listaRichieste');
+
+      if (lista.length === 0) {
+        el.innerHTML = '<div class="empty-state">Nessuna richiesta trovata.</div>';
+        return;
+      }
+
+      el.innerHTML = lista.map(r => `
+        <div class="ric-row" onclick="apriModal(${r.id})">
+          <div>
+            <div class="ric-nome">${r.nome_cliente || '—'}</div>
+            <div class="ric-sub">${r.email || r.telefono || ''}</div>
+          </div>
+          <div>
+            <div class="ric-immobile">${r.immobile || '—'}</div>
+            <div class="ric-sub">${r.interesse || ''}</div>
+          </div>
+          <div><span class="stato-pill ${classeStato[r.stato_cliente] || ''}">${r.stato_cliente || '—'}</span></div>
+          <div class="data-prossima">${fmt(r.ultimo_contatto)}</div>
+          <div class="data-prossima ${isUrgente(r.prossimo_follow) ? 'urgente' : ''}">${fmt(r.prossimo_follow)}</div>
+          <div><span class="n-follow-badge">${r.n_follow || 0}×</span></div>
+        </div>`).join('');
+    }
+
+    // Filtri
+    document.getElementById('filtriStato').addEventListener('click', e => {
+      const btn = e.target.closest('.filtro-btn');
+      if (!btn) return;
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _filtroAttivo = btn.dataset.stato;
+      renderLista();
+    });
+
+    function nuovaRichiesta() {
+      _editId = null;
+      document.getElementById('modalTitolo').textContent = 'Nuova richiesta';
+      document.getElementById('btnElimina').style.display = 'none';
+      ['f_nome','f_telefono','f_email','f_immobile','f_interesse','f_obiezioni','f_mess_follow_ai','f_note'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('f_tipo_cliente').value = 'Acquirente';
+      document.getElementById('f_stato_cliente').value = 'Nuova richiesta';
+      document.getElementById('f_stato_follow').value = 'Nessuno';
+      document.getElementById('f_ultimo_contatto').value = new Date().toISOString().split('T')[0];
+      document.getElementById('f_prossimo_follow').value = '';
+      popolaSelectProprieta(null);
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function apriModal(id) {
+      const r = _tutte.find(x => x.id === id);
+      if (!r) return;
+      _editId = id;
+      document.getElementById('modalTitolo').textContent = r.nome_cliente || 'Richiesta';
+      document.getElementById('btnElimina').style.display = '';
+      document.getElementById('f_nome').value = r.nome_cliente || '';
+      document.getElementById('f_telefono').value = r.telefono || '';
+      document.getElementById('f_email').value = r.email || '';
+      document.getElementById('f_immobile').value = r.immobile || '';
+      document.getElementById('f_interesse').value = r.interesse || '';
+      document.getElementById('f_tipo_cliente').value = r.tipo_cliente || 'Acquirente';
+      document.getElementById('f_stato_cliente').value = r.stato_cliente || 'Nuova richiesta';
+      document.getElementById('f_stato_follow').value = r.stato_follow || 'Nessuno';
+      document.getElementById('f_ultimo_contatto').value = r.ultimo_contatto || '';
+      document.getElementById('f_prossimo_follow').value = r.prossimo_follow || '';
+      document.getElementById('f_obiezioni').value = r.obiezioni || '';
+      document.getElementById('f_mess_follow_ai').value = r.mess_follow_ai || '';
+      document.getElementById('f_note').value = r.note || '';
+      popolaSelectProprieta(r.proprieta_id);
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function popolaSelectProprieta(selId) {
+      const sel = document.getElementById('f_proprieta_id');
+      sel.innerHTML = '<option value="">— nessuna —</option>' +
+        _proprieta.map(p => `<option value="${p.id}" ${p.id === selId ? 'selected' : ''}>${p.ref || p.titolo}</option>`).join('');
+    }
+
+    function chiudiModal() { document.getElementById('modalOverlay').classList.remove('open'); _editId = null; }
+
+    async function salva() {
+      const obj = {
+        nome_cliente: document.getElementById('f_nome').value.trim(),
+        telefono: document.getElementById('f_telefono').value.trim(),
+        email: document.getElementById('f_email').value.trim(),
+        immobile: document.getElementById('f_immobile').value.trim(),
+        tipo_cliente: document.getElementById('f_tipo_cliente').value,
+        stato_cliente: document.getElementById('f_stato_cliente').value,
+        stato_follow: document.getElementById('f_stato_follow').value,
+        ultimo_contatto: document.getElementById('f_ultimo_contatto').value || null,
+        prossimo_follow: document.getElementById('f_prossimo_follow').value || null,
+        interesse: document.getElementById('f_interesse').value.trim(),
+        obiezioni: document.getElementById('f_obiezioni').value.trim(),
+        mess_follow_ai: document.getElementById('f_mess_follow_ai').value.trim(),
+        note: document.getElementById('f_note').value.trim(),
+        proprieta_id: document.getElementById('f_proprieta_id').value ? parseInt(document.getElementById('f_proprieta_id').value) : null,
+      };
+
+      if (_editId) {
+        // incrementa n_follow se cambia stato verso follow-up
+        const r = _tutte.find(x => x.id === _editId);
+        if (r && obj.stato_cliente.startsWith('Follow-up') && r.stato_cliente !== obj.stato_cliente) {
+          obj.n_follow = (r.n_follow || 0) + 1;
+        }
+        await fetch(`${SB_URL}/rest/v1/richieste?id=eq.${_editId}`, { method: 'PATCH', headers: SB_H, body: JSON.stringify(obj) });
+      } else {
+        await fetch(`${SB_URL}/rest/v1/richieste`, { method: 'POST', headers: SB_H, body: JSON.stringify(obj) });
+      }
+      chiudiModal();
+      carica();
+    }
+
+    async function elimina() {
+      if (!confirm('Eliminare questa richiesta?')) return;
+      await fetch(`${SB_URL}/rest/v1/richieste?id=eq.${_editId}`, { method: 'DELETE', headers: SB_H });
+      chiudiModal();
+      carica();
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) chiudiModal(); });
+    carica();
+  </script>
+
+</body>
+</html>
