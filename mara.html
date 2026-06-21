@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ework — Mara Analytics</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* HEADER MARA */
+    .mara-header {
+      background: linear-gradient(135deg, #1a2e42 0%, #2a4a6a 100%);
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .mara-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #4a8aae; display: flex; align-items: center;
+      justify-content: center; font-size: 1.4rem; flex-shrink: 0;
+    }
+    .mara-title { font-size: 1.1rem; font-weight: 700; color: #e8f0f6; }
+    .mara-sub { font-size: 0.75rem; color: #8aaec4; margin-top: 3px; }
+    .mara-update { margin-left: auto; font-size: 0.7rem; color: #8aaec4; text-align: right; }
+
+    /* GRIGLIA DASHBOARD */
+    .mara-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .mara-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .mara-full { margin-bottom: 16px; }
+
+    /* KPI CARDS */
+    .kpi-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .kpi-card {
+      flex: 1; min-width: 100px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; text-align: center;
+    }
+    .kpi-val { font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
+    .kpi-val.verde { color: #27ae60; }
+    .kpi-val.arancio { color: #c07040; }
+    .kpi-val.rosso { color: #c0392b; }
+    .kpi-val.blu { color: #2980b9; }
+    .kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 5px; font-weight: 600; }
+
+    /* FUNNEL */
+    .funnel-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .funnel-step {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .funnel-bar-wrap { flex: 1; }
+    .funnel-label { font-size: 0.78rem; color: var(--text); font-weight: 600; min-width: 120px; }
+    .funnel-track { background: var(--border); border-radius: 20px; height: 10px; overflow: hidden; }
+    .funnel-fill { height: 100%; border-radius: 20px; background: var(--accent); transition: width 0.5s; }
+    .funnel-num { font-size: 0.8rem; font-weight: 700; color: var(--text); min-width: 32px; text-align: right; }
+    .funnel-pct { font-size: 0.68rem; color: var(--text-muted); min-width: 44px; text-align: right; }
+
+    /* GOAL BARS */
+    .goal-section { display: flex; flex-direction: column; gap: 10px; }
+    .goal-item { }
+    .goal-header { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 4px; }
+    .goal-nome { font-weight: 600; color: var(--text); }
+    .goal-num { color: var(--text-muted); }
+    .goal-track { background: var(--border); border-radius: 20px; height: 8px; overflow: hidden; }
+    .goal-fill { height: 100%; border-radius: 20px; background: var(--accent); transition: width 0.4s; }
+    .goal-fill.ok { background: #27ae60; }
+    .goal-proiezione { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; font-style: italic; }
+
+    /* FINANZE */
+    .fin-sezione { margin-bottom: 16px; }
+    .fin-sezione-label { font-size: 0.67rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; font-weight: 600; }
+    .fin-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+    .fin-item label { display: block; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+    .fin-input {
+      width: 100%; box-sizing: border-box; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 10px; font-size: 0.95rem; font-family: inherit;
+      font-weight: 600; color: var(--text); outline: none; text-align: center;
+    }
+    .fin-input:focus { border-color: var(--accent); }
+    .fin-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .fin-autosave { font-size: 0.72rem; color: var(--text-muted); font-style: italic; }
+    .btn-fin { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .btn-fin:hover { opacity: 0.85; }
+    .fin-storico-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
+    .fin-storico-data { font-size: 0.8rem; font-weight: 600; color: var(--text); min-width: 80px; }
+    .fin-storico-desc { flex: 1; font-size: 0.82rem; color: var(--text-muted); }
+    .fin-storico-importo { font-size: 0.95rem; font-weight: 700; }
+    .fin-storico-importo.entrata { color: #27ae60; }
+    .fin-storico-importo.spesa { color: #c0392b; }
+    .fin-storico-tipo { font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 8px; }
+    .tipo-provv { background: #eafaf1; color: #27ae60; }
+    .tipo-spesa { background: #fdedec; color: #c0392b; }
+    .tipo-altro { background: #fef9e7; color: #b7860b; }
+    .btn-del-fin { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 0.8rem; padding: 2px 6px; }
+    .btn-del-fin:hover { color: var(--danger); }
+    .aggiungi-fin-form { background: var(--bg-card); border: 1px dashed var(--border); border-radius: 10px; padding: 14px 16px; margin-top: 10px; }
+    .aggiungi-fin-title { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .aggiungi-fin-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+    .fin-field { display: flex; flex-direction: column; gap: 4px; }
+    .fin-field label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+    .fin-field input, .fin-field select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; }
+    .fin-field input:focus, .fin-field select:focus { border-color: var(--accent); }
+    .fin-field.wide input { width: 200px; }
+    .fin-field.sm input { width: 110px; }
+
+    /* INTERPRETAZIONE MARA */
+    .mara-insight {
+      background: #1a2e42; border-radius: 10px; padding: 14px 16px; margin-top: 12px;
+    }
+    .mara-insight-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: #8aaec4; font-weight: 700; margin-bottom: 8px; }
+    .mara-insight-text { font-size: 0.82rem; color: #c8daea; line-height: 1.6; }
+    .mara-insight-action { margin-top: 8px; font-size: 0.82rem; color: #8aaec4; }
+    .mara-insight-action strong { color: #e8f0f6; }
+
+    /* PORTAFOGLIO IMMOBILI */
+    .port-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .port-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+
+    /* SOCIAL */
+    .social-rubrica-row { display: flex; flex-direction: column; gap: 8px; }
+    .rubrica-item { display: flex; align-items: center; gap: 10px; }
+    .rubrica-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .rubrica-nome { font-size: 0.82rem; font-weight: 600; color: var(--text); min-width: 120px; }
+    .rubrica-bar-wrap { flex: 1; }
+    .rubrica-track { background: var(--border); border-radius: 20px; height: 8px; overflow: hidden; }
+    .rubrica-fill { height: 100%; border-radius: 20px; }
+    .rubrica-count { font-size: 0.75rem; color: var(--text-muted); min-width: 50px; text-align: right; }
+
+    /* MESE FINANZE */
+    .saldo-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .saldo-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); font-weight: 600; }
+    .saldo-val { font-size: 1.6rem; font-weight: 700; }
+    .saldo-val.positivo { color: #27ae60; }
+    .saldo-val.negativo { color: #c0392b; }
+
+    @media (max-width: 960px) { .mara-grid { grid-template-columns: 1fr; } .mara-grid-3 { grid-template-columns: 1fr; } .fin-row { grid-template-columns: repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html"><h1>Ework</h1></a>
+      <div class="sub">Centro operativo</div>
+    </div>
+    <nav class="nav-section c-principale">
+      <div class="nav-label">Principale</div>
+      <a class="nav-item" href="index.html"><span class="icon">🎯</span> Centro di comando</a>
+    </nav>
+    <nav class="nav-section c-operativo">
+      <div class="nav-label">Operativo</div>
+      <a class="nav-item" href="attivita.html"><span class="icon">📅</span> Attività</a>
+      <a class="nav-item" href="agenti.html"><span class="icon">🤖</span> Agenti</a>
+      <a class="nav-item active" href="mara.html"><span class="icon">📊</span> Mara Analytics</a>
+      <a class="nav-item" href="chat.html"><span class="icon">💬</span> Chat</a>
+    </nav>
+    <nav class="nav-section c-lavoro">
+      <div class="nav-label">Lavoro</div>
+      <a class="nav-item" href="clienti.html"><span class="icon">👤</span> Clienti</a>
+      <a class="nav-item" href="richieste.html"><span class="icon">📞</span> Richieste</a>
+      <a class="nav-item" href="proprieta.html"><span class="icon">🏡</span> Proprietà</a>
+      <a class="nav-item" href="valutazione.html"><span class="icon">🧮</span> Valutazione</a>
+      <a class="nav-item" href="ricerca.html"><span class="icon">🔍</span> Ricerca Immobili</a>
+      <a class="nav-item" href="radar.html"><span class="icon">📡</span> Radar Lunedì</a>
+      <a class="nav-item" href="incarico.html"><span class="icon">📋</span> Scheda Incarico</a>
+    </nav>
+    <nav class="nav-section c-contenuti">
+      <div class="nav-label">Contenuti</div>
+      <a class="nav-item" href="social.html"><span class="icon">📸</span> Social</a>
+      <a class="nav-item" href="fonti.html"><span class="icon">🌿</span> Fonti</a>
+    </nav>
+    <div class="sidebar-bottom" id="dataOggi"></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h2>📊 Mara Analytics</h2>
+      <div class="date" id="dataEstesa"></div>
+    </div>
+
+    <div class="content">
+
+      <!-- HEADER MARA -->
+      <div class="mara-header">
+        <div class="mara-avatar">📊</div>
+        <div>
+          <div class="mara-title">Mara — Analista Trasversale</div>
+          <div class="mara-sub">Funnel richieste · Metriche lavoro · Portafoglio immobili · Social · Finanze</div>
+        </div>
+        <div class="mara-update" id="maraUpdate"></div>
+      </div>
+
+      <!-- RIGA 1: KPI VELOCI -->
+      <div class="blocco mara-full">
+        <div class="blocco-header">Colpo d'occhio</div>
+        <div class="kpi-row" id="kpiRow">
+          <div class="kpi-card"><div class="kpi-val blu" id="kpi_richieste">—</div><div class="kpi-label">Richieste attive</div></div>
+          <div class="kpi-card"><div class="kpi-val arancio" id="kpi_followscad">—</div><div class="kpi-label">Follow scaduti</div></div>
+          <div class="kpi-card"><div class="kpi-val" id="kpi_contatti">—</div><div class="kpi-label">Contatti settimana</div></div>
+          <div class="kpi-card"><div class="kpi-val" id="kpi_incarichi">—</div><div class="kpi-label">Incarichi mese</div></div>
+          <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_attesa">—</div><div class="kpi-label">Provv. attesa (€)</div></div>
+          <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_incassata">—</div><div class="kpi-label">Provv. incassata (€)</div></div>
+          <div class="kpi-card"><div class="kpi-val" id="kpi_immobili">—</div><div class="kpi-label">Immobili portafoglio</div></div>
+        </div>
+      </div>
+
+      <!-- RIGA 2: FUNNEL + GOAL LAVORO -->
+      <div class="mara-grid">
+
+        <!-- FUNNEL RICHIESTE -->
+        <div class="blocco">
+          <div class="blocco-header">Funnel richieste</div>
+          <div class="funnel-wrap" id="funnelWrap">
+            <div class="placeholder">Caricamento…</div>
+          </div>
+          <div class="mara-insight" id="funnelInsight" style="display:none">
+            <div class="mara-insight-label">— Mara 📊</div>
+            <div class="mara-insight-text" id="funnelInsightText"></div>
+          </div>
+        </div>
+
+        <!-- GOAL LAVORO -->
+        <div class="blocco">
+          <div class="blocco-header">Goal mensili — <span id="meseLavoro"></span></div>
+          <div class="goal-section" id="goalSection">
+            <div class="placeholder">Nessuna metrica inserita questa settimana.</div>
+          </div>
+          <div class="mara-insight" id="goalInsight" style="display:none">
+            <div class="mara-insight-label">— Mara 📊</div>
+            <div class="mara-insight-text" id="goalInsightText"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGA 3: PORTAFOGLIO IMMOBILI + SOCIAL -->
+      <div class="mara-grid">
+
+        <!-- PORTAFOGLIO -->
+        <div class="blocco">
+          <div class="blocco-header">Portafoglio immobili</div>
+          <div class="kpi-row" id="portKpi"></div>
+          <div id="portInsight">
+            <div class="placeholder">Nessuna scheda in ricerca immobili.</div>
+          </div>
+        </div>
+
+        <!-- SOCIAL -->
+        <div class="blocco">
+          <div class="blocco-header">Piano social — distribuzione rubriche</div>
+          <div class="social-rubrica-row" id="socialRubriche">
+            <div class="placeholder">Nessun post nel piano social.</div>
+          </div>
+          <div class="mara-insight" id="socialInsight" style="display:none">
+            <div class="mara-insight-label">— Mara 📊</div>
+            <div class="mara-insight-text" id="socialInsightText"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FINANZE -->
+      <div class="blocco mara-full">
+        <div class="blocco-header">Finanze</div>
+
+        <!-- SALDI -->
+        <div class="mara-grid-3" id="saldiCards">
+          <div class="saldo-card">
+            <div><div class="saldo-label">Provvigioni incassate</div><div class="saldo-val positivo" id="fin_tot_entrate">€ 0</div></div>
+            <span style="font-size:1.8rem">💰</span>
+          </div>
+          <div class="saldo-card">
+            <div><div class="saldo-label">Spese totali</div><div class="saldo-val negativo" id="fin_tot_spese">€ 0</div></div>
+            <span style="font-size:1.8rem">📤</span>
+          </div>
+          <div class="saldo-card">
+            <div><div class="saldo-label">Saldo netto</div><div class="saldo-val" id="fin_saldo">€ 0</div></div>
+            <span style="font-size:1.8rem">⚖️</span>
+          </div>
+        </div>
+
+        <!-- GOAL ANNUO -->
+        <div class="fin-sezione">
+          <div class="fin-sezione-label">Goal annuo provvigioni</div>
+          <div class="fin-row" style="grid-template-columns: 1fr 1fr; max-width: 400px;">
+            <div class="fin-item">
+              <label>Goal annuo (€)</label>
+              <input type="number" class="fin-input" id="fin_goal_annuo" placeholder="es. 40000" oninput="salvaFinGoal()" />
+            </div>
+            <div class="fin-item">
+              <label>% raggiunto</label>
+              <input type="text" class="fin-input" id="fin_goal_pct" readonly style="background:var(--bg-card);color:var(--accent)" />
+            </div>
+          </div>
+          <div class="goal-track" style="margin-top:8px;height:12px">
+            <div class="goal-fill ok" id="fin_goal_bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- STORICO MOVIMENTI -->
+        <div class="fin-sezione">
+          <div class="fin-sezione-label">Movimenti <span id="contMovimenti"></span></div>
+          <div id="finStorico"></div>
+
+          <!-- AGGIUNGI MOVIMENTO -->
+          <div class="aggiungi-fin-form">
+            <div class="aggiungi-fin-title">+ Aggiungi movimento</div>
+            <div class="aggiungi-fin-row">
+              <div class="fin-field wide">
+                <label>Descrizione</label>
+                <input type="text" id="fin_desc" placeholder="es. Provvigione villa Scansano" />
+              </div>
+              <div class="fin-field sm">
+                <label>Importo (€)</label>
+                <input type="number" id="fin_importo" placeholder="0" />
+              </div>
+              <div class="fin-field">
+                <label>Tipo</label>
+                <select id="fin_tipo">
+                  <option value="provvigione">💰 Provvigione</option>
+                  <option value="spesa">📤 Spesa</option>
+                  <option value="altro">📋 Altro entrata</option>
+                </select>
+              </div>
+              <div class="fin-field sm">
+                <label>Data</label>
+                <input type="date" id="fin_data" />
+              </div>
+              <div class="fin-field" style="justify-content:flex-end">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-fin" onclick="aggiungiMovimento()">Aggiungi</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const d = new Date();
+    const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+    const mesiNomi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+    document.getElementById('dataOggi').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesiNomi[d.getMonth()];
+    document.getElementById('dataEstesa').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesiNomi[d.getMonth()] + ' ' + d.getFullYear();
+    document.getElementById('meseLavoro').textContent = mesiNomi[d.getMonth()] + ' ' + d.getFullYear();
+    document.getElementById('maraUpdate').innerHTML = 'Aggiornato alle<br>' + new Date().toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
+
+    // Pre-imposta data di oggi nel form finanze
+    document.getElementById('fin_data').value = d.toISOString().split('T')[0];
+
+    // SUPABASE
+    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+
+    function fmtEur(n) { return '€ ' + Math.round(n).toLocaleString('it-IT'); }
+    function pct(a, b) { return b > 0 ? Math.round((a/b)*100) : 0; }
+
+    // ═══════════════════════════════════════
+    // FUNNEL RICHIESTE (Supabase)
+    // ═══════════════════════════════════════
+    async function caricaFunnel() {
+      const oggi = new Date().toISOString().split('T')[0];
+      const res = await fetch(`${SB_URL}/rest/v1/richieste?select=stato_follow,stato_cliente,prossimo_follow`, { headers: SB_H });
+      const lista = await res.json();
+
+      const tot = lista.length;
+      const attive = lista.filter(r => !['Annullato','Perso','Venduto'].includes(r.stato_cliente)).length;
+      const risposte = lista.filter(r => !['Da generare'].includes(r.stato_follow)).length;
+      const inVisita = lista.filter(r => ['Visita fissata','Visita effettuata'].includes(r.stato_follow)).length;
+      const followScad = lista.filter(r => r.prossimo_follow && r.prossimo_follow <= oggi && !['Annullato','Perso','Venduto'].includes(r.stato_cliente)).length;
+
+      document.getElementById('kpi_richieste').textContent = attive;
+      document.getElementById('kpi_followscad').textContent = followScad;
+
+      const steps = [
+        { label: 'Richieste totali', val: tot, ref: tot },
+        { label: 'Richieste attive', val: attive, ref: tot },
+        { label: 'Risposte inviate', val: risposte, ref: tot },
+        { label: 'In visita / da visitare', val: inVisita, ref: tot },
+      ];
+
+      const el = document.getElementById('funnelWrap');
+      el.innerHTML = steps.map(s => {
+        const p = pct(s.val, s.ref);
+        return `<div class="funnel-step">
+          <div class="funnel-label">${s.label}</div>
+          <div class="funnel-bar-wrap">
+            <div class="funnel-track"><div class="funnel-fill" style="width:${p}%"></div></div>
+          </div>
+          <div class="funnel-num">${s.val}</div>
+          <div class="funnel-pct">${p}%</div>
+        </div>`;
+      }).join('');
+
+      // Insight Mara
+      const convPct = pct(risposte, tot);
+      let insight = '';
+      if (followScad > 3) insight = `${followScad} follow-up scaduti — priorità alta. Il tasso di risposta è al ${convPct}%.`;
+      else if (convPct < 70) insight = `Solo il ${convPct}% delle richieste ha ricevuto risposta. Verifica le bozze da inviare.`;
+      else insight = `Funnel in salute: ${convPct}% di risposta su ${tot} richieste totali.`;
+
+      if (followScad > 0) {
+        const ins = document.getElementById('funnelInsight');
+        document.getElementById('funnelInsightText').textContent = insight;
+        ins.style.display = '';
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // GOAL LAVORO (localStorage)
+    // ═══════════════════════════════════════
+    function caricaGoal() {
+      const corrente = JSON.parse(localStorage.getItem('metrica_corrente') || '{}');
+      const storico  = JSON.parse(localStorage.getItem('metriche_storico') || '[]');
+      const campi = ['transazioni','incarichi_e','incarichi_ne','contatti'];
+      const etichette = { transazioni:'Transazioni', incarichi_e:'Incarichi esclusiva', incarichi_ne:'Incarichi non escl.', contatti:'Contatti presi' };
+      const goal = { contatti: 16, incarichi_e: 1, incarichi_ne: 1, transazioni: 1 };
+
+      const totali = {};
+      campi.forEach(c => { totali[c] = (corrente[c] || 0) + storico.reduce((s,r) => s + (r[c]||0), 0); });
+
+      const inc_tot = (totali.incarichi_e || 0) + (totali.incarichi_ne || 0);
+      document.getElementById('kpi_contatti').textContent = totali.contatti || 0;
+      document.getElementById('kpi_incarichi').textContent = inc_tot;
+
+      const el = document.getElementById('goalSection');
+      if (!corrente.dataInizio && storico.length === 0) {
+        el.innerHTML = '<div class="placeholder">Nessuna metrica inserita. Vai su Attività per inserirle.</div>';
+        return;
+      }
+
+      // Proiezione: settimane trascorse nel mese
+      const giornoMese = d.getDate();
+      const giorniTotali = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+      const avanzamento = giornoMese / giorniTotali;
+
+      const items = [
+        { nome: 'Contatti presi', valore: totali.contatti, goal: goal.contatti },
+        { nome: 'Incarichi (E.+N.E.)', valore: inc_tot, goal: goal.incarichi_e + goal.incarichi_ne },
+        { nome: 'Transazioni', valore: totali.transazioni, goal: goal.transazioni },
+      ];
+
+      el.innerHTML = items.map(item => {
+        const p = Math.min(pct(item.valore, item.goal), 100);
+        const ok = item.valore >= item.goal;
+        const proiez = avanzamento > 0 ? Math.round(item.valore / avanzamento) : item.valore;
+        const onTrack = proiez >= item.goal;
+        return `<div class="goal-item">
+          <div class="goal-header">
+            <span class="goal-nome">${item.nome}</span>
+            <span class="goal-num">${item.valore} / ${item.goal} ${ok ? '✅' : ''}</span>
+          </div>
+          <div class="goal-track"><div class="goal-fill ${ok?'ok':''}" style="width:${p}%"></div></div>
+          <div class="goal-proiezione">${onTrack ? '✅' : '⚠️'} A fine mese proietti: ${proiez} ${ok ? '— obiettivo raggiunto' : '— obiettivo: '+item.goal}</div>
+        </div>`;
+      }).join('');
+
+      const goalIns = document.getElementById('goalInsight');
+      const goalInsText = document.getElementById('goalInsightText');
+      const onTrackCount = items.filter(i => {
+        const p = avanzamento > 0 ? Math.round(i.valore / avanzamento) : i.valore;
+        return p >= i.goal;
+      }).length;
+      if (onTrackCount < items.length) {
+        goalInsText.textContent = `${items.length - onTrackCount} obiettivi a rischio con il ritmo attuale. Siamo al ${Math.round(avanzamento*100)}% del mese.`;
+        goalIns.style.display = '';
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // PORTAFOGLIO IMMOBILI (localStorage)
+    // ═══════════════════════════════════════
+    function caricaPortafoglio() {
+      const lista = JSON.parse(localStorage.getItem('ricerca_immobili') || '[]');
+      document.getElementById('kpi_immobili').textContent = lista.length;
+
+      const stati = { in_valutazione: 0, contattato: 0, incarico: 0, archiviato: 0 };
+      let prezzoTot = 0; let conPrezzo = 0;
+      lista.forEach(s => {
+        if (stati[s.stato_scheda] !== undefined) stati[s.stato_scheda]++;
+        if (s.prezzoRichiesto > 0) { prezzoTot += s.prezzoRichiesto; conPrezzo++; }
+      });
+
+      const provvAttesa = lista
+        .filter(s => s.stato_scheda === 'incarico' && s.prezzoRichiesto > 0)
+        .reduce((sum, s) => sum + s.prezzoRichiesto * 0.03, 0);
+      document.getElementById('kpi_provv_attesa').textContent = fmtEur(provvAttesa);
+
+      if (lista.length === 0) return;
+
+      const colori = { in_valutazione:'#2980b9', contattato:'#b7860b', incarico:'#27ae60', archiviato:'#888' };
+      const label = { in_valutazione:'In valutazione', contattato:'Contattato', incarico:'Incarico preso', archiviato:'Archiviato' };
+
+      document.getElementById('portKpi').innerHTML = Object.entries(stati).map(([k,v]) =>
+        `<div class="kpi-card"><div class="kpi-val" style="color:${colori[k]};font-size:1.4rem">${v}</div><div class="kpi-label">${label[k]}</div></div>`
+      ).join('');
+
+      const prezzoMedio = conPrezzo > 0 ? prezzoTot / conPrezzo : 0;
+      const fuoriMercato = lista.filter(s => s.prezzoRichiesto > 0 && s.totMax > 0 && s.prezzoRichiesto > s.totMax * 1.15).length;
+
+      let insightHtml = `<div class="mara-insight"><div class="mara-insight-label">— Mara 📊</div><div class="mara-insight-text">`;
+      insightHtml += `Portafoglio: ${lista.length} schede · prezzo medio richiesto ${fmtEur(prezzoMedio)}.`;
+      if (fuoriMercato > 0) insightHtml += ` <strong style="color:#f4a460">⚠️ ${fuoriMercato} immobil${fuoriMercato>1?'i':'e'} con prezzo >15% sopra stima OMI.</strong>`;
+      if (provvAttesa > 0) insightHtml += ` Provvigione potenziale dagli incarichi attivi: ${fmtEur(provvAttesa)} (stima 3%).`;
+      insightHtml += `</div></div>`;
+      document.getElementById('portInsight').innerHTML = insightHtml;
+    }
+
+    // ═══════════════════════════════════════
+    // SOCIAL (localStorage)
+    // ═══════════════════════════════════════
+    function caricaSocial() {
+      const posts = JSON.parse(localStorage.getItem('social_posts') || '[]');
+      const el = document.getElementById('socialRubriche');
+
+      if (posts.length === 0) return;
+
+      const rubriche = {
+        proprieta:    { nome: 'Proprietà', colore: '#222', count: 0 },
+        personal:     { nome: 'Personal Brand', colore: '#f5f5f5', count: 0 },
+        territorio:   { nome: 'Territorio', colore: '#c9a84c', count: 0 },
+        educativo:    { nome: 'Educativo', colore: '#888', count: 0 },
+      };
+
+      posts.forEach(p => {
+        const cat = p.categoria || p.cat || '';
+        if (rubriche[cat]) rubriche[cat].count++;
+        else {
+          // fallback su colore se non c'è categoria
+          if (p.colore === 'nero' || p.tipo === 'proprieta') rubriche.proprieta.count++;
+          else if (p.colore === 'bianco' || p.tipo === 'personal') rubriche.personal.count++;
+          else if (p.colore === 'oro' || p.tipo === 'territorio') rubriche.territorio.count++;
+          else if (p.colore === 'grigio' || p.tipo === 'educativo') rubriche.educativo.count++;
+        }
+      });
+
+      const max = Math.max(...Object.values(rubriche).map(r => r.count), 1);
+      const target = posts.length / 4; // 25% ciascuna
+
+      el.innerHTML = Object.entries(rubriche).map(([k, r]) => {
+        const p = Math.round((r.count / max) * 100);
+        const pct25 = Math.round((r.count / posts.length) * 100);
+        const ok = Math.abs(pct25 - 25) <= 10;
+        return `<div class="rubrica-item">
+          <div class="rubrica-dot" style="background:${r.colore};border:1px solid var(--border)"></div>
+          <div class="rubrica-nome">${r.nome}</div>
+          <div class="rubrica-bar-wrap">
+            <div class="rubrica-track"><div class="rubrica-fill" style="width:${p}%;background:${r.colore};border:1px solid var(--border)"></div></div>
+          </div>
+          <div class="rubrica-count">${r.count} post (${pct25}%) ${ok?'✅':'⚠️'}</div>
+        </div>`;
+      }).join('');
+
+      const sbilanciati = Object.values(rubriche).filter(r => {
+        const p = Math.round((r.count / posts.length) * 100);
+        return Math.abs(p - 25) > 10;
+      });
+      if (sbilanciati.length > 0) {
+        const ins = document.getElementById('socialInsight');
+        document.getElementById('socialInsightText').textContent =
+          `${sbilanciati.map(r=>r.nome).join(', ')} ${sbilanciati.length>1?'sono sbilanciate':'è sbilanciata'} rispetto al mix target 25/25/25/25. Riequilibra il piano editoriale.`;
+        ins.style.display = '';
+      }
+    }
+
+    // ═══════════════════════════════════════
+    // FINANZE (localStorage)
+    // ═══════════════════════════════════════
+    function caricaFinGoal() {
+      const g = localStorage.getItem('fin_goal_annuo') || '';
+      document.getElementById('fin_goal_annuo').value = g;
+    }
+
+    function salvaFinGoal() {
+      localStorage.setItem('fin_goal_annuo', document.getElementById('fin_goal_annuo').value);
+      aggiornaFinSaldi();
+    }
+
+    function caricaMovimenti() { return JSON.parse(localStorage.getItem('fin_movimenti') || '[]'); }
+    function salvaMovimenti(lista) { localStorage.setItem('fin_movimenti', JSON.stringify(lista)); }
+
+    function aggiornaFinSaldi() {
+      const lista = caricaMovimenti();
+      const entrate = lista.filter(m => m.tipo !== 'spesa').reduce((s,m) => s + (m.importo||0), 0);
+      const spese   = lista.filter(m => m.tipo === 'spesa').reduce((s,m) => s + (m.importo||0), 0);
+      const saldo   = entrate - spese;
+
+      document.getElementById('fin_tot_entrate').textContent = fmtEur(entrate);
+      document.getElementById('fin_tot_spese').textContent   = fmtEur(spese);
+      const saldoEl = document.getElementById('fin_saldo');
+      saldoEl.textContent = fmtEur(saldo);
+      saldoEl.className = 'saldo-val ' + (saldo >= 0 ? 'positivo' : 'negativo');
+
+      document.getElementById('kpi_provv_incassata').textContent = fmtEur(entrate);
+
+      const goal = parseFloat(document.getElementById('fin_goal_annuo').value) || 0;
+      if (goal > 0) {
+        const p = Math.min(pct(entrate, goal), 100);
+        document.getElementById('fin_goal_pct').value = p + '%';
+        document.getElementById('fin_goal_bar').style.width = p + '%';
+      } else {
+        document.getElementById('fin_goal_pct').value = '—';
+      }
+    }
+
+    function renderMovimenti() {
+      const lista = caricaMovimenti().slice().sort((a,b) => b.data.localeCompare(a.data));
+      document.getElementById('contMovimenti').textContent = lista.length > 0 ? `(${lista.length})` : '';
+      const el = document.getElementById('finStorico');
+      if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessun movimento registrato.</div>'; return; }
+
+      const tipoCls = { provvigione:'tipo-provv', spesa:'tipo-spesa', altro:'tipo-altro' };
+      const tipoLabel = { provvigione:'Provvigione', spesa:'Spesa', altro:'Altra entrata' };
+
+      el.innerHTML = lista.map(m => `
+        <div class="fin-storico-item">
+          <div class="fin-storico-data">${fmtData(m.data)}</div>
+          <div class="fin-storico-desc">${m.desc}</div>
+          <span class="fin-storico-tipo ${tipoCls[m.tipo]||'tipo-altro'}">${tipoLabel[m.tipo]||m.tipo}</span>
+          <div class="fin-storico-importo ${m.tipo==='spesa'?'spesa':'entrata'}">${m.tipo==='spesa'?'-':'+'} ${fmtEur(m.importo)}</div>
+          <button type="button" class="btn-del-fin" onclick="eliminaMovimento(${m.id})">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function fmtData(s) {
+      if (!s) return '';
+      const [y,mo,dd] = s.split('-');
+      return dd + '/' + mo + '/' + y;
+    }
+
+    function aggiungiMovimento() {
+      const desc    = document.getElementById('fin_desc').value.trim();
+      const importo = parseFloat(document.getElementById('fin_importo').value) || 0;
+      const tipo    = document.getElementById('fin_tipo').value;
+      const data    = document.getElementById('fin_data').value;
+      if (!desc || importo <= 0) return;
+      const lista = caricaMovimenti();
+      lista.push({ id: Date.now(), desc, importo, tipo, data });
+      salvaMovimenti(lista);
+      document.getElementById('fin_desc').value = '';
+      document.getElementById('fin_importo').value = '';
+      renderMovimenti();
+      aggiornaFinSaldi();
+    }
+
+    function eliminaMovimento(id) {
+      salvaMovimenti(caricaMovimenti().filter(m => m.id !== id));
+      renderMovimenti();
+      aggiornaFinSaldi();
+    }
+
+    // ═══════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════
+    caricaFunnel();
+    caricaGoal();
+    caricaPortafoglio();
+    caricaSocial();
+    caricaFinGoal();
+    renderMovimenti();
+    aggiornaFinSaldi();
+  </script>
+
+</body>
+</html>
