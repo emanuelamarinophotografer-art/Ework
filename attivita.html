@@ -397,14 +397,22 @@
         const ymd = toYMD(giorno);
         const eventiGiorno = Array.isArray(eventi) ? eventi.filter(e => e.data_inizio && e.data_inizio.startsWith(ymd)) : [];
         const div = document.createElement('div');
-        div.className = 'giorno' + (isOggi ? ' oggi' : '');
+        div.style.cssText = `display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:8px;margin-bottom:6px;background:${isOggi ? 'var(--accent-bg)' : 'var(--bg-card)'};border:1px solid ${isOggi ? 'var(--accent)' : 'var(--border)'};`;
+        const labelColor = isOggi ? 'var(--accent)' : 'var(--text-muted)';
         const slotsHtml = eventiGiorno.length > 0
           ? eventiGiorno.map(e => {
-              const ora = e.tutto_il_giorno ? '' : `<span style="font-size:0.65rem;color:var(--text-muted)">${e.data_inizio.substring(11,16)}</span> `;
-              return `<div style="font-size:0.7rem;line-height:1.4;padding:2px 4px;margin-top:3px;background:var(--bg-card);border-radius:4px;border-left:2px solid var(--accent)">${ora}${e.titolo}</div>`;
+              const ora = e.tutto_il_giorno ? 'tutto il giorno' : e.data_inizio.substring(11,16);
+              return `<div style="font-size:0.8rem;color:var(--text);line-height:1.5">
+                <span style="font-size:0.68rem;color:var(--text-muted);margin-right:6px">${ora}</span>${e.titolo}
+              </div>`;
             }).join('')
-          : '<div class="empty-slot">libero</div>';
-        div.innerHTML = `<div class="giorno-nome">${giorniBrevi[giorno.getDay()]}</div><div class="giorno-num">${giorno.getDate()}</div>${slotsHtml}`;
+          : `<div style="font-size:0.78rem;color:var(--text-faint);font-style:italic">nessun evento</div>`;
+        div.innerHTML = `
+          <div style="flex-shrink:0;width:44px;text-align:center">
+            <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:${labelColor}">${giorniBrevi[giorno.getDay()]}</div>
+            <div style="font-size:1.3rem;font-weight:700;color:${isOggi ? 'var(--accent)' : 'var(--text)'};line-height:1.2">${giorno.getDate()}</div>
+          </div>
+          <div style="flex:1;padding-top:2px">${slotsHtml}</div>`;
         settimana.appendChild(div);
       }
     }
