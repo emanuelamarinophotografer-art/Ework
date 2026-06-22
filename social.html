@@ -120,7 +120,26 @@
     .legenda { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
     .leg-item { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--text-muted); }
 
-    @media (max-width: 1100px) { .team-grid { grid-template-columns: 1fr 1fr; } .piani-grid { grid-template-columns: 1fr; } }
+    /* STATI */
+    .stati-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 28px; }
+    .stato-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .stato-col-header { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .stato-col-header .count-badge { font-size: 0.62rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .stato-bozza-header { color: #555; }
+    .stato-bozza-header .count-badge { background: #e8e8e8; color: #555; }
+    .stato-prod-header { color: #6b3d00; }
+    .stato-prod-header .count-badge { background: #fdebc8; color: #6b3d00; }
+    .stato-pub-header { color: #145a30; }
+    .stato-pub-header .count-badge { background: #c8f0d8; color: #145a30; }
+    .stato-items { display: flex; flex-direction: column; gap: 6px; }
+    .stato-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: border-color 0.15s; }
+    .stato-item:hover { border-color: var(--accent); }
+    .stato-item-data { font-size: 0.68rem; color: var(--text-muted); margin-bottom: 3px; }
+    .stato-item-titolo { font-size: 0.82rem; color: var(--text); line-height: 1.3; }
+    .stato-item-meta { font-size: 0.65rem; color: var(--text-faint); margin-top: 4px; }
+    .stato-empty { font-size: 0.8rem; color: var(--text-faint); font-style: italic; }
+
+    @media (max-width: 1100px) { .team-grid { grid-template-columns: 1fr 1fr; } .piani-grid { grid-template-columns: 1fr; } .stati-grid { grid-template-columns: 1fr; } }
     @media (max-width: 700px) { .team-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -244,6 +263,9 @@
         </div>
 
       </div>
+
+      <!-- STATI -->
+      <div class="stati-grid" id="gridStati"></div>
 
     </div>
   </main>
@@ -551,6 +573,7 @@
       chiudiModal();
       renderSettimana();
       renderMese();
+      renderStati();
     }
 
     async function eliminaPost() {
@@ -559,6 +582,7 @@
       chiudiModal();
       renderSettimana();
       renderMese();
+      renderStati();
     }
 
     /* ── BRAINSTORMING ── */
@@ -650,9 +674,57 @@
       setTimeout(() => cfm.style.display = 'none', 2000);
     }
 
+    /* ── STATI ── */
+    const FORMATO_LABEL = { reel: 'Reel', carosello: 'Carosello', foto: 'Foto', stories: 'Stories' };
+    const RUBRICA_DOT = { nero: '⬛', bianco: '⬜', oro: '🟡', grigio: '🔲' };
+
+    async function renderStati() {
+      const posts = await loadPosts();
+      const bozze    = posts.filter(p => p.stato === 'bozza');
+      const prod     = posts.filter(p => p.stato === 'in-produzione');
+      const pub      = posts.filter(p => p.stato === 'pubblicato');
+
+      const el = document.getElementById('gridStati');
+      el.innerHTML = `
+        <div class="stato-col">
+          <div class="stato-col-header stato-bozza-header">
+            Bozza <span class="count-badge">${bozze.length}</span>
+          </div>
+          <div class="stato-items">${bozze.length ? bozze.map(p => statoItem(p)).join('') : '<div class="stato-empty">Nessuna bozza</div>'}</div>
+        </div>
+        <div class="stato-col">
+          <div class="stato-col-header stato-prod-header">
+            In produzione <span class="count-badge">${prod.length}</span>
+          </div>
+          <div class="stato-items">${prod.length ? prod.map(p => statoItem(p)).join('') : '<div class="stato-empty">Nessun contenuto in produzione</div>'}</div>
+        </div>
+        <div class="stato-col">
+          <div class="stato-col-header stato-pub-header">
+            Pubblicato <span class="count-badge">${pub.length}</span>
+          </div>
+          <div class="stato-items">${pub.length ? pub.map(p => statoItem(p)).join('') : '<div class="stato-empty">Nessun contenuto pubblicato</div>'}</div>
+        </div>`;
+
+      el.querySelectorAll('.stato-item').forEach(item => {
+        const id = parseInt(item.dataset.id);
+        const post = posts.find(p => p.id === id);
+        if (post) item.onclick = () => apriModal(post);
+      });
+    }
+
+    function statoItem(p) {
+      const dataFmt = p.data ? new Date(p.data + 'T00:00:00').toLocaleDateString('it-IT', {day:'2-digit', month:'short'}) : '—';
+      return `<div class="stato-item" data-id="${p.id}">
+        <div class="stato-item-data">${dataFmt}</div>
+        <div class="stato-item-titolo">${p.titolo || 'Post senza titolo'}</div>
+        <div class="stato-item-meta">${RUBRICA_DOT[p.rubrica] || '●'} ${FORMATO_LABEL[p.formato] || p.formato}</div>
+      </div>`;
+    }
+
     /* ── INIT ── */
     renderSettimana();
     renderMese();
+    renderStati();
   </script>
 
 </body>
