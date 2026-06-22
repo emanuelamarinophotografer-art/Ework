@@ -81,12 +81,13 @@
     /* METRICHE COLLASSABILI */
     .metriche-toggle {
       display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; user-select: none;
+      cursor: pointer; -webkit-user-select: none; user-select: none;
     }
     .metriche-toggle-btn {
       background: none; border: 1px solid var(--border); border-radius: 6px;
       padding: 4px 12px; font-size: 0.75rem; font-family: inherit;
       color: var(--text-muted); cursor: pointer; font-weight: 600;
+      -webkit-user-select: none; user-select: none;
     }
     .metriche-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
     .metriche-body { display: none; margin-top: 16px; }
@@ -139,6 +140,13 @@
     .form-mese-passato.aperto { display: block; }
     .select-mese { width: 100%; padding: 7px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.88rem; background: var(--bg); }
     .input-anno { width: 100%; padding: 7px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.88rem; background: var(--bg); box-sizing: border-box; }
+
+    /* SETTIMANA — grid 7 col, no scroll */
+    .settimana-wrap { overflow-x: unset !important; }
+    .settimana { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; min-width: unset !important; gap: 6px !important; }
+    .settimana .giorno { min-width: unset !important; min-height: 100px; padding: 10px 8px; }
+    .settimana .giorno-num { font-size: 0.95rem; }
+    .settimana .giorno-nome { font-size: 0.58rem; }
   </style>
 </head>
 <body>
@@ -246,10 +254,10 @@
       <div class="blocco">
         <div class="metriche-toggle">
           <div class="blocco-header" style="margin-bottom:0">Metriche settimanali</div>
-          <button type="button" class="metriche-toggle-btn" onclick="toggleMetriche()" id="btnToggleMetriche">▼ Apri</button>
+          <button type="button" class="metriche-toggle-btn" onclick="toggleMetriche()" id="btnToggleMetriche">▲ Chiudi</button>
         </div>
 
-        <div class="metriche-body" id="metricheBody">
+        <div class="metriche-body aperto" id="metricheBody">
           <div class="metriche-form" style="margin-top:16px;">
             <div class="metriche-gruppo">
               <div class="metriche-gruppo-label">Transazioni & Incarichi</div>
