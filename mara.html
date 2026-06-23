@@ -285,6 +285,30 @@
           </div>
         </div>
 
+        <!-- CALCOLATORE PROVVIGIONE -->
+        <div class="blocco" style="margin-bottom:16px">
+          <div class="fin-sezione-label">Calcolatore provvigione</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px">
+            <div class="fin-field"><label>Prezzo vendita (€)</label><input type="number" class="fin-input" id="calc_prezzo" placeholder="es. 280000" style="width:160px" oninput="calcolaProvv()" /></div>
+            <div class="fin-field">
+              <label>Tipo transazione</label>
+              <select class="fin-input" id="calc_tipo" style="width:180px" onchange="calcolaProvv()">
+                <option value="singola">Singola (1 lato)</option>
+                <option value="doppia">Doppia (venditore + acquirente)</option>
+              </select>
+            </div>
+          </div>
+          <div id="calc_result" style="display:none">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
+              <div class="kpi-card"><div class="kpi-val blu" id="calc_provv">—</div><div class="kpi-label">Provvigione lorda</div></div>
+              <div class="kpi-card"><div class="kpi-val arancio" id="calc_royalty">—</div><div class="kpi-label">Royalty C21 (8%)</div></div>
+              <div class="kpi-card"><div class="kpi-val" id="calc_netto_agenzia">—</div><div class="kpi-label">Netto agenzia</div></div>
+              <div class="kpi-card"><div class="kpi-val verde" id="calc_tuo">—</div><div class="kpi-label">Tuo incasso (50%)</div></div>
+            </div>
+            <div class="mara-insight"><div class="mara-insight-label">— Mara 📊</div><div class="mara-insight-text" id="calc_note"></div></div>
+          </div>
+        </div>
+
         <!-- GOAL ANNUO -->
         <div class="blocco" style="margin-bottom:16px">
           <div class="fin-sezione-label">Goal annuo provvigioni</div>
@@ -512,8 +536,8 @@
     function caricaGoal() {
       const corrente = JSON.parse(localStorage.getItem('metrica_corrente') || '{}');
       const storico  = JSON.parse(localStorage.getItem('metriche_storico') || '[]');
-      const campi = ['transazioni','incarichi_e','incarichi_ne','contatti'];
-      const goal = { contatti:16, incarichi_e:1, incarichi_ne:1, transazioni:1 };
+      const campi = ['vendite','incarichi_e','incarichi_ne','contatti'];
+      const goal = { contatti:16, incarichi_e:1, incarichi_ne:1, vendite:1 };
       const totali = {};
       campi.forEach(c => { totali[c] = (corrente[c]||0) + storico.reduce((s,r) => s+(r[c]||0), 0); });
       const inc_tot = (totali.incarichi_e||0) + (totali.incarichi_ne||0);
@@ -527,7 +551,7 @@
       const items = [
         { nome:'Contatti presi', valore:totali.contatti, goal:goal.contatti },
         { nome:'Incarichi (E.+N.E.)', valore:inc_tot, goal:goal.incarichi_e+goal.incarichi_ne },
-        { nome:'Transazioni', valore:totali.transazioni, goal:goal.transazioni },
+        { nome:'Vendite', valore:totali.vendite, goal:goal.vendite },
       ];
       el.innerHTML = items.map(item => {
         const p = Math.min(pct(item.valore, item.goal), 100);
@@ -720,6 +744,26 @@
     function precaricaEsempio() {
       if (JSON.parse(localStorage.getItem(RPT_KEY)||'[]').length>0) return;
       localStorage.setItem(RPT_KEY, JSON.stringify([{ id:1750000000000, codice:'33541050-144', tipo:'Villa bifamiliare · Grosseto', decisione:'monitorare', link:'https://drive.google.com/file/d/1n34jwq4NqNTT_xw0DsGZvGxsQw2vBox7/view', data:'17/06/2026' }]));
+    }
+
+    // ── CALCOLATORE PROVVIGIONE ──
+    function calcolaProvv() {
+      const prezzo = parseFloat(document.getElementById('calc_prezzo').value) || 0;
+      const doppia = document.getElementById('calc_tipo').value === 'doppia';
+      if (!prezzo) { document.getElementById('calc_result').style.display = 'none'; return; }
+      let provv = prezzo < 100000 ? 3000 : prezzo * 0.03;
+      if (doppia) provv *= 2;
+      const royalty = provv * 0.08;
+      const nettoAgenzia = provv - royalty;
+      const tuo = nettoAgenzia / 2;
+      document.getElementById('calc_provv').textContent = fmtEur(provv);
+      document.getElementById('calc_royalty').textContent = fmtEur(royalty);
+      document.getElementById('calc_netto_agenzia').textContent = fmtEur(nettoAgenzia);
+      document.getElementById('calc_tuo').textContent = fmtEur(tuo);
+      const tipo = doppia ? 'doppia transazione' : 'singola transazione';
+      const base = prezzo < 100000 ? 'provvigione fissa €3.000 (sotto €100k)' : `3% su ${fmtEur(prezzo)}`;
+      document.getElementById('calc_note').textContent = `${base} · ${tipo} · royalty C21 8% · split 50/50 → tuo incasso netto: ${fmtEur(tuo)}`;
+      document.getElementById('calc_result').style.display = '';
     }
 
     // ── INIT ──

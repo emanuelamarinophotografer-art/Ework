@@ -17,6 +17,24 @@
     .task-col { display: flex; flex-direction: column; gap: 16px; }
     @media (max-width: 960px) { .task-grid { grid-template-columns: 1fr; } }
 
+    /* VENDITE */
+    .vendita-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+    .vendita-info { flex: 1; min-width: 0; }
+    .vendita-nome { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+    .vendita-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .vendita-stato { font-size: 0.65rem; font-weight: 700; padding: 3px 9px; border-radius: 8px; white-space: nowrap; flex-shrink: 0; }
+    .stato-proposta { background: #fff3cd; color: #856404; }
+    .stato-rogito { background: #d1ecf1; color: #0c5460; }
+    .stato-conclusa { background: #d4edda; color: #155724; }
+    .vendita-incasso { font-size: 0.95rem; font-weight: 700; color: #27ae60; min-width: 80px; text-align: right; flex-shrink: 0; }
+    .vendita-form { background: var(--bg-card); border: 1px dashed var(--border); border-radius: 10px; padding: 14px 16px; margin-top: 10px; display: none; }
+    .vendita-form-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+    .vf-field { display: flex; flex-direction: column; gap: 4px; }
+    .vf-field label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+    .vf-field input, .vf-field select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; }
+    .vf-field.wide input { width: 160px; }
+    .vf-field.sm input, .vf-field.sm select { width: 120px; }
+
     /* PRIORITÀ */
     .priorita-input-wrap { display: flex; gap: 10px; margin-bottom: 12px; }
     .priorita-input {
@@ -250,6 +268,42 @@
         </div>
       </div>
 
+      <!-- VENDITE IN CORSO -->
+      <div class="blocco">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="blocco-header" style="margin-bottom:0">Vendite in corso <span class="count" id="contVendite">0</span></div>
+          <button type="button" class="btn-nuova" onclick="toggleFormVendita()">+ Aggiungi</button>
+        </div>
+        <div class="vendita-form" id="formVendita">
+          <div class="vendita-form-row">
+            <div class="vf-field wide"><label>Cliente</label><input type="text" id="v_cliente" placeholder="Nome cliente" /></div>
+            <div class="vf-field wide"><label>Immobile</label><input type="text" id="v_immobile" placeholder="es. Casale Roccastrada" /></div>
+            <div class="vf-field sm"><label>Prezzo (€)</label><input type="number" id="v_prezzo" placeholder="0" oninput="aggiornaCalcoloForm()" /></div>
+            <div class="vf-field sm">
+              <label>Transazione</label>
+              <select id="v_tipo" onchange="aggiornaCalcoloForm()">
+                <option value="singola">Singola</option>
+                <option value="doppia">Doppia</option>
+              </select>
+            </div>
+            <div class="vf-field sm">
+              <label>Stato</label>
+              <select id="v_stato">
+                <option value="proposta">Proposta firmata</option>
+                <option value="rogito">Rogito fissato</option>
+                <option value="conclusa">Conclusa</option>
+              </select>
+            </div>
+          </div>
+          <div id="v_preview" style="font-size:0.82rem;color:#27ae60;font-weight:600;margin-bottom:10px;"></div>
+          <div style="display:flex;gap:8px">
+            <button type="button" class="btn-aggiungi" onclick="aggiungiVendita()">💾 Salva</button>
+            <button type="button" class="btn-elimina" style="padding:6px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--border);color:var(--text-muted);cursor:pointer" onclick="toggleFormVendita()">Annulla</button>
+          </div>
+        </div>
+        <div id="listaVendite"><div class="placeholder">Nessuna vendita in corso.</div></div>
+      </div>
+
       <!-- METRICHE — collassabili -->
       <div class="blocco">
         <div class="metriche-toggle">
@@ -321,7 +375,7 @@
                 <div class="metriche-gruppo">
                   <div class="metriche-gruppo-label">Transazioni & Incarichi</div>
                   <div class="metriche-row">
-                    <div class="metrica-item"><label>Transazioni</label><input type="number" min="0" id="mp_transazioni" placeholder="0" /></div>
+                    <div class="metrica-item"><label>Vendite</label><input type="number" min="0" id="mp_vendite" placeholder="0" /></div>
                     <div class="metrica-item"><label>Incarichi E.</label><input type="number" min="0" id="mp_incarichi_e" placeholder="0" /></div>
                     <div class="metrica-item"><label>Incarichi N.E.</label><input type="number" min="0" id="mp_incarichi_ne" placeholder="0" /></div>
                     <div class="metrica-item"><label>Valutazioni</label><input type="number" min="0" id="mp_valutazioni" placeholder="0" /></div>
@@ -653,6 +707,91 @@
         </div>`).join('');
     }
     renderMesiPassati();
+
+    // ── VENDITE ──
+    const V_KEY = 'vendite_in_corso';
+    function caricaVendite() { return JSON.parse(localStorage.getItem(V_KEY) || '[]'); }
+    function salvaVendite(lista) { localStorage.setItem(V_KEY, JSON.stringify(lista)); }
+
+    function calcolaIncasso(prezzo, doppia) {
+      const p = parseFloat(prezzo) || 0;
+      let provv = p < 100000 ? 3000 : p * 0.03;
+      if (doppia) provv *= 2;
+      const royalty = provv * 0.08;
+      return (provv - royalty) / 2;
+    }
+
+    function fmtEur(n) { return '€ ' + Math.round(n).toLocaleString('it-IT'); }
+
+    function aggiornaCalcoloForm() {
+      const prezzo = parseFloat(document.getElementById('v_prezzo').value) || 0;
+      const doppia = document.getElementById('v_tipo').value === 'doppia';
+      const el = document.getElementById('v_preview');
+      if (!prezzo) { el.textContent = ''; return; }
+      el.textContent = 'Tuo incasso stimato: ' + fmtEur(calcolaIncasso(prezzo, doppia));
+    }
+
+    function toggleFormVendita() {
+      const f = document.getElementById('formVendita');
+      f.style.display = f.style.display === 'none' || f.style.display === '' ? 'block' : 'none';
+    }
+
+    function aggiungiVendita() {
+      const cliente = document.getElementById('v_cliente').value.trim();
+      const immobile = document.getElementById('v_immobile').value.trim();
+      const prezzo = parseFloat(document.getElementById('v_prezzo').value) || 0;
+      const tipo = document.getElementById('v_tipo').value;
+      const stato = document.getElementById('v_stato').value;
+      if (!cliente || !prezzo) { alert('Inserisci almeno cliente e prezzo.'); return; }
+      const lista = caricaVendite();
+      lista.unshift({ id: Date.now(), cliente, immobile, prezzo, tipo, stato, data: new Date().toISOString().split('T')[0] });
+      salvaVendite(lista);
+      document.getElementById('v_cliente').value = '';
+      document.getElementById('v_immobile').value = '';
+      document.getElementById('v_prezzo').value = '';
+      document.getElementById('v_preview').textContent = '';
+      document.getElementById('formVendita').style.display = 'none';
+      renderVendite();
+    }
+
+    function cambiaStatoVendita(id, stato) {
+      const lista = caricaVendite().map(v => v.id === id ? { ...v, stato } : v);
+      salvaVendite(lista);
+      renderVendite();
+    }
+
+    function eliminaVendita(id) {
+      if (!confirm('Eliminare questa vendita?')) return;
+      salvaVendite(caricaVendite().filter(v => v.id !== id));
+      renderVendite();
+    }
+
+    function renderVendite() {
+      const lista = caricaVendite();
+      document.getElementById('contVendite').textContent = lista.length;
+      const el = document.getElementById('listaVendite');
+      if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessuna vendita in corso.</div>'; return; }
+      const statoLabel = { proposta: 'Proposta firmata', rogito: 'Rogito fissato', conclusa: 'Conclusa ✓' };
+      const statoCls = { proposta: 'stato-proposta', rogito: 'stato-rogito', conclusa: 'stato-conclusa' };
+      el.innerHTML = lista.map(v => {
+        const incasso = calcolaIncasso(v.prezzo, v.tipo === 'doppia');
+        return `<div class="vendita-item">
+          <div class="vendita-info">
+            <div class="vendita-nome">${v.cliente}</div>
+            <div class="vendita-sub">${v.immobile || '—'} · ${fmtEur(v.prezzo)} · ${v.tipo === 'doppia' ? 'Doppia transazione' : 'Singola'}</div>
+          </div>
+          <select class="vendita-stato ${statoCls[v.stato]}" onchange="cambiaStatoVendita(${v.id}, this.value)">
+            <option value="proposta" ${v.stato==='proposta'?'selected':''}>Proposta firmata</option>
+            <option value="rogito" ${v.stato==='rogito'?'selected':''}>Rogito fissato</option>
+            <option value="conclusa" ${v.stato==='conclusa'?'selected':''}>Conclusa ✓</option>
+          </select>
+          <div class="vendita-incasso">${fmtEur(incasso)}</div>
+          <button class="btn-elimina" onclick="eliminaVendita(${v.id})">✕</button>
+        </div>`;
+      }).join('');
+    }
+
+    renderVendite();
   </script>
 
 </body>
