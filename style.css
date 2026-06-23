@@ -343,9 +343,9 @@ body {
 }
 
 /* BOTTOM NAV MOBILE */
-.bottom-nav {
-  display: none;
-}
+.bottom-nav { display: none; }
+.bn-drawer { display: none; }
+.bn-drawer-overlay { display: none; }
 
 @media (max-width: 640px) {
   .sidebar { display: none; }
@@ -389,6 +389,7 @@ body {
 
   /* Drawer menu "altro" */
   .bn-drawer {
+    display: grid;
     position: fixed;
     bottom: 60px; left: 0; right: 0;
     background: var(--bg-card);
@@ -430,6 +431,7 @@ body {
     display: none;
   }
   .bn-drawer-overlay.open { display: block; }
+  .bn-drawer.open { display: grid; transform: translateY(0); }
 }
 
 @media (max-width: 600px) {
