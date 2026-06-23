@@ -262,7 +262,7 @@
             <div class="metriche-gruppo">
               <div class="metriche-gruppo-label">Transazioni & Incarichi</div>
               <div class="metriche-row">
-                <div class="metrica-item"><label>Transazioni chiuse</label><input type="number" min="0" id="m_transazioni" placeholder="0" /></div>
+                <div class="metrica-item"><label>Vendite</label><input type="number" min="0" id="m_vendite" placeholder="0" /></div>
                 <div class="metrica-item"><label>Incarichi esclusiva</label><input type="number" min="0" id="m_incarichi_e" placeholder="0" /></div>
                 <div class="metrica-item"><label>Incarichi non esclusiva</label><input type="number" min="0" id="m_incarichi_ne" placeholder="0" /></div>
                 <div class="metrica-item"><label>Valutazioni</label><input type="number" min="0" id="m_valutazioni" placeholder="0" /></div>
@@ -541,7 +541,7 @@
 
     // METRICHE
     const goal = { contatti: 16, incarichi: 2, transazioni: 1 };
-    const campi = ['transazioni','incarichi_e','incarichi_ne','valutazioni','visita','coll_int','coll_ext','x_incarico','contatti','telefonate','ribassi','proposte_rit'];
+    const campi = ['vendite','incarichi_e','incarichi_ne','valutazioni','visita','coll_int','coll_ext','x_incarico','contatti','telefonate','ribassi','proposte_rit'];
     const etichette = { transazioni:'Transazioni', incarichi_e:'Inc. E.', incarichi_ne:'Inc. N.E.', valutazioni:'Valutazioni', visita:'Visite', coll_int:'Coll. Int.', coll_ext:'Coll. Ext.', x_incarico:'App. Incarico', contatti:'Contatti', telefonate:'Telefonate', ribassi:'Ribassi', proposte_rit:'Prop. Ritirate' };
 
     function caricaCorrente() { return JSON.parse(localStorage.getItem('metrica_corrente') || '{}'); }
