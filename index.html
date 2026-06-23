@@ -349,8 +349,11 @@
           </div>
 
           <div class="col-card">
-            <div class="col-card-title">⭐ Da seguire oggi</div>
-            <div id="recapStellati"><div class="placeholder">Nessun cliente in evidenza.</div></div>
+            <div class="col-card-title" style="display:flex;justify-content:space-between;align-items:center">
+              <span>⭐ Da fare oggi</span>
+              <span id="dsfCount" style="font-size:0.72rem;font-weight:700;background:var(--accent);color:white;padding:2px 8px;border-radius:10px;display:none"></span>
+            </div>
+            <div id="recapStellati"><div class="placeholder">Tutto in ordine.</div></div>
             <a href="richieste.html" class="link-goto">→ Vai alle Richieste</a>
           </div>
         </div>
@@ -583,21 +586,56 @@
           fdEl.innerHTML = '<div class="placeholder">Nessun follow-up scaduto.</div>';
         }
 
-        // Da seguire oggi: prossimo_follow = oggi
-        const rDS = await fetch(`${SB_URL}/rest/v1/richieste?prossimo_follow=eq.${oggi}&order=nome_cliente.asc&limit=6`, { headers: SB_H });
-        const dsList = await rDS.json();
+        // ── DA FARE OGGI: aggregato da tutte le fonti ──
         const dsEl = document.getElementById('recapStellati');
-        if (Array.isArray(dsList) && dsList.length > 0) {
-          dsEl.innerHTML = dsList.map(r => `
-            <div class="lista-item">
-              <div class="dot dot-gold"></div>
-              <div style="flex:1">
-                <div class="lista-testo">${r.nome_cliente || '—'}</div>
-                <div class="lista-sub">${r.immobile || ''}</div>
+        const azioni = [];
+
+        // 1. Bozze pronte da inviare (massima priorità)
+        if (Array.isArray(richAll)) {
+          richAll.filter(r => r.stato_follow === 'Bozza creata' || (r.stato_cliente === 'Nuova richiesta' && r.stato_follow === 'Nuovo'))
+            .forEach(r => azioni.push({ tipo: 'bozza', label: '✉️ Rispondi', nome: r.nome_cliente || '—', sub: r.immobile || r.stato_follow, urgenza: 0 }));
+        }
+
+        // 2. Follow-up scaduti (prossimo_follow < oggi, stato attivo)
+        if (Array.isArray(richAll)) {
+          richAll.filter(r => r.prossimo_follow && r.prossimo_follow < oggi && !STATI_CHIUSI.has(r.stato_cliente))
+            .forEach(r => {
+              const gg = Math.floor((Date.now() - new Date(r.prossimo_follow)) / 86400000);
+              azioni.push({ tipo: 'scaduto', label: `⏰ Follow scaduto (${gg}gg)`, nome: r.nome_cliente || '—', sub: r.stato_cliente + (r.immobile ? ' · ' + r.immobile : ''), urgenza: 1 });
+            });
+        }
+
+        // 3. Pianificati per oggi (prossimo_follow = oggi)
+        if (Array.isArray(richAll)) {
+          richAll.filter(r => r.prossimo_follow === oggi && !STATI_CHIUSI.has(r.stato_cliente))
+            .forEach(r => azioni.push({ tipo: 'oggi', label: '📅 Oggi', nome: r.nome_cliente || '—', sub: r.stato_cliente + (r.immobile ? ' · ' + r.immobile : ''), urgenza: 2 }));
+        }
+
+        // 4. Priorità aperte da Supabase
+        if (Array.isArray(prList)) {
+          prList.slice(0, 3).forEach(p => azioni.push({ tipo: 'task', label: '🔴 Task', nome: p.testo, sub: '', urgenza: 3 }));
+        }
+
+        const colore = { bozza: '#e74c3c', scaduto: '#e67e22', oggi: '#c9a84c', task: '#8e44ad' };
+        const countEl = document.getElementById('dsfCount');
+
+        if (azioni.length > 0) {
+          countEl.textContent = azioni.length;
+          countEl.style.display = '';
+          dsEl.innerHTML = azioni.map(a => `
+            <div class="lista-item" style="cursor:pointer" onclick="location.href='richieste.html'">
+              <div class="dot" style="background:${colore[a.tipo]};flex-shrink:0"></div>
+              <div style="flex:1;min-width:0">
+                <div class="lista-testo" style="display:flex;gap:6px;align-items:center">
+                  <span style="font-size:0.65rem;font-weight:700;color:${colore[a.tipo]}">${a.label}</span>
+                  <span>${a.nome}</span>
+                </div>
+                ${a.sub ? `<div class="lista-sub">${a.sub}</div>` : ''}
               </div>
             </div>`).join('');
         } else {
-          dsEl.innerHTML = '<div class="placeholder">Nessun cliente da seguire oggi.</div>';
+          countEl.style.display = 'none';
+          dsEl.innerHTML = '<div class="placeholder">Tutto in ordine. ✅</div>';
         }
 
       } catch(e) {
@@ -605,7 +643,7 @@
       }
     }
     caricaContatori();
-    setInterval(caricaContatori, 5 * 60 * 1000);
+    setInterval(caricaContatori, 60 * 1000);
 
     // AGENDA
     function caricaAgenda() { return JSON.parse(localStorage.getItem('agenda_' + d.toDateString()) || '[]'); }
