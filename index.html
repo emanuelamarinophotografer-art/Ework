@@ -527,7 +527,7 @@
         }
 
         // SEMAFORO: Nuove richieste da Supabase
-        const rRich = await fetch(`${SB_URL}/rest/v1/richieste?stato_cliente=eq.Nuova richiesta&order=data_richiesta.desc&limit=6`, { headers: SB_H });
+        const rRich = await fetch(`${SB_URL}/rest/v1/richieste?stato_cliente=eq.Nuova%20richiesta&order=data_richiesta.desc&limit=6`, { headers: SB_H });
         const richList = await rRich.json();
         const richEl = document.getElementById('richiesteList');
         document.getElementById('countNuoveRichieste').textContent = Array.isArray(richList) ? richList.length : 0;
