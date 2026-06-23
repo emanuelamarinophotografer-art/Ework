@@ -597,60 +597,94 @@
     caricaRichieste();
     renderPriorita();
 
-    // METRICHE
+    // METRICHE — dati su Supabase
+    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const SB_H_R = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+    const SB_H_W = { ...SB_H_R, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
     const goal = { contatti: 16, incarichi: 2, transazioni: 1 };
     const campi = ['vendite','incarichi_e','incarichi_ne','valutazioni','visita','coll_int','coll_ext','x_incarico','contatti','telefonate','ribassi','proposte_rit'];
     const etichette = { vendite:'Vendite', incarichi_e:'Inc. E.', incarichi_ne:'Inc. N.E.', valutazioni:'Valutazioni', visita:'Visite', coll_int:'Coll. Int.', coll_ext:'Coll. Ext.', x_incarico:'App. Incarico', contatti:'Contatti', telefonate:'Telefonate', ribassi:'Ribassi', proposte_rit:'Prop. Ritirate' };
 
-    function caricaCorrente() { return JSON.parse(localStorage.getItem('metrica_corrente') || '{}'); }
-    function salvaCorrente(r) { localStorage.setItem('metrica_corrente', JSON.stringify(r)); }
-    function caricaStorico() { return JSON.parse(localStorage.getItem('metriche_storico') || '[]'); }
-    function salvaStorico(lista) { localStorage.setItem('metriche_storico', JSON.stringify(lista)); }
+    let _corrente = {};
+    let _storico = [];
+    let _correnteId = null;
+    let _autosaveTimer = null;
+
+    async function inizializzaMetriche() {
+      // carica corrente
+      const rc = await fetch(`${SB_URL}/rest/v1/metriche_corrente?select=*&limit=1`, { headers: SB_H_R });
+      const dc = await rc.json();
+      if (dc.length > 0) { _corrente = dc[0]; _correnteId = dc[0].id; }
+      // carica storico settimane
+      const rs = await fetch(`${SB_URL}/rest/v1/metriche_storico?select=*&order=ts.desc`, { headers: SB_H_R });
+      _storico = await rs.json();
+      caricaCampi();
+      renderMetriche();
+    }
 
     function caricaCampi() {
-      const r = caricaCorrente();
-      campi.forEach(c => { const el = document.getElementById('m_' + c); if (el) el.value = r[c] || ''; });
+      campi.forEach(c => { const el = document.getElementById('m_' + c); if (el) el.value = _corrente[c] || ''; });
     }
+
+    async function salvaCorrenteSB() {
+      const body = { data_inizio: _corrente.data_inizio || new Date().toLocaleDateString('it-IT') };
+      campi.forEach(c => { body[c] = parseInt(document.getElementById('m_' + c).value) || 0; });
+      if (_correnteId) {
+        await fetch(`${SB_URL}/rest/v1/metriche_corrente?id=eq.${_correnteId}`, { method: 'PATCH', headers: SB_H_W, body: JSON.stringify(body) });
+      } else {
+        const r = await fetch(`${SB_URL}/rest/v1/metriche_corrente`, { method: 'POST', headers: SB_H_W, body: JSON.stringify(body) });
+        const d = await r.json();
+        if (d[0]) { _correnteId = d[0].id; _corrente = d[0]; }
+      }
+    }
+
     function autosave() {
-      const r = caricaCorrente();
-      campi.forEach(c => { r[c] = parseInt(document.getElementById('m_' + c).value) || 0; });
-      if (!r.dataInizio) r.dataInizio = new Date().toLocaleDateString('it-IT');
-      salvaCorrente(r);
+      campi.forEach(c => { _corrente[c] = parseInt(document.getElementById('m_' + c).value) || 0; });
+      if (!_corrente.data_inizio) _corrente.data_inizio = new Date().toLocaleDateString('it-IT');
       document.getElementById('autosaveMsg').textContent = 'Salvato ' + new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
       renderMetriche();
+      clearTimeout(_autosaveTimer);
+      _autosaveTimer = setTimeout(salvaCorrenteSB, 1500);
     }
     campi.forEach(c => { const el = document.getElementById('m_' + c); if (el) el.addEventListener('input', autosave); });
 
-    function chiudiSettimana() {
-      const r = caricaCorrente();
-      if (!r.dataInizio) { alert('Nessun dato da chiudere.'); return; }
-      r.dataFine = new Date().toLocaleDateString('it-IT');
-      r.ts = Date.now();
-      const storico = caricaStorico();
-      storico.unshift(r);
-      salvaStorico(storico);
-      salvaCorrente({});
+    async function chiudiSettimana() {
+      if (!_corrente.data_inizio) { alert('Nessun dato da chiudere.'); return; }
+      const ts = Date.now();
+      const body = { ts, data_inizio: _corrente.data_inizio, data_fine: new Date().toLocaleDateString('it-IT') };
+      campi.forEach(c => { body[c] = _corrente[c] || 0; });
+      await fetch(`${SB_URL}/rest/v1/metriche_storico`, { method: 'POST', headers: SB_H_W, body: JSON.stringify(body) });
+      // azzera corrente
+      if (_correnteId) await fetch(`${SB_URL}/rest/v1/metriche_corrente?id=eq.${_correnteId}`, { method: 'DELETE', headers: SB_H_R });
+      _corrente = {}; _correnteId = null;
       campi.forEach(c => { document.getElementById('m_' + c).value = ''; });
       document.getElementById('autosaveMsg').textContent = 'Settimana chiusa ✓';
+      const rs = await fetch(`${SB_URL}/rest/v1/metriche_storico?select=*&order=ts.desc`, { headers: SB_H_R });
+      _storico = await rs.json();
       renderMetriche();
     }
-    function eliminaMetrica(ts) { salvaStorico(caricaStorico().filter(r => r.ts !== ts)); renderMetriche(); }
+
+    async function eliminaMetrica(ts) {
+      await fetch(`${SB_URL}/rest/v1/metriche_storico?ts=eq.${ts}`, { method: 'DELETE', headers: SB_H_R });
+      _storico = _storico.filter(r => r.ts !== ts);
+      renderMetriche();
+    }
 
     function renderMetriche() {
-      const corrente = caricaCorrente();
-      const storico = caricaStorico();
       const el = document.getElementById('storicoMetriche');
       const meseCorrente = new Date().toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
       const totali = {};
       campi.forEach(c => totali[c] = 0);
-      campi.forEach(c => { totali[c] += corrente[c] || 0; });
-      storico.forEach(r => { campi.forEach(c => { totali[c] += r[c] || 0; }); });
+      campi.forEach(c => { totali[c] += _corrente[c] || 0; });
+      _storico.forEach(r => { campi.forEach(c => { totali[c] += r[c] || 0; }); });
 
       const incarichi_tot = (totali.incarichi_e||0) + (totali.incarichi_ne||0);
       const goalBars = [
         { nome: 'Contatti', valore: totali.contatti, goal: goal.contatti },
         { nome: 'Incarichi (E. + N.E.)', valore: incarichi_tot, goal: goal.incarichi },
-        { nome: 'Transazioni', valore: totali.transazioni, goal: goal.transazioni },
+        { nome: 'Transazioni', valore: totali.vendite||0, goal: goal.transazioni },
       ];
       const barre = goalBars.map(g => {
         const perc = Math.min(Math.round((g.valore / g.goal) * 100), 100);
@@ -667,50 +701,60 @@
         <div class="goal-bars">${barre}</div>
       </div>`;
 
-      if (storico.length > 0) {
-        html += storico.map(r => `
+      if (_storico.length > 0) {
+        html += _storico.map(r => `
           <div class="storico-settimana">
-            <div class="storico-header"><div class="storico-data">${r.dataInizio} → ${r.dataFine||r.dataInizio}</div><button class="btn-del-storico" onclick="eliminaMetrica(${r.ts})">✕</button></div>
+            <div class="storico-header"><div class="storico-data">${r.data_inizio} → ${r.data_fine||r.data_inizio}</div><button class="btn-del-storico" onclick="eliminaMetrica(${r.ts})">✕</button></div>
             <div class="storico-grid">${campi.map(c => `<div class="storico-val"><span>${etichette[c]}</span><strong class="${(r[c]||0)===0?'zero':''}">${r[c]||0}</strong></div>`).join('')}</div>
           </div>`).join('');
-      } else if (!corrente.dataInizio) {
+      } else if (!_corrente.data_inizio) {
         html += '<div class="placeholder" style="margin-top:12px">Nessuna settimana chiusa ancora.</div>';
       }
       el.innerHTML = html;
     }
-    caricaCampi();
-    renderMetriche();
+    inizializzaMetriche();
 
-    // MESI PASSATI
+    // MESI PASSATI — su Supabase
     const nomiMesi = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-    function toggleFormMese() { document.getElementById('formMesePassato').classList.toggle('aperto'); }
-    function caricaMesiPassati() { return JSON.parse(localStorage.getItem('mesi_passati') || '[]'); }
-    function salvaMesiPassatiStorage(lista) { localStorage.setItem('mesi_passati', JSON.stringify(lista)); }
-    function salvaMesePassato() {
-      const mese = parseInt(document.getElementById('mp_mese').value);
-      const anno = parseInt(document.getElementById('mp_anno').value);
-      const record = { mese, anno, ts: Date.now() };
-      campi.forEach(c => { record[c] = parseInt(document.getElementById('mp_' + c).value) || 0; });
-      const lista = caricaMesiPassati();
-      lista.unshift(record);
-      lista.sort((a, b) => (b.anno * 12 + b.mese) - (a.anno * 12 + a.mese));
-      salvaMesiPassatiStorage(lista);
-      campi.forEach(c => { document.getElementById('mp_' + c).value = ''; });
-      document.getElementById('formMesePassato').classList.remove('aperto');
+    let _mesiPassati = [];
+
+    async function inizializzaMesi() {
+      const r = await fetch(`${SB_URL}/rest/v1/mesi_passati?select=*&order=anno.desc,mese.desc`, { headers: SB_H_R });
+      _mesiPassati = await r.json();
       renderMesiPassati();
     }
-    function eliminaMese(ts) { salvaMesiPassatiStorage(caricaMesiPassati().filter(r => r.ts !== ts)); renderMesiPassati(); }
+
+    function toggleFormMese() { document.getElementById('formMesePassato').classList.toggle('aperto'); }
+
+    async function salvaMesePassato() {
+      const mese = parseInt(document.getElementById('mp_mese').value);
+      const anno = parseInt(document.getElementById('mp_anno').value);
+      const body = { mese, anno, ts: Date.now() };
+      campi.forEach(c => { body[c] = parseInt(document.getElementById('mp_' + c).value) || 0; });
+      await fetch(`${SB_URL}/rest/v1/mesi_passati`, { method: 'POST', headers: SB_H_W, body: JSON.stringify(body) });
+      campi.forEach(c => { document.getElementById('mp_' + c).value = ''; });
+      document.getElementById('formMesePassato').classList.remove('aperto');
+      const r = await fetch(`${SB_URL}/rest/v1/mesi_passati?select=*&order=anno.desc,mese.desc`, { headers: SB_H_R });
+      _mesiPassati = await r.json();
+      renderMesiPassati();
+    }
+
+    async function eliminaMese(ts) {
+      await fetch(`${SB_URL}/rest/v1/mesi_passati?ts=eq.${ts}`, { method: 'DELETE', headers: SB_H_R });
+      _mesiPassati = _mesiPassati.filter(r => r.ts !== ts);
+      renderMesiPassati();
+    }
+
     function renderMesiPassati() {
-      const lista = caricaMesiPassati();
       const el = document.getElementById('storicoMesi');
-      if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessun mese passato inserito.</div>'; return; }
-      el.innerHTML = lista.map(r => `
+      if (_mesiPassati.length === 0) { el.innerHTML = '<div class="placeholder">Nessun mese passato inserito.</div>'; return; }
+      el.innerHTML = _mesiPassati.map(r => `
         <div class="mese-card">
           <div class="mese-card-header"><div class="mese-card-title">${nomiMesi[r.mese]} ${r.anno}</div><button class="btn-del-storico" onclick="eliminaMese(${r.ts})">✕</button></div>
           <div class="storico-grid">${campi.map(c => `<div class="storico-val"><span>${etichette[c]}</span><strong class="${(r[c]||0)===0?'zero':''}">${r[c]||0}</strong></div>`).join('')}</div>
         </div>`).join('');
     }
-    renderMesiPassati();
+    inizializzaMesi();
 
     // ── VENDITE ──
     const V_KEY = 'vendite_in_corso';
