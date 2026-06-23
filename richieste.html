@@ -332,7 +332,7 @@
 
     async function carica() {
       const [rR, rP] = await Promise.all([
-        fetch(`${SB_URL}/rest/v1/richieste?order=data_richiesta.asc&limit=300`, { headers: SB_H }),
+        fetch(`${SB_URL}/rest/v1/richieste?order=data_richiesta.desc&limit=300`, { headers: SB_H }),
         fetch(`${SB_URL}/rest/v1/proprieta?select=id,ref,titolo&order=ref.asc&limit=200`, { headers: SB_H })
       ]);
       _tutte = await rR.json();
