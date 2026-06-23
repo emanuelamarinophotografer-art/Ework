@@ -538,9 +538,10 @@
       const attive = await resAttive.json();
       const tutte = await resTot.json();
 
+      const STATI_DA_CONTATTARE = new Set(['Risposto','Follow-up 1','Follow-up 2','Follow-up 3','Da richiamare','In attesa risposta','Nuova richiesta']);
       const seguire = attive.filter(r => {
         if (!r.prossimo_follow) return false;
-        if (['Completato','Perso','Annullato'].includes(r.stato_follow)) return false;
+        if (!STATI_DA_CONTATTARE.has(r.stato_cliente)) return false;
         return r.prossimo_follow <= oggiStr;
       });
       const rispondere = attive.filter(r => r.stato_follow === 'Bozza creata' || r.stato_follow === 'Da rispondere' || (r.stato_cliente === 'Nuova richiesta' && r.stato_follow === 'Nuovo'));

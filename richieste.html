@@ -85,6 +85,24 @@
     .n-follow-badge { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; font-size: 0.72rem; padding: 2px 8px; color: var(--text-muted); }
     .data-prossima { font-size: 0.78rem; color: var(--text-muted); }
     .data-prossima.urgente { color: #c0392b; font-weight: 600; }
+
+    /* PIPELINE VISIVA */
+    .pipeline-strip { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+    .pipe-step { flex: 1; min-width: 80px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; text-align: center; cursor: pointer; transition: border-color 0.15s; }
+    .pipe-step:hover { border-color: var(--accent); }
+    .pipe-step.active { border-color: var(--accent); background: var(--accent-bg); }
+    .pipe-step-count { font-size: 1.3rem; font-weight: 700; line-height: 1; }
+    .pipe-step-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+    .pipe-step-bar { height: 3px; border-radius: 2px; margin-top: 6px; background: var(--border); }
+    .pipe-step-fill { height: 100%; border-radius: 2px; transition: width 0.4s; }
+
+    /* STORICO NEL MODAL */
+    .storico-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+    .storico-item { display: flex; align-items: flex-start; gap: 10px; font-size: 0.8rem; }
+    .storico-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 4px; }
+    .storico-data { color: var(--text-faint); font-size: 0.72rem; min-width: 76px; }
+    .storico-testo { color: var(--text); flex: 1; }
+    .storico-vuoto { color: var(--text-faint); font-size: 0.82rem; font-style: italic; }
   </style>
 </head>
 <body>
@@ -133,10 +151,13 @@
     </div>
     <div class="content">
 
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div class="blocco-header" style="margin:0">Pipeline acquirenti <span class="count" id="totCount">0</span></div>
         <button class="btn-nuova" onclick="nuovaRichiesta()">+ Nuova richiesta</button>
       </div>
+
+      <!-- PIPELINE VISIVA -->
+      <div class="pipeline-strip" id="pipelineStrip"></div>
 
       <div class="filtri" id="filtriStato">
         <button class="filtro-btn active" data-stato="__aperte__">Aperte</button>
@@ -282,6 +303,9 @@
         <textarea class="form-textarea" id="f_note"></textarea>
       </div>
 
+      <div class="form-section">Storico contatti</div>
+      <div id="storicoList"><div class="storico-vuoto">Nessuno storico.</div></div>
+
       <div class="modal-actions">
         <button class="btn-elimina" id="btnElimina" onclick="elimina()" style="display:none">Elimina</button>
         <div class="btns-right">
@@ -337,6 +361,41 @@
       ]);
       _tutte = await rR.json();
       _proprieta = await rP.json();
+      renderPipeline();
+      renderLista();
+    }
+
+    // ── PIPELINE VISIVA ──
+    const PIPE_FASI = [
+      { label: 'Nuove',    stati: ['Nuova richiesta'], colore: '#1565c0' },
+      { label: 'Contatto', stati: ['Risposto','In attesa risposta'], colore: '#2e7d32' },
+      { label: 'Follow-up',stati: ['Follow-up 1','Follow-up 2','Follow-up 3','Da richiamare'], colore: '#bf360c' },
+      { label: 'Visita',   stati: ['Visita proposta','Visita fissata','Visita effettuata'], colore: '#6a1b9a' },
+      { label: 'Caldo',    stati: ['Interessato'], colore: '#880e4f' },
+      { label: 'Chiusi',   stati: ['Perso','Non interessato','Chiuso'], colore: '#757575' },
+    ];
+
+    function renderPipeline() {
+      if (!Array.isArray(_tutte)) return;
+      const aperte = _tutte.filter(r => !STATI_CHIUSI_SET.has(r.stato_cliente));
+      const max = Math.max(...PIPE_FASI.slice(0,-1).map(f => f.stati.reduce((s,st) => s + aperte.filter(r => r.stato_cliente === st).length, 0)), 1);
+      document.getElementById('pipelineStrip').innerHTML = PIPE_FASI.map(f => {
+        const count = f.stati.reduce((s, st) => s + _tutte.filter(r => r.stato_cliente === st).length, 0);
+        const pct = Math.round((count / max) * 100);
+        const filtroVal = f.stati.join('|');
+        return `<div class="pipe-step" onclick="setFiltroBtn('${filtroVal}')">
+          <div class="pipe-step-count" style="color:${f.colore}">${count}</div>
+          <div class="pipe-step-label">${f.label}</div>
+          <div class="pipe-step-bar"><div class="pipe-step-fill" style="width:${pct}%;background:${f.colore}"></div></div>
+        </div>`;
+      }).join('');
+    }
+
+    function setFiltroBtn(filtroVal) {
+      _filtroAttivo = filtroVal;
+      document.querySelectorAll('.filtro-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.stato === filtroVal);
+      });
       renderLista();
     }
 
@@ -468,6 +527,7 @@
       document.getElementById('f_ultimo_contatto').value = new Date().toISOString().split('T')[0];
       document.getElementById('f_prossimo_follow').value = '';
       document.getElementById('f_proprieta_cerca').value = '';
+      document.getElementById('storicoList').innerHTML = '<div class="storico-vuoto">Nessuno storico ancora.</div>';
       renderPills();
       aggiornaClienteLink();
       document.getElementById('modalOverlay').classList.add('open');
@@ -501,7 +561,32 @@
       _selProprieta = links.map(l => ({ id: l.proprieta_id, label: l.proprieta?.ref || l.proprieta?.titolo || l.proprieta_id }));
       renderPills();
       aggiornaClienteLink();
+      caricaStorico(id);
       document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function nuovaRichiestaStorico() {
+      document.getElementById('storicoList').innerHTML = '<div class="storico-vuoto">Nessuno storico.</div>';
+    }
+
+    function caricaStorico(richiestaId) {
+      const key = `storico_rich_${richiestaId}`;
+      const lista = JSON.parse(localStorage.getItem(key) || '[]');
+      const el = document.getElementById('storicoList');
+      if (lista.length === 0) { el.innerHTML = '<div class="storico-vuoto">Nessuno storico ancora.</div>'; return; }
+      el.innerHTML = '<div class="storico-list">' + lista.slice().reverse().map(s => `
+        <div class="storico-item">
+          <div class="storico-dot"></div>
+          <div class="storico-data">${s.data}</div>
+          <div class="storico-testo">${s.testo}</div>
+        </div>`).join('') + '</div>';
+    }
+
+    function aggiungiStorico(richiestaId, testo) {
+      const key = `storico_rich_${richiestaId}`;
+      const lista = JSON.parse(localStorage.getItem(key) || '[]');
+      lista.push({ data: new Date().toLocaleDateString('it-IT'), testo });
+      localStorage.setItem(key, JSON.stringify(lista));
     }
 
     function chiudiModal() { document.getElementById('modalOverlay').classList.remove('open'); _editId = null; }
@@ -527,8 +612,14 @@
       let richiestaId = _editId;
       if (_editId) {
         const r = _tutte.find(x => x.id === _editId);
-        if (r && obj.stato_cliente.startsWith('Follow-up') && r.stato_cliente !== obj.stato_cliente) {
-          obj.n_follow = (r.n_follow || 0) + 1;
+        if (r && obj.stato_cliente !== r.stato_cliente) {
+          if (obj.stato_cliente.startsWith('Follow-up')) obj.n_follow = (r.n_follow || 0) + 1;
+          const nota = obj.note?.trim();
+          const log = `${r.stato_cliente} → ${obj.stato_cliente}` + (nota ? ` · ${nota}` : '');
+          aggiungiStorico(_editId, log);
+        } else if (obj.ultimo_contatto && obj.ultimo_contatto !== r.ultimo_contatto) {
+          const nota = obj.note?.trim();
+          aggiungiStorico(_editId, `Contatto aggiornato: ${obj.ultimo_contatto}` + (nota ? ` · ${nota}` : ''));
         }
         await fetch(`${SB_URL}/rest/v1/richieste?id=eq.${_editId}`, { method: 'PATCH', headers: SB_H, body: JSON.stringify(obj) });
       } else {
