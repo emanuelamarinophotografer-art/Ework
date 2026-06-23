@@ -697,43 +697,49 @@
     }
     caricaEventiCalendar();
 
-    // METRICHE
-    const campi = ['transazioni','incarichi_e','incarichi_ne','valutazioni','visita','coll_int','coll_ext','x_incarico','contatti','telefonate','ribassi','proposte_rit'];
-    const etichette = { transazioni:'Transazioni', incarichi_e:'Inc. E.', incarichi_ne:'Inc. N.E.', valutazioni:'Valutazioni', visita:'Visite', coll_int:'Coll. Int.', coll_ext:'Coll. Ext.', x_incarico:'App. Inc.', contatti:'Contatti', telefonate:'Telefonate', ribassi:'Ribassi', proposte_rit:'Prop. Rit.' };
-    const goal = { contatti: 16, incarichi: 2, transazioni: 1 };
-    const corrente = JSON.parse(localStorage.getItem('metrica_corrente') || '{}');
-    const storico = JSON.parse(localStorage.getItem('metriche_storico') || '[]');
+    // METRICHE — da Supabase
+    const campi = ['vendite','incarichi_e','incarichi_ne','valutazioni','visita','coll_int','coll_ext','x_incarico','contatti','telefonate','ribassi','proposte_rit'];
+    const etichette = { vendite:'Transazioni', incarichi_e:'Inc. E.', incarichi_ne:'Inc. N.E.', valutazioni:'Valutazioni', visita:'Visite', coll_int:'Coll. Int.', coll_ext:'Coll. Ext.', x_incarico:'App. Inc.', contatti:'Contatti', telefonate:'Telefonate', ribassi:'Ribassi', proposte_rit:'Prop. Rit.' };
+    const goal = { contatti: 16, incarichi: 2, vendite: 1 };
     const totali = {};
     campi.forEach(c => totali[c] = 0);
-    campi.forEach(c => { totali[c] += corrente[c] || 0; });
-    storico.forEach(r => { campi.forEach(c => { totali[c] += r[c] || 0; }); });
+    (async () => {
+      const [rc, rs] = await Promise.all([
+        fetch(`${SB_URL}/rest/v1/metriche_corrente?select=*&limit=1`, { headers: SB_H }),
+        fetch(`${SB_URL}/rest/v1/metriche_storico?select=*`, { headers: SB_H })
+      ]);
+      const corrente = (await rc.json())[0] || {};
+      const storico = await rs.json();
+      campi.forEach(c => { totali[c] += corrente[c] || 0; });
+      storico.forEach(r => { campi.forEach(c => { totali[c] += r[c] || 0; }); });
 
-    const numeriChiave = ['transazioni','contatti','incarichi_e','incarichi_ne','visita','valutazioni'];
-    document.getElementById('metricheNumeri').innerHTML = numeriChiave.map(c => `
-      <div class="metrica-mini">
-        <span>${etichette[c]}</span>
-        <strong class="${totali[c]===0?'zero':''}">${totali[c]}</strong>
-      </div>`).join('');
+      const numeriChiave = ['vendite','contatti','incarichi_e','incarichi_ne','visita','valutazioni'];
+      document.getElementById('metricheNumeri').innerHTML = numeriChiave.map(c => `
+        <div class="metrica-mini">
+          <span>${etichette[c]}</span>
+          <strong class="${totali[c]===0?'zero':''}">${totali[c]}</strong>
+        </div>`).join('');
 
-    const incarichi_tot = (totali.incarichi_e||0) + (totali.incarichi_ne||0);
-    const goalBars = [
-      { nome: 'Contatti', valore: totali.contatti, goal: goal.contatti },
-      { nome: 'Incarichi', valore: incarichi_tot, goal: goal.incarichi },
-      { nome: 'Transazioni', valore: totali.transazioni, goal: goal.transazioni },
-    ];
-    document.getElementById('goalBarsHome').innerHTML = goalBars.map(g => {
-      const perc = Math.min(Math.round((g.valore / g.goal) * 100), 100);
-      const raggiunto = g.valore >= g.goal;
-      return `<div class="goal-bar-item">
-        <div class="goal-bar-header">
-          <span class="goal-bar-nome">${g.nome}</span>
-          <span class="goal-bar-num">${g.valore} / ${g.goal} ${raggiunto ? '✓' : ''}</span>
-        </div>
-        <div class="goal-bar-track">
-          <div class="goal-bar-fill ${raggiunto?'raggiunto':''}" style="width:${perc}%"></div>
-        </div>
-      </div>`;
-    }).join('');
+      const incarichi_tot = (totali.incarichi_e||0) + (totali.incarichi_ne||0);
+      const goalBars = [
+        { nome: 'Contatti', valore: totali.contatti, goal: goal.contatti },
+        { nome: 'Incarichi', valore: incarichi_tot, goal: goal.incarichi },
+        { nome: 'Transazioni', valore: totali.vendite||0, goal: goal.vendite },
+      ];
+      document.getElementById('goalBarsHome').innerHTML = goalBars.map(g => {
+        const perc = Math.min(Math.round((g.valore / g.goal) * 100), 100);
+        const raggiunto = g.valore >= g.goal;
+        return `<div class="goal-bar-item">
+          <div class="goal-bar-header">
+            <span class="goal-bar-nome">${g.nome}</span>
+            <span class="goal-bar-num">${g.valore} / ${g.goal} ${raggiunto ? '✓' : ''}</span>
+          </div>
+          <div class="goal-bar-track">
+            <div class="goal-bar-fill ${raggiunto?'raggiunto':''}" style="width:${perc}%"></div>
+          </div>
+        </div>`;
+      }).join('');
+    })();
 
     // OSSERVATORIO — TOP 3
     const ricercaImmobili = JSON.parse(localStorage.getItem('ricerca_immobili') || '[]');
