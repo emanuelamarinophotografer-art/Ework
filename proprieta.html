@@ -121,6 +121,19 @@
 
       <div class="filtri-stato" id="filtriStato"></div>
 
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+        <label style="font-size:0.72rem;font-weight:600;color:var(--text-muted)">Prezzo:</label>
+        <select id="filtroPrezzo" onchange="renderLista()" style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:0.78rem;font-family:inherit;color:var(--text-muted);cursor:pointer;outline:none">
+          <option value="">Tutti i prezzi</option>
+          <option value="0-100000">fino a €100k</option>
+          <option value="100000-200000">€100k – €200k</option>
+          <option value="200000-350000">€200k – €350k</option>
+          <option value="350000-600000">€350k – €600k</option>
+          <option value="600000-99999999">oltre €600k</option>
+        </select>
+        <button id="btnAttivi" class="filtro-btn" onclick="toggleAttivi(this)" style="border-radius:20px">Solo attivi</button>
+      </div>
+
       <div class="prop-grid" id="propGrid">
         <div class="placeholder">Nessuna proprietà ancora. Aggiungine una.</div>
       </div>
@@ -244,7 +257,14 @@
     const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
     let filtroStato = 'Tutti';
+    let filtroAttivi = false;
     let _lista = [];
+
+    function toggleAttivi(btn) {
+      filtroAttivi = !filtroAttivi;
+      btn.classList.toggle('active', filtroAttivi);
+      renderLista();
+    }
 
     async function aggiorna() {
       const res = await fetch(`${SB_URL}/rest/v1/proprieta?order=created_at.desc`, { headers: SB_H });
@@ -270,8 +290,14 @@
     function renderLista() {
       let lista = [..._lista];
       const q = document.getElementById('searchInput').value.toLowerCase();
+      const prezzoFascia = document.getElementById('filtroPrezzo').value;
+      if (filtroAttivi) lista = lista.filter(p => !['Venduto','Ritirato'].includes(p.stato));
       if (filtroStato !== 'Tutti') lista = lista.filter(p => p.stato === filtroStato);
       if (q) lista = lista.filter(p => ((p.titolo||'')+(p.zona||'')+(p.tipologia||'')+(p.ref||'')).toLowerCase().includes(q));
+      if (prezzoFascia) {
+        const [min, max] = prezzoFascia.split('-').map(Number);
+        lista = lista.filter(p => { const pr = Number(p.prezzo)||0; return pr >= min && pr <= max; });
+      }
 
       const el = document.getElementById('propGrid');
       if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessuna proprietà trovata.</div>'; return; }
