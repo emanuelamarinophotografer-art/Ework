@@ -536,7 +536,8 @@
         }
         const richList = Array.isArray(richAll) ? richAll.filter(r => !STATI_CHIUSI.has(r.stato_cliente)) : [];
         const richEl = document.getElementById('richiesteList');
-        document.getElementById('countNuoveRichieste').textContent = Array.isArray(richList) ? richList.length : 0;
+        document.getElementById('countNuoveRichieste').textContent = richList.length;
+        const richMostRecent = richList.slice(-4).reverse(); // le 4 più nuove
         const STATO_COLORE = {
           'Nuova richiesta': '#e74c3c',
           'Risposto': '#e67e22', 'Follow-up 1': '#e67e22', 'Follow-up 2': '#e67e22', 'Follow-up 3': '#e67e22',
@@ -544,8 +545,8 @@
           'Visita proposta': '#27ae60', 'Visita fissata': '#27ae60', 'Visita effettuata': '#145a30',
           'Interessato': '#145a30'
         };
-        if (Array.isArray(richList) && richList.length > 0) {
-          richEl.innerHTML = richList.map(r => {
+        if (richMostRecent.length > 0) {
+          richEl.innerHTML = richMostRecent.map(r => {
             const col = STATO_COLORE[r.stato_cliente] || '#888';
             const gg = r.data_richiesta ? Math.floor((Date.now() - new Date(r.data_richiesta)) / 86400000) : '—';
             return `<div class="lista-item" style="cursor:pointer" onclick="location.href='richieste.html'">
