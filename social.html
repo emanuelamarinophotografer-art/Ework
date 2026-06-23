@@ -139,7 +139,42 @@
     .stato-item-meta { font-size: 0.65rem; color: var(--text-faint); margin-top: 4px; }
     .stato-empty { font-size: 0.8rem; color: var(--text-faint); font-style: italic; }
 
-    @media (max-width: 1100px) { .team-grid { grid-template-columns: 1fr 1fr; } .piani-grid { grid-template-columns: 1fr; } .stati-grid { grid-template-columns: 1fr; } }
+    /* TRENDISTA */
+    .trend-header-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+    .trend-filtri { display: flex; gap: 6px; flex-wrap: wrap; }
+    .trend-filtro-btn { padding: 5px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-muted); font-size: 0.78rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .trend-filtro-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .trend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .trend-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+    .trend-card:hover { border-color: var(--accent); }
+    .trend-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .trend-rubrica { font-size: 0.62rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+    .rubr-proprieta { background: #2a2a2a; color: #fff; }
+    .rubr-personal { background: #e5e5e5; color: #333; }
+    .rubr-territorio { background: #f5e9c0; color: #7a5c00; }
+    .rubr-educativo { background: #e8e8e8; color: #555; }
+    .trend-formato { font-size: 0.62rem; color: var(--text-muted); font-weight: 600; }
+    .trend-titolo { font-size: 0.88rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .trend-gancio { font-size: 0.78rem; color: var(--text-muted); font-style: italic; line-height: 1.4; border-left: 2px solid var(--accent); padding-left: 8px; }
+    .trend-fonte { font-size: 0.65rem; color: var(--text-faint); }
+    .trend-actions { display: flex; gap: 6px; margin-top: 4px; }
+    .btn-trend-usa { background: var(--accent); color: white; border: none; border-radius: 7px; padding: 5px 12px; font-size: 0.75rem; font-family: inherit; font-weight: 600; cursor: pointer; }
+    .btn-trend-usa:hover { opacity: 0.85; }
+    .btn-trend-del { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; font-size: 0.75rem; font-family: inherit; color: var(--text-muted); cursor: pointer; }
+    .btn-trend-del:hover { border-color: var(--danger); color: var(--danger); }
+    .trend-usata { opacity: 0.45; }
+    .trend-badge-usata { font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: #c8f0d8; color: #145a30; }
+    .trend-add-form { background: var(--bg-card); border: 1px dashed var(--border); border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; display: none; }
+    .trend-add-form.aperta { display: block; }
+    .trend-form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
+    .trend-field { display: flex; flex-direction: column; gap: 4px; }
+    .trend-field label { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
+    .trend-field input, .trend-field select, .trend-field textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.82rem; font-family: inherit; color: var(--text); outline: none; }
+    .trend-field.wide input, .trend-field.wide textarea { width: 280px; }
+    .trend-field textarea { min-height: 56px; resize: vertical; }
+    .trend-settimana { font-size: 0.62rem; font-weight: 700; color: var(--text-faint); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; }
+
+    @media (max-width: 1100px) { .team-grid { grid-template-columns: 1fr 1fr; } .piani-grid { grid-template-columns: 1fr; } .stati-grid { grid-template-columns: 1fr; } .trend-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 700px) { .team-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -262,6 +297,59 @@
           <div class="mese-grid" id="gridMese"></div>
         </div>
 
+      </div>
+
+      <!-- TRENDISTA -->
+      <div class="blocco" style="margin-top:28px">
+        <div class="trend-header-bar">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:1.2rem">👩‍🎤</span>
+            <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent)">Trend — La Trendista</span>
+            <span class="trend-settimana" id="trendCountLabel"></span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="trend-filtri">
+              <button class="trend-filtro-btn active" onclick="setTrendFiltro('tutti',this)">Tutti</button>
+              <button class="trend-filtro-btn" onclick="setTrendFiltro('reel',this)">Reel</button>
+              <button class="trend-filtro-btn" onclick="setTrendFiltro('carosello',this)">Carosello</button>
+              <button class="trend-filtro-btn" onclick="setTrendFiltro('post',this)">Post</button>
+              <button class="trend-filtro-btn" onclick="setTrendFiltro('da_usare',this)">Da usare</button>
+            </div>
+            <button class="btn-nav" onclick="toggleTrendForm()" style="white-space:nowrap">+ Aggiungi</button>
+          </div>
+        </div>
+
+        <!-- FORM AGGIUNTA MANUALE -->
+        <div class="trend-add-form" id="trendAddForm">
+          <div class="trend-form-row">
+            <div class="trend-field wide"><label>Titolo idea</label><input type="text" id="t_titolo" placeholder="es. Tre cose che nessuno ti dice sul mutuo in Maremma" /></div>
+            <div class="trend-field"><label>Formato</label>
+              <select id="t_formato">
+                <option value="reel">Reel</option>
+                <option value="carosello">Carosello</option>
+                <option value="post">Post</option>
+                <option value="stories">Stories</option>
+              </select>
+            </div>
+            <div class="trend-field"><label>Rubrica</label>
+              <select id="t_rubrica">
+                <option value="proprieta">⬛ Proprietà</option>
+                <option value="personal">⬜ Personal Brand</option>
+                <option value="territorio">🟡 Territorio</option>
+                <option value="educativo">⬜ Educativo</option>
+              </select>
+            </div>
+          </div>
+          <div class="trend-form-row">
+            <div class="trend-field wide"><label>Gancio (hook)</label><textarea id="t_gancio" placeholder="es. Hai mai pensato che la tua seconda casa potrebbe pagarsi da sola?"></textarea></div>
+            <div class="trend-field wide"><label>Fonte / ispirazione</label><input type="text" id="t_fonte" placeholder="es. Reel @luxuryrealestate, trend lunedì 23 giu" /></div>
+          </div>
+          <button class="btn-trend-usa" onclick="salvaTrend()">Salva idea</button>
+        </div>
+
+        <div class="trend-grid" id="trendGrid">
+          <div class="placeholder" style="grid-column:1/-1">Nessuna idea salvata. Aggiungi manualmente o chiedi alla Trendista in chat.</div>
+        </div>
       </div>
 
       <!-- STATI -->
@@ -721,10 +809,99 @@
       </div>`;
     }
 
+    /* ── TRENDISTA ── */
+    const TREND_KEY = 'trend_idee';
+
+    function caricaTrend() { return JSON.parse(localStorage.getItem(TREND_KEY) || '[]'); }
+    function salvaTrendList(lista) { localStorage.setItem(TREND_KEY, JSON.stringify(lista)); }
+
+    const rubricaLabel = { proprieta:'Proprietà', personal:'Personal Brand', territorio:'Territorio', educativo:'Educativo' };
+    const rubricaCls = { proprieta:'rubr-proprieta', personal:'rubr-personal', territorio:'rubr-territorio', educativo:'rubr-educativo' };
+    const formatoLabel = { reel:'🎬 Reel', carosello:'📑 Carosello', post:'📷 Post', stories:'💬 Stories' };
+
+    let trendFiltro = 'tutti';
+
+    function setTrendFiltro(filtro, btn) {
+      trendFiltro = filtro;
+      document.querySelectorAll('.trend-filtro-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTrend();
+    }
+
+    function toggleTrendForm() {
+      document.getElementById('trendAddForm').classList.toggle('aperta');
+    }
+
+    function salvaTrend() {
+      const titolo = document.getElementById('t_titolo').value.trim();
+      if (!titolo) return;
+      const lista = caricaTrend();
+      lista.unshift({
+        id: Date.now(),
+        titolo,
+        formato: document.getElementById('t_formato').value,
+        rubrica: document.getElementById('t_rubrica').value,
+        gancio: document.getElementById('t_gancio').value.trim(),
+        fonte: document.getElementById('t_fonte').value.trim(),
+        usata: false,
+        data: new Date().toLocaleDateString('it-IT')
+      });
+      salvaTrendList(lista);
+      document.getElementById('t_titolo').value = '';
+      document.getElementById('t_gancio').value = '';
+      document.getElementById('t_fonte').value = '';
+      document.getElementById('trendAddForm').classList.remove('aperta');
+      renderTrend();
+    }
+
+    function usaTrend(id) {
+      const lista = caricaTrend().map(t => t.id === id ? { ...t, usata: true } : t);
+      salvaTrendList(lista);
+      renderTrend();
+    }
+
+    function eliminaTrend(id) {
+      salvaTrendList(caricaTrend().filter(t => t.id !== id));
+      renderTrend();
+    }
+
+    function renderTrend() {
+      const lista = caricaTrend();
+      let filtrata = lista;
+      if (trendFiltro === 'da_usare') filtrata = lista.filter(t => !t.usata);
+      else if (trendFiltro !== 'tutti') filtrata = lista.filter(t => t.formato === trendFiltro);
+
+      const daUsare = lista.filter(t => !t.usata).length;
+      document.getElementById('trendCountLabel').textContent = daUsare > 0 ? `${daUsare} da usare` : lista.length > 0 ? `${lista.length} idee` : '';
+
+      const el = document.getElementById('trendGrid');
+      if (filtrata.length === 0) {
+        el.innerHTML = '<div class="placeholder" style="grid-column:1/-1">Nessuna idea' + (trendFiltro !== 'tutti' ? ' per questo filtro' : '') + '. Aggiungi manualmente o chiedi alla Trendista in chat.</div>';
+        return;
+      }
+      el.innerHTML = filtrata.map(t => `
+        <div class="trend-card ${t.usata ? 'trend-usata' : ''}">
+          <div class="trend-card-top">
+            <span class="trend-rubrica ${rubricaCls[t.rubrica] || ''}">${rubricaLabel[t.rubrica] || t.rubrica}</span>
+            <span class="trend-formato">${formatoLabel[t.formato] || t.formato}</span>
+          </div>
+          <div class="trend-titolo">${t.titolo}</div>
+          ${t.gancio ? `<div class="trend-gancio">${t.gancio}</div>` : ''}
+          ${t.fonte ? `<div class="trend-fonte">📌 ${t.fonte}</div>` : ''}
+          <div class="trend-actions">
+            ${t.usata
+              ? `<span class="trend-badge-usata">✅ Usata</span>`
+              : `<button type="button" class="btn-trend-usa" onclick="usaTrend(${t.id})">Usa nel piano</button>`}
+            <button type="button" class="btn-trend-del" onclick="eliminaTrend(${t.id})">Rimuovi</button>
+          </div>
+        </div>`).join('');
+    }
+
     /* ── INIT ── */
     renderSettimana();
     renderMese();
     renderStati();
+    renderTrend();
   </script>
 
 </body>
