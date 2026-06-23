@@ -362,7 +362,7 @@
 
         <div class="semaforo-card">
           <div class="semaforo-header">
-            <div class="semaforo-title">📩 Nuove richieste</div>
+            <div class="semaforo-title">📩 Richieste aperte</div>
             <div class="semaforo-count warn" id="countNuoveRichieste">0</div>
           </div>
           <div id="richiesteList"><div class="placeholder">Nessuna richiesta nuova.</div></div>
@@ -526,22 +526,37 @@
           schedeEl.innerHTML = '<div class="placeholder">Nessuna scheda in attesa.</div>';
         }
 
-        // SEMAFORO: Nuove richieste da Supabase
-        const rRich = await fetch(`${SB_URL}/rest/v1/richieste?stato_cliente=eq.Nuova%20richiesta&order=data_richiesta.desc&limit=6`, { headers: SB_H });
+        // SEMAFORO: Richieste aperte (tutte tranne chiuse/perse)
+        const STATI_CHIUSI = ['Chiuso','Perso','Non interessato','Non procedere'];
+        const rRich = await fetch(`${SB_URL}/rest/v1/richieste?stato_cliente=not.in.(Chiuso,Perso,Non%20interessato,Non%20procedere)&order=data_richiesta.asc&limit=20`, { headers: SB_H });
         const richList = await rRich.json();
         const richEl = document.getElementById('richiesteList');
         document.getElementById('countNuoveRichieste').textContent = Array.isArray(richList) ? richList.length : 0;
+        const STATO_COLORE = {
+          'Nuova richiesta': '#e74c3c',
+          'Risposto': '#e67e22', 'Follow-up 1': '#e67e22', 'Follow-up 2': '#e67e22', 'Follow-up 3': '#e67e22',
+          'In attesa risposta': '#2980b9', 'Da richiamare': '#8e44ad',
+          'Visita proposta': '#27ae60', 'Visita fissata': '#27ae60', 'Visita effettuata': '#145a30',
+          'Interessato': '#145a30'
+        };
         if (Array.isArray(richList) && richList.length > 0) {
-          richEl.innerHTML = richList.map(r => `
-            <div class="lista-item">
-              <div class="dot dot-warn"></div>
-              <div style="flex:1">
+          richEl.innerHTML = richList.map(r => {
+            const col = STATO_COLORE[r.stato_cliente] || '#888';
+            const gg = r.data_richiesta ? Math.floor((Date.now() - new Date(r.data_richiesta)) / 86400000) : '—';
+            return `<div class="lista-item" style="cursor:pointer" onclick="location.href='richieste.html'">
+              <div class="dot" style="background:${col};flex-shrink:0"></div>
+              <div style="flex:1;min-width:0">
                 <div class="lista-testo">${r.nome_cliente || '—'}</div>
-                <div class="lista-sub">${r.immobile || ''}</div>
+                <div class="lista-sub" style="display:flex;gap:8px;flex-wrap:wrap">
+                  <span style="color:${col};font-weight:600">${r.stato_cliente}</span>
+                  <span>${r.immobile || ''}</span>
+                  <span style="margin-left:auto;color:var(--text-faint)">${gg}gg</span>
+                </div>
               </div>
-            </div>`).join('');
+            </div>`;
+          }).join('');
         } else {
-          richEl.innerHTML = '<div class="placeholder">Nessuna richiesta nuova.</div>';
+          richEl.innerHTML = '<div class="placeholder">Nessuna richiesta aperta.</div>';
         }
 
         // SEMAFORO: Follow-up scaduti dettaglio

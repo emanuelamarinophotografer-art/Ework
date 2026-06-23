@@ -139,7 +139,8 @@
       </div>
 
       <div class="filtri" id="filtriStato">
-        <button class="filtro-btn active" data-stato="">Tutte</button>
+        <button class="filtro-btn active" data-stato="__aperte__">Aperte</button>
+        <button class="filtro-btn" data-stato="">Tutte</button>
         <button class="filtro-btn" data-stato="Nuova richiesta">🆕 Nuove</button>
         <button class="filtro-btn" data-stato="In attesa risposta">⏳ In attesa</button>
         <button class="filtro-btn" data-stato="Follow-up 1|Follow-up 2|Follow-up 3">🔁 Follow-up</button>
@@ -303,7 +304,8 @@
     const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 
     let _tutte = [];
-    let _filtroAttivo = '';
+    const STATI_CHIUSI_SET = new Set(['Chiuso','Perso','Non interessato','Non procedere']);
+    let _filtroAttivo = '__aperte__';
     let _editId = null;
     let _proprieta = [];
     let _selProprieta = []; // [{id, label}]
@@ -330,7 +332,7 @@
 
     async function carica() {
       const [rR, rP] = await Promise.all([
-        fetch(`${SB_URL}/rest/v1/richieste?order=data_richiesta.desc&limit=300`, { headers: SB_H }),
+        fetch(`${SB_URL}/rest/v1/richieste?order=data_richiesta.asc&limit=300`, { headers: SB_H }),
         fetch(`${SB_URL}/rest/v1/proprieta?select=id,ref,titolo&order=ref.asc&limit=200`, { headers: SB_H })
       ]);
       _tutte = await rR.json();
@@ -340,9 +342,11 @@
 
     function renderLista() {
       const filtro = _filtroAttivo;
-      const lista = filtro
-        ? _tutte.filter(r => filtro.split('|').includes(r.stato_cliente))
-        : _tutte;
+      const lista = filtro === '__aperte__'
+        ? _tutte.filter(r => !STATI_CHIUSI_SET.has(r.stato_cliente))
+        : filtro
+          ? _tutte.filter(r => filtro.split('|').includes(r.stato_cliente))
+          : _tutte;
 
       document.getElementById('totCount').textContent = lista.length;
       const el = document.getElementById('listaRichieste');
