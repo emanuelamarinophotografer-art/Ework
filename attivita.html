@@ -670,19 +670,74 @@
       renderMetriche();
     }
 
+    function meseDaData(dataStr) {
+      // DD/MM/YYYY → { mese (0-based), anno }
+      const p = (dataStr || '').split('/');
+      return p.length === 3 ? { mese: parseInt(p[1]) - 1, anno: parseInt(p[2]) } : null;
+    }
+
+    function aggMese(settimane, mese, anno) {
+      const tot = {}; campi.forEach(c => tot[c] = 0);
+      settimane.forEach(r => {
+        const d = meseDaData(r.data_inizio);
+        if (d && d.mese === mese && d.anno === anno) campi.forEach(c => { tot[c] += r[c] || 0; });
+      });
+      return tot;
+    }
+
+    function renderStoricoPeriodi() {
+      // Aggrega storico per mese e mostra tabella compatta
+      const mappa = {};
+      _storico.forEach(r => {
+        const d = meseDaData(r.data_inizio);
+        if (!d) return;
+        const key = `${d.anno}-${d.mese}`;
+        if (!mappa[key]) { mappa[key] = { mese: d.mese, anno: d.anno }; campi.forEach(c => mappa[key][c] = 0); }
+        campi.forEach(c => { mappa[key][c] += r[c] || 0; });
+      });
+      const mesiAgg = Object.values(mappa).sort((a,b) => (b.anno*12+b.mese)-(a.anno*12+a.mese));
+      const nomiMesiS = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+      const campiRid = ['vendite','incarichi_e','incarichi_ne','valutazioni','visita','contatti'];
+      const etRid = { vendite:'Vend.', incarichi_e:'Inc.E', incarichi_ne:'Inc.NE', valutazioni:'Val.', visita:'Visite', contatti:'Cont.' };
+      if (mesiAgg.length === 0) return '';
+      return `<div style="margin-top:16px">
+        <div class="blocco-header" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+          <span>Storico mesi</span>
+          <a href="storico-metriche.html" style="font-size:0.72rem;color:var(--accent);text-decoration:none;font-weight:600">→ Dettaglio completo</a>
+        </div>
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:0.78rem">
+          <thead><tr style="color:var(--text-muted);text-transform:uppercase;font-size:0.6rem;letter-spacing:0.1em">
+            <th style="text-align:left;padding:4px 8px">Mese</th>
+            ${campiRid.map(c => `<th style="text-align:center;padding:4px 6px">${etRid[c]}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${mesiAgg.map(r => `<tr style="border-top:1px solid var(--border)">
+              <td style="padding:6px 8px;font-weight:600">${nomiMesiS[r.mese]} ${r.anno}</td>
+              ${campiRid.map(c => `<td style="text-align:center;padding:6px;color:${(r[c]||0)===0?'var(--text-faint)':'var(--text)'};font-weight:${(r[c]||0)>0?'600':'400'}">${r[c]||0}</td>`).join('')}
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        </div>
+      </div>`;
+    }
+
     function renderMetriche() {
       const el = document.getElementById('storicoMetriche');
-      const meseCorrente = new Date().toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-      const totali = {};
-      campi.forEach(c => totali[c] = 0);
-      campi.forEach(c => { totali[c] += _corrente[c] || 0; });
-      _storico.forEach(r => { campi.forEach(c => { totali[c] += r[c] || 0; }); });
+      const ora = new Date();
+      const meseCorrLabel = ora.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+      const meseCorrNum = ora.getMonth();
+      const annoCorrNum = ora.getFullYear();
 
-      const incarichi_tot = (totali.incarichi_e||0) + (totali.incarichi_ne||0);
+      // Totale mese = solo settimane del mese corrente + settimana in corso
+      const totMese = aggMese(_storico, meseCorrNum, annoCorrNum);
+      campi.forEach(c => { totMese[c] += _corrente[c] || 0; });
+
+      const incarichi_tot = (totMese.incarichi_e||0) + (totMese.incarichi_ne||0);
       const goalBars = [
-        { nome: 'Contatti', valore: totali.contatti, goal: goal.contatti },
+        { nome: 'Contatti', valore: totMese.contatti, goal: goal.contatti },
         { nome: 'Incarichi (E. + N.E.)', valore: incarichi_tot, goal: goal.incarichi },
-        { nome: 'Transazioni', valore: totali.vendite||0, goal: goal.transazioni },
+        { nome: 'Transazioni', valore: totMese.vendite||0, goal: goal.transazioni },
       ];
       const barre = goalBars.map(g => {
         const perc = Math.min(Math.round((g.valore / g.goal) * 100), 100);
@@ -694,24 +749,26 @@
       }).join('');
 
       let html = `<div class="totale-mese">
-        <div class="totale-mese-label">Totale mese — ${meseCorrente}</div>
-        <div class="storico-grid">${campi.map(c => `<div class="storico-val"><span>${etichette[c]}</span><strong class="${totali[c]===0?'zero':''}">${totali[c]}</strong></div>`).join('')}</div>
+        <div class="totale-mese-label">Totale mese — ${meseCorrLabel}</div>
+        <div class="storico-grid">${campi.map(c => `<div class="storico-val"><span>${etichette[c]}</span><strong class="${totMese[c]===0?'zero':''}">${totMese[c]}</strong></div>`).join('')}</div>
         <div class="goal-bars">${barre}</div>
       </div>`;
 
-      const ultime2 = _storico.slice(0, 2);
-      if (ultime2.length > 0) {
-        html += ultime2.map(r => `
+      // Ultime 2 settimane chiuse del mese corrente
+      const settMese = _storico.filter(r => { const d = meseDaData(r.data_inizio); return d && d.mese === meseCorrNum && d.anno === annoCorrNum; }).slice(0,2);
+      if (settMese.length > 0) {
+        html += settMese.map(r => `
           <div class="storico-settimana">
             <div class="storico-header"><div class="storico-data">${r.data_inizio} → ${r.data_fine||r.data_inizio}</div><button class="btn-del-storico" onclick="eliminaMetrica(${r.ts})">✕</button></div>
             <div class="storico-grid">${campi.map(c => `<div class="storico-val"><span>${etichette[c]}</span><strong class="${(r[c]||0)===0?'zero':''}">${r[c]||0}</strong></div>`).join('')}</div>
           </div>`).join('');
       } else if (!_corrente.data_inizio) {
-        html += '<div class="placeholder" style="margin-top:12px">Nessuna settimana chiusa ancora.</div>';
+        html += '<div class="placeholder" style="margin-top:12px">Nessuna settimana chiusa questo mese.</div>';
       }
-      if (_storico.length > 2) {
-        html += `<a href="storico-metriche.html" class="link-goto" style="display:inline-block;margin-top:12px">→ Storico completo (${_storico.length} settimane)</a>`;
-      }
+
+      // Tabella storico mesi
+      html += renderStoricoPeriodi();
+
       el.innerHTML = html;
     }
     inizializzaMetriche();
