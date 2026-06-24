@@ -699,14 +699,18 @@
         <div class="goal-bars">${barre}</div>
       </div>`;
 
-      if (_storico.length > 0) {
-        html += _storico.map(r => `
+      const ultime2 = _storico.slice(0, 2);
+      if (ultime2.length > 0) {
+        html += ultime2.map(r => `
           <div class="storico-settimana">
             <div class="storico-header"><div class="storico-data">${r.data_inizio} → ${r.data_fine||r.data_inizio}</div><button class="btn-del-storico" onclick="eliminaMetrica(${r.ts})">✕</button></div>
             <div class="storico-grid">${campi.map(c => `<div class="storico-val"><span>${etichette[c]}</span><strong class="${(r[c]||0)===0?'zero':''}">${r[c]||0}</strong></div>`).join('')}</div>
           </div>`).join('');
       } else if (!_corrente.data_inizio) {
         html += '<div class="placeholder" style="margin-top:12px">Nessuna settimana chiusa ancora.</div>';
+      }
+      if (_storico.length > 2) {
+        html += `<a href="storico-metriche.html" class="link-goto" style="display:inline-block;margin-top:12px">→ Storico completo (${_storico.length} settimane)</a>`;
       }
       el.innerHTML = html;
     }

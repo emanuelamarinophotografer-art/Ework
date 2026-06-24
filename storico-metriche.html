@@ -120,12 +120,24 @@
     };
     const campiPrincipali = ['vendite','incarichi_e','incarichi_ne','contatti','visita'];
 
-    let filtroAttivo = 'tutti';
+    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+    const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+    const SB_HW = { ...SB_H, 'Content-Type': 'application/json' };
 
-    function caricaStorico() { return JSON.parse(localStorage.getItem('metriche_storico') || '[]'); }
-    function salvaStorico(lista) { localStorage.setItem('metriche_storico', JSON.stringify(lista)); }
-    function caricaMesiPassati() { return JSON.parse(localStorage.getItem('mesi_passati') || '[]'); }
-    function salvaMesiPassati(lista) { localStorage.setItem('mesi_passati', JSON.stringify(lista)); }
+    let filtroAttivo = 'tutti';
+    let _settimane = [];
+    let _mesi = [];
+
+    async function inizializza() {
+      const [rs, rm] = await Promise.all([
+        fetch(`${SB_URL}/rest/v1/metriche_storico?select=*&order=ts.desc`, { headers: SB_H }),
+        fetch(`${SB_URL}/rest/v1/mesi_passati?select=*&order=anno.desc,mese.desc`, { headers: SB_H })
+      ]);
+      _settimane = await rs.json();
+      _mesi = await rm.json();
+      render();
+    }
 
     function setFiltro(filtro, btn) {
       filtroAttivo = filtro;
@@ -135,8 +147,8 @@
     }
 
     function render() {
-      const settimane = caricaStorico();
-      const mesi = caricaMesiPassati();
+      const settimane = _settimane;
+      const mesi = _mesi;
 
       // KPI totali
       const tutti = [
@@ -154,7 +166,7 @@
       // Tabella
       let righe = [];
       if (filtroAttivo !== 'mensili') {
-        settimane.forEach(r => righe.push({ ...r, _tipo: 'sett', _label: 'Settimana chiusa ' + (r.dataFine || r.dataInizio || '—') }));
+        settimane.forEach(r => righe.push({ ...r, _tipo: 'sett', _label: (r.data_inizio || '—') + ' → ' + (r.data_fine || '—') }));
       }
       if (filtroAttivo !== 'settimanali') {
         mesi.forEach(r => righe.push({ ...r, _tipo: 'mese', _label: nomiMesi[r.mese] + ' ' + r.anno }));
@@ -189,7 +201,7 @@
                 <td class="td-periodo">${r._label}</td>
                 <td><span class="td-tipo ${r._tipo === 'sett' ? 'tipo-sett' : 'tipo-mese'}">${r._tipo === 'sett' ? 'Sett.' : 'Mese'}</span></td>
                 ${campi.map(c => `<td class="td-num ${(r[c]||0)===0?'zero':''} ${campiPrincipali.includes(c)&&(r[c]||0)>0?'highlight':''}">${r[c]||0}</td>`).join('')}
-                <td class="td-actions"><button class="btn-del" onclick="elimina('${r._tipo}', ${r.ts || 0}, ${i})">✕</button></td>
+                <td class="td-actions"><button class="btn-del" onclick="elimina('${r._tipo}', ${r.ts || 0})">✕</button></td>
               </tr>`).join('')}
             <tr class="totali-row">
               <td colspan="2"><strong>TOTALE</strong></td>
@@ -200,19 +212,19 @@
         </table>`;
     }
 
-    function elimina(tipo, ts, idx) {
+    async function elimina(tipo, ts) {
       if (!confirm('Eliminare questo periodo?')) return;
       if (tipo === 'sett') {
-        salvaStorico(caricaStorico().filter(r => r.ts !== ts));
+        await fetch(`${SB_URL}/rest/v1/metriche_storico?ts=eq.${ts}`, { method: 'DELETE', headers: SB_H });
+        _settimane = _settimane.filter(r => r.ts !== ts);
       } else {
-        const lista = caricaMesiPassati();
-        lista.splice(idx - caricaStorico().length, 1);
-        salvaMesiPassati(lista);
+        await fetch(`${SB_URL}/rest/v1/mesi_passati?ts=eq.${ts}`, { method: 'DELETE', headers: SB_H });
+        _mesi = _mesi.filter(r => r.ts !== ts);
       }
       render();
     }
 
-    render();
+    inizializza();
   </script>
 
 <script src="bottom-nav.js"></script>
