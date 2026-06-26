@@ -486,7 +486,19 @@
         const rN = await fetch(`${SB_URL}/rest/v1/messaggi?mittente=eq.newspepper&order=created_at.desc&limit=1`, { headers: SB_H });
         const nMsg = await rN.json();
         if (Array.isArray(nMsg) && nMsg.length > 0) {
-          document.getElementById('newspepperBriefing').textContent = nMsg[0].testo;
+          const newsText = nMsg[0].testo;
+          // Formatta i punti numerati con spaziatura
+          const newsHtml = newsText
+            .split(/\n/)
+            .map(line => {
+              const trimmed = line.trim();
+              if (/^\d+[\.\)]/.test(trimmed)) return `<div style="margin-bottom:10px;padding-left:4px">${trimmed}</div>`;
+              if (trimmed === '') return '';
+              return `<div>${trimmed}</div>`;
+            })
+            .filter(l => l !== '')
+            .join('');
+          document.getElementById('newspepperBriefing').innerHTML = newsHtml;
           const dt = new Date(nMsg[0].created_at);
           document.getElementById('newspepperData').textContent = 'Ultimo aggiornamento: ' + dt.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }) + ' ore ' + dt.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
@@ -683,8 +695,16 @@
       ]);
       const corrente = (await rc.json())[0] || {};
       const storico = await rs.json();
+      const oggi = new Date();
       campi.forEach(c => { totali[c] += corrente[c] || 0; });
-      storico.forEach(r => { campi.forEach(c => { totali[c] += r[c] || 0; }); });
+      storico.forEach(r => {
+        const p = (r.data_inizio || '').split('/');
+        if (p.length !== 3) return;
+        const meseSett = parseInt(p[1]) - 1;
+        const annoSett = parseInt(p[2]);
+        if (meseSett !== oggi.getMonth() || annoSett !== oggi.getFullYear()) return;
+        campi.forEach(c => { totali[c] += r[c] || 0; });
+      });
 
       const numeriChiave = ['vendite','contatti','incarichi_e','incarichi_ne','visita','valutazioni'];
       document.getElementById('metricheNumeri').innerHTML = numeriChiave.map(c => `
