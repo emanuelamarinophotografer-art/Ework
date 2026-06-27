@@ -211,6 +211,14 @@
     @media (max-width: 700px) { .chicca-panel-body { grid-template-columns: 1fr; } }
     @media (max-width: 1100px) { .team-grid { grid-template-columns: 1fr 1fr; } .piani-grid { grid-template-columns: 1fr; } .stati-grid { grid-template-columns: 1fr; } .trend-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 700px) { .team-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) {
+      .pannello { width: 100vw; right: -100vw; }
+      .lista-row { grid-template-columns: 60px 1fr 80px; gap: 8px; padding: 10px 14px; }
+      .lista-row .badge-rubrica, .lista-row .badge-stato { display: none; }
+      .piani-grid { grid-template-columns: 1fr; }
+      .mese-grid { grid-template-columns: repeat(4, 1fr); }
+      .trend-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
