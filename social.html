@@ -322,12 +322,9 @@
               <div class="mix-row"><span class="dot-post dot-grigio" style="display:inline-block"></span> Educativo <strong>20%</strong></div>
               <div class="mix-row"><span class="dot-post dot-nero" style="display:inline-block"></span> Proprietà <strong>15%</strong></div>
             </div>
-            <div class="chicca-col-label">📡 Segnali IG</div>
-            <div class="chicca-signals">
-              <div class="signal-item">Watch time — priorità Reels</div>
-              <div class="signal-item">DM shares — caption che invitano a condividere</div>
-              <div class="signal-item">Max 5 hashtag — no generici</div>
-              <div class="signal-item">Originality score — no watermark, no riciclo</div>
+            <div class="chicca-col-label">📊 Analisi Mara → Chicca</div>
+            <div class="chicca-signals" id="maraChiccaSignals">
+              <div class="signal-item" style="color:var(--text-muted)">Caricamento analisi…</div>
             </div>
           </div>
           <div class="chicca-agenti-col">
@@ -1060,12 +1057,73 @@
       cfm.style.display = 'inline'; setTimeout(() => cfm.style.display = 'none', 2000);
     }
 
+    async function caricaAnalisiMara() {
+      const el = document.getElementById('maraChiccaSignals');
+      try {
+        const [igRows, posts] = await Promise.all([
+          fetch(`${SB_URL}/rest/v1/metriche_ig?order=periodo_fine.desc&limit=2`, { headers: SB_H }).then(r => r.json()),
+          fetch(`${SB_URL}/rest/v1/piano_editoriale?select=rubrica,stato&limit=500`, { headers: SB_H }).then(r => r.json())
+        ]);
+
+        const segnali = [];
+
+        // Analisi metriche IG
+        if (igRows.length) {
+          const m = igRows[0];
+          const prev = igRows[1];
+          const eng = m.visualizzazioni_reel ? ((m.mi_piace + m.salvataggi + m.condivisioni) / m.visualizzazioni_reel * 100) : 0;
+          const saveRate = m.visualizzazioni_reel ? (m.salvataggi / m.visualizzazioni_reel * 100) : 0;
+
+          if (prev && m.follower && prev.follower) {
+            const delta = m.follower - prev.follower;
+            segnali.push(`${delta >= 0 ? '📈' : '📉'} Follower: ${m.follower} (${delta >= 0 ? '+' : ''}${delta} vs periodo precedente)`);
+          } else {
+            segnali.push(`👥 ${m.follower} follower — fase early, priorità costanza`);
+          }
+
+          segnali.push(`${eng >= 5 ? '✅' : eng >= 2 ? '⚠️' : '🔴'} Engagement reel: ${eng.toFixed(1)}% — ${eng >= 5 ? 'buono, mantieni il formato' : eng >= 2 ? 'nella media, testa hook più forti' : 'basso — rielabora il gancio iniziale'}`);
+
+          if (saveRate >= 5) segnali.push(`🔖 Salvataggi ${saveRate.toFixed(1)}% — contenuto percepito come utile. Produci più educativo/territorio.`);
+          else segnali.push(`🔖 Salvataggi bassi (${saveRate.toFixed(1)}%) — punta su contenuti "da tenere": guide, confronti, consigli pratici.`);
+
+          if (m.citta_top) segnali.push(`📍 Pubblico top: ${m.citta_top} — tieni questo pubblico urbano come destinatario primario nelle caption.`);
+        }
+
+        // Analisi piano editoriale
+        if (posts.length) {
+          const tot = posts.length;
+          const conteggi = { nero: 0, bianco: 0, oro: 0, grigio: 0 };
+          const nomi = { nero: 'Proprietà', bianco: 'Personal', oro: 'Territorio', grigio: 'Educativo' };
+          posts.forEach(p => { if (conteggi[p.rubrica] !== undefined) conteggi[p.rubrica]++; });
+          const sbilanciati = Object.entries(conteggi).filter(([k,v]) => Math.abs((v/tot*100) - 25) > 15);
+          if (sbilanciati.length) {
+            const ecc = sbilanciati.filter(([,v]) => v/tot*100 > 40).map(([k]) => nomi[k]);
+            const man = sbilanciati.filter(([,v]) => v/tot*100 < 10).map(([k]) => nomi[k]);
+            if (ecc.length) segnali.push(`⚖️ Troppo ${ecc.join(', ')} nel piano (>${Math.round(Math.max(...sbilanciati.map(([,v])=>v))/tot*100)}%) — bilancia il mix.`);
+            if (man.length) segnali.push(`⚖️ Mancano contenuti ${man.join(', ')} — inserisci almeno 1 nella prossima settimana.`);
+          } else {
+            segnali.push(`✅ Mix rubriche bilanciato sul piano — continua così.`);
+          }
+          const bozze = posts.filter(p => p.stato === 'bozza').length;
+          if (bozze > 0) segnali.push(`📝 ${bozze} contenuti in bozza da assegnare al Produttore.`);
+        }
+
+        el.innerHTML = segnali.length
+          ? segnali.map(s => `<div class="signal-item">${s}</div>`).join('')
+          : '<div class="signal-item" style="color:var(--text-muted)">Nessuna metrica disponibile.</div>';
+
+      } catch(e) {
+        el.innerHTML = '<div class="signal-item" style="color:var(--text-muted)">Errore caricamento analisi.</div>';
+      }
+    }
+
     /* ── INIT ── */
     renderSettimana();
     renderMese();
     renderLista();
     renderTrend();
     caricaChiccaBrief();
+    caricaAnalisiMara();
   </script>
 
 <script src="bottom-nav.js"></script>
