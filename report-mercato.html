@@ -12,13 +12,14 @@
     .btn-small { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 7px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
     .btn-small:hover { opacity: 0.88; }
     .empty-state { color: var(--text-muted); font-size: 0.82rem; padding: 16px 0; text-align: center; }
-    .mercato-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-    .mercato-card { background: var(--bg); border-radius: 10px; padding: 14px; border: 1px solid var(--border); }
-    .mercato-zona { font-weight: 700; font-size: 0.8rem; margin-bottom: 8px; color: var(--accent); }
-    .mercato-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 3px 0; border-bottom: 1px solid var(--border); }
+    .mercato-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (max-width: 700px) { .mercato-grid { grid-template-columns: 1fr; } }
+    .mercato-card { background: #1e3a5f; border-radius: 10px; padding: 14px; border: 1px solid #2a4a73; }
+    .mercato-zona { font-weight: 700; font-size: 0.8rem; margin-bottom: 8px; color: #7eb8f7; }
+    .mercato-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 3px 0; border-bottom: 1px solid #2a4a73; color: #c8ddf0; }
     .mercato-row:last-child { border-bottom: none; }
-    .mercato-row .val { font-weight: 600; }
-    .mercato-trend { color: #27ae60; font-size: 0.7rem; }
+    .mercato-row .val { font-weight: 600; color: #e8f1fb; }
+    .mercato-trend { color: #5dd88a; font-size: 0.7rem; }
     .mara-insight { background: var(--bg); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 12px 14px; margin-top: 14px; }
     .mara-insight-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 5px; }
     .mara-insight-text { font-size: 0.82rem; line-height: 1.6; color: var(--text); }
