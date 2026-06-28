@@ -840,7 +840,7 @@
       document.getElementById('pannelloValutazione').style.display = 'block';
     }
 
-    if (fromRicercaId) prefillDaRicerca(fromRicercaId);
+    // prefillDaRicerca viene chiamato dopo caricaListaSchede() in fondo alla pagina
 
     // Stato chip
     const chipState = {};
@@ -1189,8 +1189,10 @@
       aggiornaBottoneConverti();
     }
 
-    caricaListaSchede();
-    if (schedaId) apriScheda(schedaId);
+    caricaListaSchede().then(() => {
+      if (schedaId) apriScheda(schedaId);
+      else if (fromRicercaId) prefillDaRicerca(fromRicercaId);
+    });
   </script>
 
 <script src="bottom-nav.js"></script>
