@@ -341,7 +341,7 @@
             <div class="ric-actions">
               <button type="button" class="btn-card" onclick="apriModalStato(${s.id})">📋 Stato</button>
               <button type="button" class="btn-card" onclick="apriModifica(${s.id})">✏️ Modifica</button>
-              ${s.stato_scheda !== 'incarico' ? `<button type="button" class="btn-promuovi" onclick="promuoviIncarico(${s.id})">✅ Incarico preso</button>` : '<span class="inc-label">✅ In Proprietà</span>'}
+              ${s.stato_scheda !== 'incarico' ? `<button type="button" class="btn-promuovi" onclick="apriIncarico(${s.id})">📋 Apri come Incarico</button>` : '<span class="inc-label">✅ Incarico preso</span>'}
               <button type="button" class="btn-card btn-del" onclick="elimina(${s.id})">✕</button>
             </div>
           </div>
@@ -362,6 +362,10 @@
       if (nuovoStato === 'incarico') await promuoviIncarico(idSelezionato);
       document.getElementById('modalStato').classList.remove('open');
       render();
+    }
+
+    function apriIncarico(id) {
+      window.location.href = `incarico.html?from_ricerca=${id}`;
     }
 
     async function promuoviIncarico(id) {

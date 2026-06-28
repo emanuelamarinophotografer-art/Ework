@@ -756,6 +756,33 @@
     // Leggi ID da URL se presente (per edit futuro)
     const params = new URLSearchParams(location.search);
     let schedaId = params.get('id') ? parseInt(params.get('id')) : null;
+    const fromRicercaId = params.get('from_ricerca') ? parseInt(params.get('from_ricerca')) : null;
+
+    async function prefillDaRicerca(id) {
+      const res = await fetch(`${SB_URL}/rest/v1/ricerca_schede?id=eq.${id}&select=*`, { headers: SB_H });
+      const rows = await res.json();
+      if (!rows.length) return;
+      const r = rows[0];
+      const d = r.dati ? JSON.parse(r.dati) : {};
+      const set = (elId, val) => { const el = document.getElementById(elId); if (el && val != null && val !== '') el.value = val; };
+      set('h_nome', r.nome || d.comuneLabel || '');
+      set('h_comune', r.comune || d.comuneLabel || '');
+      set('h_zona', d.zonaLabel || '');
+      set('q_prezzo', d.prezzoRichiesto || r.prezzo_richiesto || '');
+      set('t_tipologia', d.tipoLabel || r.tipologia || '');
+      set('t_mq_abitabili', d.mq || r.mq || '');
+      set('t_anno_costruzione', d.anno || '');
+      set('t_n_locali', d.locali || '');
+      set('t_n_bagni', d.bagni || '');
+      set('t_stato_manutentivo', d.statoLabel || '');
+      set('t_classe_energetica', d.classeEnergetica || '');
+      set('t_riscaldamento', d.riscaldamento || '');
+      // note dalla scheda valutazione
+      const noteEl = document.getElementById('q_note_qualifica');
+      if (noteEl) noteEl.value = [r.note || '', d.score ? `Score vendibilità: ${d.score}/100` : ''].filter(Boolean).join('\n');
+    }
+
+    if (fromRicercaId) prefillDaRicerca(fromRicercaId);
 
     // Stato chip
     const chipState = {};
@@ -910,7 +937,16 @@
         res = await fetch(`${SB_URL}/rest/v1/scheda_qualifica`, { method: 'POST', headers: SB_H, body: JSON.stringify(record) });
         if (res.ok) {
           const data = await res.json();
-          if (data[0]) { schedaId = data[0].id; history.replaceState(null,'',`?id=${schedaId}`); }
+          if (data[0]) {
+            schedaId = data[0].id;
+            history.replaceState(null,'',`?id=${schedaId}`);
+            if (fromRicercaId) {
+              await fetch(`${SB_URL}/rest/v1/ricerca_schede?id=eq.${fromRicercaId}`, {
+                method: 'PATCH', headers: SB_H,
+                body: JSON.stringify({ stato_scheda: 'incarico', id_incarico: schedaId })
+              });
+            }
+          }
         }
       }
 
