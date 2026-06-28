@@ -808,30 +808,41 @@
       const rows = await res.json();
       if (!rows.length) return;
       const r = rows[0];
-      const d = r.dati ? JSON.parse(r.dati) : {};
-      _valutazioneDaRicerca = { ...d, totMin: d.totMin || r.tot_min, totMax: d.totMax || r.tot_max, score: d.score || r.score };
+      let d = {};
+      try { if (r.dati) d = JSON.parse(r.dati); } catch(e) {}
 
-      const set = (elId, val) => { const el = document.getElementById(elId); if (el && val != null && val !== '') el.value = val; };
-      set('h_nome', r.nome || d.comuneLabel || '');
+      const totMin = d.totMin || r.tot_min || null;
+      const totMax = d.totMax || r.tot_max || null;
+      const score = d.score || r.score || 0;
+      const prezzoRich = d.prezzoRichiesto || r.prezzo_richiesto || null;
+      _valutazioneDaRicerca = { totMin, totMax, score, prezzoRich };
+
+      // mappa stato valutazione → opzione select incarico
+      const statoMap = { ottimo:'Ristrutturato', buono:'Buono', discreto:'Da ristrutturare', daRistrutturare:'Da ristrutturare' };
+      const riscMap = { autonomo:'Autonomo', pompa:'Pompa di calore', caminetto:'Altro', assente:'Altro' };
+
+      const set = (elId, val) => {
+        if (val == null || val === '') return;
+        const el = document.getElementById(elId);
+        if (el) el.value = val;
+      };
+
+      set('h_nome', r.nome || d.comuneLabel || r.comune || '');
       set('h_comune', r.comune || d.comuneLabel || '');
-      set('h_zona', d.zonaLabel || '');
-      set('q_prezzo', d.prezzoRichiesto || r.prezzo_richiesto || '');
+      set('h_zona', d.zonaLabel || r.zona || '');
+      set('t_prezzo_richiesto', prezzoRich ? String(Math.round(prezzoRich)) : '');
       set('t_tipologia', d.tipoLabel || r.tipologia || '');
       set('t_mq_abitabili', d.mq || r.mq || '');
       set('t_anno_costruzione', d.anno || '');
       set('t_n_locali', d.locali || '');
       set('t_n_bagni', d.bagni || '');
-      set('t_stato_manutentivo', d.statoLabel || '');
-      set('t_classe_energetica', d.classeEnergetica || '');
-      set('t_riscaldamento', d.riscaldamento || '');
+      set('t_stato_manutentivo', statoMap[d.stato] || '');
+      set('t_classe_energetica', d.classeEnergetica && d.classeEnergetica !== 'nd' ? d.classeEnergetica : '');
+      set('t_riscaldamento', riscMap[d.riscaldamento] || '');
       const noteEl = document.getElementById('q_note_qualifica');
-      if (noteEl) noteEl.value = [r.note || '', d.score ? `Score vendibilità: ${d.score}/100` : ''].filter(Boolean).join('\n');
+      if (noteEl) noteEl.value = [r.note || '', score ? `Score vendibilità: ${score}/100` : ''].filter(Boolean).join('\n');
 
-      // pannello valutazione
-      const totMin = d.totMin || r.tot_min;
-      const totMax = d.totMax || r.tot_max;
-      const score = d.score || r.score || 0;
-      const prezzoRich = d.prezzoRichiesto || r.prezzo_richiesto;
+      // pannello confronto
       document.getElementById('pv_stima').textContent = (totMin && totMax) ? `${fmt(totMin)} – ${fmt(totMax)}` : totMin ? fmt(totMin) : '—';
       document.getElementById('pv_prezzo').textContent = prezzoRich ? fmt(prezzoRich) : '—';
       const scoreEl = document.getElementById('pv_score');
