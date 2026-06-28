@@ -726,8 +726,8 @@
         sbGet('proprieta?order=created_at.desc'),
         sbGet('vendite?incassata=eq.false')
       ]);
-      const attive = props.filter(p => !['Venduto','Ritirato'].includes(p.stato));
-      document.getElementById('kpi_immobili').textContent = attive.length;
+      const inPortaleCount = props.filter(p => p.stato === 'In portale').length;
+      document.getElementById('kpi_immobili').textContent = inPortaleCount;
       function calcolaIncasso(prezzo, doppia) { let p=parseFloat(prezzo)||0,provv=p<100000?3000:p*0.03; if(doppia)provv*=2; return (provv-provv*0.08)/2; }
       const provvAttesa = venditeRows.reduce((s,v)=>s+calcolaIncasso(v.prezzo,v.doppia),0);
       document.getElementById('kpi_provv_attesa').textContent = fmtEur(provvAttesa);
@@ -747,8 +747,7 @@
       const inPortale = stati['In portale'] || 0;
       const inTrattativa = stati['In trattativa'] || 0;
       let ins = `<div class="mara-insight"><div class="mara-insight-label">— Mara 📊</div><div class="mara-insight-text">`;
-      ins += `${attive.length} immobili attivi · prezzo medio ${fmtEur(prezzoMedio)}.`;
-      if (inPortale>0) ins += ` ${inPortale} in portale.`;
+      ins += `${inPortale} in portale · prezzo medio ${fmtEur(prezzoMedio)}.`;
       if (inTrattativa>0) ins += ` <strong style="color:#c07040">${inTrattativa} in trattativa</strong>.`;
       if (provvAttesa>0) ins += ` Provvigione attesa: ${fmtEur(provvAttesa)}.`;
       ins += `</div></div>`;
