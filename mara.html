@@ -247,43 +247,53 @@
       <!-- ═══════ TAB LAVORO ═══════ -->
       <div class="mara-panel active" id="panel-lavoro">
 
-        <div class="mara-grid">
-          <div class="blocco">
-            <div class="blocco-header">Funnel richieste</div>
-            <div class="funnel-wrap" id="funnelWrap"><div class="placeholder">Caricamento…</div></div>
-            <div class="mara-insight" id="funnelInsight" style="display:none">
-              <div class="mara-insight-label">— Mara 📊</div>
-              <div class="mara-insight-text" id="funnelInsightText"></div>
-            </div>
-          </div>
-          <div class="blocco">
-            <div class="blocco-header">Goal mensili — <span id="meseLavoro"></span></div>
-            <div class="goal-section" id="goalSection"><div class="placeholder">Nessuna metrica inserita.</div></div>
-            <div class="mara-insight" id="goalInsight" style="display:none">
-              <div class="mara-insight-label">— Mara 📊</div>
-              <div class="mara-insight-text" id="goalInsightText"></div>
-            </div>
-          </div>
-        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
 
-        <div class="mara-grid">
-          <div class="blocco">
-            <div class="blocco-header">Portafoglio immobili</div>
-            <div class="kpi-row" id="portKpi"></div>
-            <div id="portInsight"><div class="placeholder">Nessuna scheda in ricerca immobili.</div></div>
-          </div>
-          <div class="blocco">
-            <div class="blocco-header">Piano social — distribuzione rubriche</div>
-            <div class="social-rubrica-row" id="socialRubriche"><div class="placeholder">Nessun post nel piano social.</div></div>
-            <div class="mara-insight" id="socialInsight" style="display:none">
-              <div class="mara-insight-label">— Mara 📊</div>
-              <div class="mara-insight-text" id="socialInsightText"></div>
+          <!-- COLONNA SX — LAVORO -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="blocco">
+              <div class="blocco-header">Funnel richieste</div>
+              <div class="funnel-wrap" id="funnelWrap"><div class="placeholder">Caricamento…</div></div>
+              <div class="mara-insight" id="funnelInsight" style="display:none">
+                <div class="mara-insight-label">— Mara 📊</div>
+                <div class="mara-insight-text" id="funnelInsightText"></div>
+              </div>
+            </div>
+            <div class="blocco">
+              <div class="blocco-header">Goal mensili — <span id="meseLavoro"></span></div>
+              <div class="goal-section" id="goalSection"><div class="placeholder">Nessuna metrica inserita.</div></div>
+              <div class="mara-insight" id="goalInsight" style="display:none">
+                <div class="mara-insight-label">— Mara 📊</div>
+                <div class="mara-insight-text" id="goalInsightText"></div>
+              </div>
+            </div>
+            <div class="blocco">
+              <div class="blocco-header">Portafoglio immobili</div>
+              <div class="kpi-row" id="portKpi"></div>
+              <div id="portInsight"><div class="placeholder">Nessuna scheda in ricerca immobili.</div></div>
             </div>
           </div>
-          <div class="blocco">
-            <div class="blocco-header">Metriche Instagram reali <span id="igPeriodo" style="font-weight:400;font-size:0.75rem;color:var(--text-muted)"></span></div>
-            <div id="igMetriche"><div class="placeholder">Caricamento...</div></div>
+
+          <!-- COLONNA DX — SOCIAL -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="blocco">
+              <div class="blocco-header">Piano social — distribuzione rubriche</div>
+              <div class="social-rubrica-row" id="socialRubriche"><div class="placeholder">Nessun post nel piano social.</div></div>
+              <div class="mara-insight" id="socialInsight" style="display:none">
+                <div class="mara-insight-label">— Mara 📊</div>
+                <div class="mara-insight-text" id="socialInsightText"></div>
+              </div>
+            </div>
+            <div class="blocco">
+              <div class="blocco-header">Metriche Instagram <span id="igPeriodo" style="font-weight:400;font-size:0.75rem;color:var(--text-muted)"></span></div>
+              <div id="igMetriche"><div class="placeholder">Caricamento...</div></div>
+              <div class="mara-insight" id="igInsight" style="display:none;margin-top:12px">
+                <div class="mara-insight-label">— Mara 📊</div>
+                <div class="mara-insight-text" id="igInsightText"></div>
+              </div>
+            </div>
           </div>
+
         </div>
 
       </div>
@@ -783,6 +793,23 @@
           </div>
           ${m.note ? `<div style="margin-top:10px;font-size:0.72rem;color:var(--text-muted)">📎 ${m.note}</div>` : ''}
         `;
+
+        // Analisi Mara
+        const insights = [];
+        const engRate = m.visualizzazioni_reel ? ((m.mi_piace + m.salvataggi + m.condivisioni) / m.visualizzazioni_reel * 100) : 0;
+        if (engRate > 0) insights.push(`Engagement rate reel: ${engRate.toFixed(1)}% — ${engRate >= 5 ? 'buono ✅' : engRate >= 2 ? 'nella media ⚠️' : 'basso, lavora sul gancio iniziale 🔴'}.`);
+        if (m.salvataggi && m.visualizzazioni_reel) {
+          const saveRate = (m.salvataggi / m.visualizzazioni_reel * 100).toFixed(1);
+          insights.push(`Salvataggi ${saveRate}% delle views — ${parseFloat(saveRate) >= 5 ? 'contenuto utile percepito, continua su questo formato ✅' : 'lavora su contenuti più "da tenere".'}`);
+        }
+        if (m.genere_donne_pct && m.genere_donne_pct > 50) insights.push(`Pubblico prevalentemente femminile (${m.genere_donne_pct}%). Verifica che il tono dei reel parli anche agli acquirenti internazionali maschi.`);
+        if (m.citta_top) insights.push(`Città top: ${m.citta_top}. Roma è il tuo mercato urbano principale — tienila in mente per targeting e tono.`);
+        if (m.follower < 300) insights.push(`${m.follower} follower — fase early. Priorità: costanza e contenuti che generano salvataggi, non like.`);
+
+        if (insights.length) {
+          document.getElementById('igInsightText').innerHTML = insights.map(i => `<div style="margin-bottom:6px">• ${i}</div>`).join('');
+          document.getElementById('igInsight').style.display = '';
+        }
       } catch(e) { document.getElementById('igMetriche').innerHTML = '<div class="placeholder">Errore caricamento metriche.</div>'; }
     }
 
