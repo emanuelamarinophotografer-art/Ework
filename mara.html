@@ -933,55 +933,45 @@
       status.textContent = 'Lettura file…';
       const text = await file.text();
       const rows = parseCSV(text);
-      status.textContent = `Importazione ${rows.length} righe…`;
-      let ok = 0, err = 0;
-      // Carica tutti i ref del DB per fare il match (CSV ha solo numero, DB ha "016 - numero")
-      const allProps = await sbGet('proprieta?select=ref&limit=500');
-      const refMap = {};
-      allProps.forEach(p => {
-        if (!p.ref) return;
-        const clean = p.ref.replace(/^[\d\s\-]+/, '').trim(); // rimuove prefisso "016 - "
-        refMap[clean] = p.ref;
-      });
-
-      for (const r of rows) {
-        const refCSV = (r.riferimento_interno || '').trim();
-        if (!refCSV) continue;
-        // Trova il ref completo nel DB che termina con il ref del CSV
-        const refDB = refMap[refCSV] || Object.values(refMap).find(v => v.includes(refCSV)) || refCSV;
-        const record = {
-          ref: refDB, mese,
+      status.textContent = `Preparazione ${rows.length} righe…`;
+      const records = rows
+        .filter(r => (r.riferimento_interno || '').trim())
+        .map(r => ({
+          ref: (r.riferimento_interno || '').trim(),
+          mese,
           presente_idealista: r.presente_idealista === '1',
           presente_immobiliare: r.presente_immobiliare === '1',
-          idealista_codice: r.idealista_codice,
+          idealista_codice: r.idealista_codice || null,
           idealista_visite_liste: parseFloat(r.idealista_visite_liste) || null,
           idealista_visite_dettaglio: parseFloat(r.idealista_visite_dettaglio) || null,
           idealista_condiviso: parseFloat(r.idealista_condiviso) || null,
           idealista_invii_avvisi: parseFloat(r.idealista_invii_avvisi) || null,
           idealista_preferiti: parseFloat(r.idealista_preferiti) || null,
           idealista_contatti: parseFloat(r.idealista_contatti) || null,
-          imm_visibilita: r.imm_visibilita,
+          imm_visibilita: r.imm_visibilita || null,
           imm_posizione: parseFloat(r.imm_posizione) || null,
-          imm_pagina: r.imm_pagina,
+          imm_pagina: r.imm_pagina || null,
           imm_qualita_pct: parseFloat(r.imm_qualita_pct) || null,
-          imm_rank: r.imm_rank,
-          imm_variazione: r.imm_variazione,
+          imm_rank: r.imm_rank || null,
+          imm_variazione: r.imm_variazione || null,
           imm_visite_dettaglio: parseFloat(r.imm_visite_dettaglio) || null,
           imm_salvati: parseFloat(r.imm_salvati) || null,
           imm_nascosti: parseFloat(r.imm_nascosti) || null,
           imm_messaggi: parseFloat(r.imm_messaggi) || null,
           imm_match: parseFloat(r.imm_match) || null
-        };
-        const existing = await sbGet(`analisi_portale?ref=eq.${encodeURIComponent(ref)}&mese=eq.${mese}&limit=1`);
-        let res;
-        if (existing && existing.length > 0) {
-          res = await fetch(`${SB}/rest/v1/analisi_portale?ref=eq.${encodeURIComponent(ref)}&mese=eq.${mese}`, { method:'PATCH', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify(record) });
-        } else {
-          res = await fetch(`${SB}/rest/v1/analisi_portale`, { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify(record) });
-        }
-        res.ok ? ok++ : err++;
+        }));
+      status.textContent = `Importazione ${records.length} righe in batch…`;
+      const res = await fetch(`${SB}/rest/v1/analisi_portale`, {
+        method: 'POST',
+        headers: { ...H, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(records)
+      });
+      if (res.ok) {
+        status.textContent = `✅ Importati ${records.length} immobili`;
+      } else {
+        const err = await res.text();
+        status.textContent = `⚠ Errore: ${err}`;
       }
-      status.textContent = `✅ Importati ${ok} immobili${err>0?' · ⚠ '+err+' errori':''}`;
       caricaMercato();
     }
 
