@@ -346,8 +346,8 @@
           <div class="fin-sezione-label">Goal annuo provvigioni</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;margin-bottom:10px">
             <div class="fin-field">
-              <label>Goal annuo (€)</label>
-              <input type="number" class="fin-input" id="fin_goal_annuo" placeholder="es. 40000" oninput="salvaFinGoal()" />
+              <label>Goal annuo (n° provv.)</label>
+              <input type="number" class="fin-input" id="fin_goal_annuo" placeholder="es. 12" oninput="salvaFinGoal()" />
             </div>
             <div class="fin-field">
               <label>% raggiunto</label>
@@ -873,10 +873,11 @@
       saldoEl.textContent = fmtEur(saldo);
       saldoEl.className = 'saldo-val ' + (saldo>=0?'positivo':'negativo');
       document.getElementById('kpi_provv_incassata').textContent = fmtEur(entrate);
-      const goal = parseFloat(document.getElementById('fin_goal_annuo').value) || 0;
+      const nProvv = lista.filter(m=>m.tipo==='provvigione').length;
+      const goal = parseInt(document.getElementById('fin_goal_annuo').value) || 0;
       if (goal>0) {
-        const p = Math.min(pct(entrate,goal),100);
-        document.getElementById('fin_goal_pct').value = p+'%';
+        const p = Math.min(pct(nProvv,goal),100);
+        document.getElementById('fin_goal_pct').value = nProvv+'/'+goal+' ('+p+'%)';
         document.getElementById('fin_goal_bar').style.width = p+'%';
       } else {
         document.getElementById('fin_goal_pct').value = '—';
