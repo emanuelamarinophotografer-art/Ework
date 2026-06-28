@@ -815,6 +815,7 @@
 
     // Variabile condivisa tra Finanze e Vita & Casa
     let _totEntrate = 0;
+    let _movimentiCache = [];
 
     // ── FINANZE (Supabase) ──
     async function caricaMovimenti() {
@@ -849,12 +850,12 @@
     async function salvaFinGoal() {
       const val = document.getElementById('fin_goal_annuo').value;
       await fetch(`${SB_URL}/rest/v1/social_appunti`, { method:'POST', headers: { ...SB_H, 'Prefer': 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ chiave:'fin_goal_annuo', valore: val }) });
-      renderMovimenti();
+      aggiornaFinSaldi(_movimentiCache);
     }
 
     function aggiornaFinSaldi(lista) {
-      const entrate = lista.filter(m=>m.tipo!=='spesa').reduce((s,m)=>s+(m.importo||0),0);
-      const spese   = lista.filter(m=>m.tipo==='spesa').reduce((s,m)=>s+(m.importo||0),0);
+      const entrate = lista.filter(m=>m.tipo!=='spesa').reduce((s,m)=>s+parseFloat(m.importo||0),0);
+      const spese   = lista.filter(m=>m.tipo==='spesa').reduce((s,m)=>s+parseFloat(m.importo||0),0);
       const saldo   = entrate - spese;
       _totEntrate = entrate;
       document.getElementById('fin_tot_entrate').textContent = fmtEur(entrate);
@@ -875,6 +876,7 @@
 
     async function renderMovimenti() {
       const lista = await caricaMovimenti();
+      _movimentiCache = lista;
       document.getElementById('contMovimenti').textContent = lista.length>0 ? `(${lista.length})` : '';
       const el = document.getElementById('finStorico');
       if (lista.length===0) { el.innerHTML='<div class="placeholder">Nessun movimento registrato.</div>'; aggiornaFinSaldi([]); return; }
@@ -1128,9 +1130,8 @@
     }
     init();
 
-    document.getElementById('fin_goal_annuo').addEventListener('change', async function() {
-      await fetch(`${SB_URL}/rest/v1/social_appunti`, { method:'POST', headers: { ...SB_H, 'Prefer': 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ chiave:'fin_goal_annuo', valore: this.value }) });
-      renderMovimenti();
+    document.getElementById('fin_goal_annuo').addEventListener('change', function() {
+      salvaFinGoal();
     });
   </script>
 
