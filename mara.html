@@ -390,55 +390,35 @@
       <!-- ═══════ TAB MERCATO ═══════ -->
       <div class="mara-panel" id="panel-mercato">
 
-        <!-- SKILL BOX -->
-        <div class="skill-box">
-          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">Per generare un report immobile usa <span class="skill-cmd">/analisi-mercato</span> in Claude Code. Mara legge i dati portali + CRM + OMI e salva il file in Drive automaticamente.</div>
-          <div class="skill-steps">
-            <div class="skill-step"><span class="skill-step-num">1</span> Dai i dati portali a Mara</div>
-            <div class="skill-step"><span class="skill-step-num">2</span> Mara legge CRM + Drive</div>
-            <div class="skill-step"><span class="skill-step-num">3</span> Genera HTML → Drive</div>
-            <div class="skill-step"><span class="skill-step-num">4</span> Aggiungi il link qui sotto</div>
-          </div>
-        </div>
-
-        <!-- REPORT SALVATI -->
+        <!-- IMPORT CSV PORTALE -->
         <div class="blocco" style="margin-bottom:16px">
           <div class="blocco-header" style="display:flex;justify-content:space-between;align-items:center">
-            <span>📁 Report salvati</span>
-            <button type="button" class="btn-small" onclick="toggleFormAggiungi()">+ Aggiungi</button>
+            <span>📥 Statistiche portali</span>
+            <span id="mercato_mese_label" style="font-size:0.75rem;color:var(--text-muted)"></span>
           </div>
-
-          <div class="form-aggiungi" id="formAggiungi">
-            <div class="aggiungi-fin-title">Nuovo report</div>
-            <div class="form-row">
-              <div class="form-field"><label>Codice immobile</label><input type="text" id="inp-codice" placeholder="es. 33541050-144" /></div>
-              <div class="form-field wide"><label>Tipologia + Comune</label><input type="text" id="inp-tipo" placeholder="es. Villa bifamiliare · Grosseto" /></div>
-              <div class="form-field sm">
-                <label>Decisione Mara</label>
-                <select id="inp-decisione">
-                  <option value="monitorare">↗ Monitorare</option>
-                  <option value="ottimizzare">⚠ Ottimizzare</option>
-                  <option value="intervenire">🔴 Intervenire</option>
-                  <option value="performante">✅ Performante</option>
-                </select>
-              </div>
-              <div class="form-field wide"><label>Link Drive</label><input type="text" id="inp-link" placeholder="https://drive.google.com/..." /></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div>
+              <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:4px">Mese di riferimento</label>
+              <input type="month" id="csv_mese" class="fin-input" style="width:140px" />
             </div>
-            <div style="display:flex;gap:8px">
-              <button type="button" class="btn-small" onclick="salvaReport()">Salva</button>
-              <button type="button" class="btn-small" style="background:var(--bg);color:var(--text-muted);border:1px solid var(--border)" onclick="toggleFormAggiungi()">Annulla</button>
+            <div style="flex:1">
+              <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:4px">File CSV dall'amministrazione</label>
+              <input type="file" id="csv_file" accept=".csv" style="font-size:0.8rem" />
             </div>
+            <button type="button" class="btn-small" style="margin-top:18px" onclick="importaCSV()">Importa</button>
           </div>
+          <div id="csv_status" style="font-size:0.8rem;color:var(--text-muted);min-height:18px"></div>
+        </div>
 
-          <div class="tab-row">
-            <button type="button" class="tab-btn active" onclick="filtraReport('tutti', this)">Tutti</button>
-            <button type="button" class="tab-btn" onclick="filtraReport('monitorare', this)">↗ Monitorare</button>
-            <button type="button" class="tab-btn" onclick="filtraReport('ottimizzare', this)">⚠ Ottimizzare</button>
-            <button type="button" class="tab-btn" onclick="filtraReport('intervenire', this)">🔴 Intervenire</button>
-            <button type="button" class="tab-btn" onclick="filtraReport('performante', this)">✅ Performante</button>
+        <!-- LISTA IMMOBILI CON METRICHE -->
+        <div class="blocco" style="margin-bottom:16px">
+          <div class="blocco-header" style="display:flex;justify-content:space-between;align-items:center">
+            <span>🏡 Immobili attivi — metriche portale</span>
+            <select id="filtro_mese_portale" class="fin-input" style="width:140px;font-size:0.8rem" onchange="caricaMercato()">
+              <option value="">Ultimo disponibile</option>
+            </select>
           </div>
-
-          <div class="report-list" id="reportList"></div>
+          <div id="portale_list" style="margin-top:8px"></div>
         </div>
 
         <!-- DATI MERCATO OMI -->
@@ -733,20 +713,27 @@
       document.getElementById('kpi_provv_attesa').textContent = fmtEur(provvAttesa);
       if (props.length===0) return;
       const stati = { 'Attivo':0, 'Venduto':0, 'Ritirato':0 };
-      let prezzoTot = 0, conPrezzo = 0;
+      let prezzoTot = 0, conPrezzo = 0, mqTot = 0, conMq = 0, eurMqTot = 0, conEurMq = 0;
       props.forEach(p => {
         const k = p.stato === 'In portale' ? 'Attivo' : (stati[p.stato]!==undefined ? p.stato : null);
         if (k) stati[k]++;
-        const pr = parseFloat(p.prezzo)||0;
-        if (pr>0 && p.stato === 'In portale') { prezzoTot+=pr; conPrezzo++; }
+        if (p.stato === 'In portale') {
+          const pr = parseFloat(p.prezzo)||0;
+          const mq = parseFloat(p.mq)||0;
+          if (pr>0) { prezzoTot+=pr; conPrezzo++; }
+          if (pr>0 && mq>0) { eurMqTot+=(pr/mq); conEurMq++; }
+        }
       });
       const colori = { 'Attivo':'#8e44ad', 'Venduto':'#27ae60', 'Ritirato':'#888' };
       document.getElementById('portKpi').innerHTML = Object.entries(stati)
         .filter(([k,v]) => v > 0)
         .map(([k,v]) => `<div class="kpi-card"><div class="kpi-val" style="color:${colori[k]};font-size:1.4rem">${v}</div><div class="kpi-label">${k}</div></div>`).join('');
       const prezzoMedio = conPrezzo>0 ? prezzoTot/conPrezzo : 0;
+      const eurMqMedio = conEurMq>0 ? eurMqTot/conEurMq : 0;
       let ins = `<div class="mara-insight"><div class="mara-insight-label">— Mara 📊</div><div class="mara-insight-text">`;
-      ins += `${stati.Attivo} attivi · prezzo medio ${fmtEur(prezzoMedio)}.`;
+      ins += `${stati.Attivo} attivi · prezzo medio ${fmtEur(prezzoMedio)}`;
+      if (eurMqMedio>0) ins += ` · <strong>${Math.round(eurMqMedio).toLocaleString('it-IT')} €/mq</strong>`;
+      ins += `.`;
       if (provvAttesa>0) ins += ` Provvigione attesa: ${fmtEur(provvAttesa)}.`;
       ins += `</div></div>`;
       document.getElementById('portInsight').innerHTML = ins;
@@ -922,52 +909,111 @@
       renderVitaCasa();
     }
 
-    // ── REPORT (Supabase mara_rpt) ──
-    let filtroReport = 'tutti';
-
-    function toggleFormAggiungi() { document.getElementById('formAggiungi').classList.toggle('aperta'); }
-
-    async function salvaReport() {
-      const codice = document.getElementById('inp-codice').value.trim();
-      if (!codice) { alert('Inserisci il codice immobile'); return; }
-      await sbPost('mara_rpt', { codice, tipo: document.getElementById('inp-tipo').value.trim(), decisione: document.getElementById('inp-decisione').value, link: document.getElementById('inp-link').value.trim(), data: new Date().toLocaleDateString('it-IT') });
-      document.getElementById('inp-codice').value=''; document.getElementById('inp-tipo').value=''; document.getElementById('inp-link').value='';
-      document.getElementById('formAggiungi').classList.remove('aperta');
-      renderReport(filtroReport);
+    // ── MERCATO: import CSV portale ──
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      return lines.slice(1).map(line => {
+        const vals = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || line.split(',');
+        const obj = {};
+        headers.forEach((h, i) => {
+          let v = (vals[i] || '').replace(/^"|"$/g, '').trim();
+          obj[h] = v === '' ? null : v;
+        });
+        return obj;
+      });
     }
 
-    async function eliminaReport(id) {
-      if (!confirm('Eliminare?')) return;
-      await sbDelete(`mara_rpt?id=eq.${id}`);
-      renderReport(filtroReport);
+    async function importaCSV() {
+      const file = document.getElementById('csv_file').files[0];
+      const mese = document.getElementById('csv_mese').value;
+      const status = document.getElementById('csv_status');
+      if (!file) { status.textContent = '⚠ Seleziona un file CSV'; return; }
+      if (!mese) { status.textContent = '⚠ Seleziona il mese di riferimento'; return; }
+      status.textContent = 'Lettura file…';
+      const text = await file.text();
+      const rows = parseCSV(text);
+      status.textContent = `Importazione ${rows.length} righe…`;
+      let ok = 0, err = 0;
+      for (const r of rows) {
+        const ref = (r.riferimento_interno || '').trim();
+        if (!ref) continue;
+        const record = {
+          ref, mese,
+          presente_idealista: r.presente_idealista === '1',
+          presente_immobiliare: r.presente_immobiliare === '1',
+          idealista_codice: r.idealista_codice,
+          idealista_visite_liste: parseFloat(r.idealista_visite_liste) || null,
+          idealista_visite_dettaglio: parseFloat(r.idealista_visite_dettaglio) || null,
+          idealista_condiviso: parseFloat(r.idealista_condiviso) || null,
+          idealista_invii_avvisi: parseFloat(r.idealista_invii_avvisi) || null,
+          idealista_preferiti: parseFloat(r.idealista_preferiti) || null,
+          idealista_contatti: parseFloat(r.idealista_contatti) || null,
+          imm_visibilita: r.imm_visibilita,
+          imm_posizione: parseFloat(r.imm_posizione) || null,
+          imm_pagina: r.imm_pagina,
+          imm_qualita_pct: parseFloat(r.imm_qualita_pct) || null,
+          imm_rank: r.imm_rank,
+          imm_variazione: r.imm_variazione,
+          imm_visite_dettaglio: parseFloat(r.imm_visite_dettaglio) || null,
+          imm_salvati: parseFloat(r.imm_salvati) || null,
+          imm_nascosti: parseFloat(r.imm_nascosti) || null,
+          imm_messaggi: parseFloat(r.imm_messaggi) || null,
+          imm_match: parseFloat(r.imm_match) || null
+        };
+        const existing = await sbGet(`analisi_portale?ref=eq.${encodeURIComponent(ref)}&mese=eq.${mese}&limit=1`);
+        let res;
+        if (existing && existing.length > 0) {
+          res = await fetch(`${SB}/rest/v1/analisi_portale?ref=eq.${encodeURIComponent(ref)}&mese=eq.${mese}`, { method:'PATCH', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify(record) });
+        } else {
+          res = await fetch(`${SB}/rest/v1/analisi_portale`, { method:'POST', headers:{...H,'Content-Type':'application/json'}, body: JSON.stringify(record) });
+        }
+        res.ok ? ok++ : err++;
+      }
+      status.textContent = `✅ Importati ${ok} immobili${err>0?' · ⚠ '+err+' errori':''}`;
+      caricaMercato();
     }
 
-    function filtraReport(cat, btn) {
-      filtroReport = cat;
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      renderReport(cat);
-    }
-
-    const decLabel = { monitorare:'↗ Monitorare', ottimizzare:'⚠ Ottimizzare', intervenire:'🔴 Intervenire', performante:'✅ Performante' };
-    const decClass = { monitorare:'dec-monitorare', ottimizzare:'dec-ottimizzare', intervenire:'dec-intervenire', performante:'dec-performante' };
-
-    async function renderReport(cat) {
-      const el = document.getElementById('reportList');
+    async function caricaMercato() {
+      const el = document.getElementById('portale_list');
       el.innerHTML = '<div class="empty-state">Caricamento…</div>';
-      let lista = await sbGet('mara_rpt?order=created_at.desc&limit=200');
-      if (cat!=='tutti') lista = lista.filter(r=>r.decisione===cat);
-      if (lista.length===0) { el.innerHTML='<div class="empty-state">Nessun report salvato. Usa <strong>/analisi-mercato</strong> e aggiungi il link con +.</div>'; return; }
-      el.innerHTML = lista.map(r=>`
-        <div class="report-card">
-          <div class="report-icon">📄</div>
-          <div class="report-info"><div class="report-code">${r.codice}</div><div class="report-meta">${r.tipo||'—'} · ${r.data}</div></div>
-          <span class="report-decisione ${decClass[r.decisione]||''}">${decLabel[r.decisione]||r.decisione}</span>
-          <div class="report-actions">
-            ${r.link?`<a class="btn-report primary" href="${r.link}" target="_blank">📂 Drive</a>`:''}
-            <button type="button" class="btn-report" onclick="eliminaReport(${r.id})">🗑</button>
+      // Carica mesi disponibili
+      const mesiRaw = await sbGet('analisi_portale?select=mese&order=mese.desc');
+      const mesi = [...new Set((mesiRaw||[]).map(r=>r.mese))];
+      const sel = document.getElementById('filtro_mese_portale');
+      const valAttuale = sel.value;
+      sel.innerHTML = '<option value="">Ultimo disponibile</option>' + mesi.map(m=>`<option value="${m}">${m}</option>`).join('');
+      if (valAttuale) sel.value = valAttuale;
+      const meseTarget = sel.value || mesi[0];
+      if (!meseTarget) { el.innerHTML = '<div class="empty-state">Nessun dato importato. Carica il CSV dall\'amministrazione.</div>'; return; }
+      document.getElementById('mercato_mese_label').textContent = meseTarget;
+      // Carica proprietà attive + metriche
+      const [props, portale] = await Promise.all([
+        sbGet('proprieta?stato=eq.In portale&order=created_at.desc'),
+        sbGet(`analisi_portale?mese=eq.${meseTarget}&order=ref.asc`)
+      ]);
+      const portaleMap = {};
+      portale.forEach(p => portaleMap[p.ref] = p);
+      if (props.length === 0) { el.innerHTML = '<div class="empty-state">Nessun immobile attivo in portale.</div>'; return; }
+      el.innerHTML = props.map(p => {
+        const m = portaleMap[p.ref] || {};
+        const visite = (m.idealista_visite_dettaglio||0) + (m.imm_visite_dettaglio||0);
+        const contatti = (m.idealista_contatti||0) + (m.imm_messaggi||0);
+        const giorni = p.data_incarico ? Math.floor((new Date()-new Date(p.data_incarico))/86400000) : null;
+        const hasDati = Object.keys(m).length > 0;
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.titolo||p.ref}</div>
+            <div style="font-size:0.72rem;color:var(--text-muted)">${p.ref}${giorni!==null?' · '+giorni+' gg sul mercato':''}</div>
           </div>
-        </div>`).join('');
+          ${hasDati ? `
+          <div style="text-align:center;min-width:50px"><div style="font-weight:700;font-size:1rem">${visite||'—'}</div><div style="font-size:0.65rem;color:var(--text-muted)">visite</div></div>
+          <div style="text-align:center;min-width:50px"><div style="font-weight:700;font-size:1rem;color:${contatti>0?'#27ae60':'var(--text)'}">${contatti||'—'}</div><div style="font-size:0.65rem;color:var(--text-muted)">contatti</div></div>
+          <div style="text-align:center;min-width:50px"><div style="font-weight:700;font-size:1rem">${m.imm_qualita_pct||'—'}<span style="font-size:0.65rem">%</span></div><div style="font-size:0.65rem;color:var(--text-muted)">qualità</div></div>
+          ` : `<div style="font-size:0.75rem;color:var(--text-muted);flex:0 0 auto">nessun dato portale</div>`}
+          <a href="report-proprieta.html?ref=${encodeURIComponent(p.ref)}&mese=${meseTarget}" target="_blank" class="btn-small" style="white-space:nowrap;text-decoration:none">📄 PDF</a>
+        </div>`;
+      }).join('');
     }
 
     async function precaricaEsempio() {
@@ -1150,8 +1196,7 @@
       caricaSocial();
       caricaMetricheIG();
       await renderMovimenti();
-      await precaricaEsempio();
-      renderReport('tutti');
+      caricaMercato();
       renderVitaCasa();
     }
     init();
