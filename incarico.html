@@ -185,7 +185,7 @@
               oninput="aggiornaDelta()" />
           </div>
           <div>
-            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:2px">Δ rispetto alla stima</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:2px">Δ rispetto al massimo stimato</div>
             <div id="pv_delta" style="font-size:1rem;font-weight:700;color:var(--text-muted)">—</div>
           </div>
         </div>
@@ -793,14 +793,14 @@
 
     function aggiornaDelta() {
       const v = _valutazioneDaRicerca;
-      const stima = v.totMax ? ((v.totMin || 0) + v.totMax) / 2 : (v.totMin || 0);
+      const riferimento = v.totMax || v.totMin || 0;
       const prezzoInc = parseFloat(document.getElementById('pv_prezzo_incarico').value) || 0;
       const deltaEl = document.getElementById('pv_delta');
-      if (!stima || !prezzoInc) { deltaEl.textContent = '—'; deltaEl.style.color = 'var(--text-muted)'; return; }
-      const delta = prezzoInc - stima;
-      const pct = ((delta / stima) * 100).toFixed(1);
+      if (!riferimento || !prezzoInc) { deltaEl.textContent = '—'; deltaEl.style.color = 'var(--text-muted)'; return; }
+      const delta = prezzoInc - riferimento;
+      const pct = ((delta / riferimento) * 100).toFixed(1);
       deltaEl.textContent = (delta >= 0 ? '+' : '') + fmt(delta) + ` (${pct}%)`;
-      deltaEl.style.color = delta > stima * 0.15 ? '#e74c3c' : delta < -stima * 0.1 ? '#e67e22' : '#27ae60';
+      deltaEl.style.color = delta > riferimento * 0.15 ? '#e74c3c' : delta > 0 ? '#e67e22' : '#27ae60';
     }
 
     async function prefillDaRicerca(id) {
