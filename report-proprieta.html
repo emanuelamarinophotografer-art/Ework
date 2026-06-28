@@ -122,9 +122,12 @@ async function init() {
   const mese = params.get('mese') || '';
   if (!ref) { document.getElementById('contenuto').innerHTML = '<div style="color:#c00;padding:40px">Parametro ref mancante.</div>'; return; }
 
+  // Il ref in analisi_portale è senza prefisso "016 - " (viene dal CSV)
+  const refCorto = ref.replace(/^[\d\s\-]+/, '').trim();
+
   const [props, portaleRows, richiesteRows, proposteRows] = await Promise.all([
     get(`proprieta?ref=eq.${encodeURIComponent(ref)}&limit=1`),
-    get(`analisi_portale?ref=eq.${encodeURIComponent(ref)}${mese?'&mese=eq.'+mese:'&order=mese.desc&limit=1'}`),
+    get(`analisi_portale?ref=eq.${encodeURIComponent(refCorto)}${mese?'&mese=eq.'+mese:'&order=mese.desc&limit=1'}`),
     get(`richieste?select=*&order=data_richiesta.desc`),
     get(`proposte?ref_proprieta=eq.${encodeURIComponent(ref)}&order=data_proposta.desc`)
   ]);
@@ -163,7 +166,7 @@ async function init() {
       </div>
       <div class="header-info">
         <div><strong>Report mensile</strong> · ${meseLabel || new Date().toLocaleDateString('it-IT',{month:'long',year:'numeric'})}</div>
-        <div>emanuelamarinophotografer@gmail.com</div>
+        <div>emarino@century21.it</div>
         <div>Maremma Toscana</div>
       </div>
     </div>
@@ -182,7 +185,7 @@ async function init() {
         <div class="metrica"><div class="metrica-val">${fmtN(visteDetTot)}</div><div class="metrica-label">Visite scheda</div></div>
         <div class="metrica"><div class="metrica-val ${contatti>0?'ok':''}">${fmtN(contatti)}</div><div class="metrica-label">Contatti ricevuti</div></div>
         <div class="metrica"><div class="metrica-val">${fmtN(preferiti)}</div><div class="metrica-label">Salvati / Preferiti</div></div>
-        <div class="metrica"><div class="metrica-val ${scartoClass}">${scarto !== null ? (scarto > 0 ? '+' : '') + scarto + '%' : '—'}</div><div class="metrica-label">Scarto da mercato</div></div>
+        <div class="metrica"><div class="metrica-val">${p.benchmark_mq ? fmtEur(p.benchmark_mq)+'/mq' : '—'}</div><div class="metrica-label">Benchmark zona OMI</div></div>
       </div>
     </div>
 
@@ -216,8 +219,8 @@ async function init() {
       <div class="sezione-title">Posizionamento rispetto al mercato</div>
       <div class="mercato-row"><span class="lbl">Prezzo richiesto</span><span class="val">${fmtEur(p.prezzo)}</span></div>
       ${p.mq ? `<div class="mercato-row"><span class="lbl">Superficie</span><span class="val">${p.mq} mq${p.prezzo && p.mq ? ' · ' + fmtEur(Math.round(p.prezzo/p.mq)) + '/mq' : ''}</span></div>` : ''}
-      ${p.benchmark_mq ? `<div class="mercato-row"><span class="lbl">Benchmark di mercato</span><span class="val">${fmtEur(p.benchmark_mq)}/mq</span></div>` : ''}
-      ${scarto !== null ? `<div class="mercato-row"><span class="lbl">Scarto dal benchmark</span><span class="val ${scartoClass}">${scarto > 0 ? '+' : ''}${scarto}%</span></div>` : ''}
+      ${p.mq && p.prezzo ? `<div class="mercato-row"><span class="lbl">Prezzo €/mq immobile</span><span class="val">${fmtEur(Math.round(parseFloat(p.prezzo)/p.mq))}/mq</span></div>` : ''}
+      ${p.benchmark_mq ? `<div class="mercato-row"><span class="lbl">Benchmark zona OMI</span><span class="val">${fmtEur(p.benchmark_mq)}/mq</span></div>` : ''}
       ${p.data_incarico ? `<div class="mercato-row"><span class="lbl">Data incarico</span><span class="val">${fmtData(p.data_incarico)}</span></div>` : ''}
       ${p.scadenza ? `<div class="mercato-row"><span class="lbl">Scadenza incarico</span><span class="val">${fmtData(p.scadenza)}</span></div>` : ''}
     </div>
@@ -248,6 +251,7 @@ async function init() {
         Maremma Toscana<br>
         emarino@century21.it
       </div>
+
       <div class="footer-logo">
         Report generato il ${new Date().toLocaleDateString('it-IT')}<br>
         Century 21 Silver · Riservatezza garantita
