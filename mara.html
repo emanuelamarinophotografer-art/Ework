@@ -280,6 +280,10 @@
               <div class="mara-insight-text" id="socialInsightText"></div>
             </div>
           </div>
+          <div class="blocco">
+            <div class="blocco-header">Metriche Instagram reali <span id="igPeriodo" style="font-weight:400;font-size:0.75rem;color:var(--text-muted)"></span></div>
+            <div id="igMetriche"><div class="placeholder">Caricamento...</div></div>
+          </div>
         </div>
 
       </div>
@@ -729,14 +733,10 @@
     async function caricaSocial() {
       const posts = await sbGet('piano_editoriale?order=data.desc&limit=200');
       if (posts.length===0) return;
-      const rubriche = { proprieta:{nome:'Proprietà',colore:'#222',count:0}, personal:{nome:'Personal Brand',colore:'#aaa',count:0}, territorio:{nome:'Territorio',colore:'#c9a84c',count:0}, educativo:{nome:'Educativo',colore:'#888',count:0} };
+      const rubriche = { nero:{nome:'Proprietà',colore:'#222',count:0}, bianco:{nome:'Personal Brand',colore:'#aaa',count:0}, oro:{nome:'Territorio',colore:'#c9a84c',count:0}, grigio:{nome:'Educativo',colore:'#888',count:0} };
       posts.forEach(p => {
-        const cat = p.categoria||p.cat||'';
-        if (rubriche[cat]) rubriche[cat].count++;
-        else if (p.colore==='nero'||p.tipo==='proprieta') rubriche.proprieta.count++;
-        else if (p.colore==='bianco'||p.tipo==='personal') rubriche.personal.count++;
-        else if (p.colore==='oro'||p.tipo==='territorio') rubriche.territorio.count++;
-        else if (p.colore==='grigio'||p.tipo==='educativo') rubriche.educativo.count++;
+        const r = p.rubrica || '';
+        if (rubriche[r]) rubriche[r].count++;
       });
       const max = Math.max(...Object.values(rubriche).map(r=>r.count),1);
       document.getElementById('socialRubriche').innerHTML = Object.entries(rubriche).map(([k,r]) => {
@@ -750,6 +750,40 @@
         document.getElementById('socialInsightText').textContent = `${sbilanciati.map(r=>r.nome).join(', ')} ${sbilanciati.length>1?'sono sbilanciate':'è sbilanciata'} rispetto al mix 25/25/25/25.`;
         document.getElementById('socialInsight').style.display='';
       }
+    }
+
+    // ── METRICHE IG (Supabase) ──
+    async function caricaMetricheIG() {
+      try {
+        const rows = await sbGet('metriche_ig?order=periodo_fine.desc&limit=1');
+        const el = document.getElementById('igMetriche');
+        if (!rows.length) { el.innerHTML = '<div class="placeholder">Nessuna metrica disponibile.</div>'; return; }
+        const m = rows[0];
+        const fmt = d => d ? new Date(d).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+        document.getElementById('igPeriodo').textContent = `· ${fmt(m.periodo_inizio)} – ${fmt(m.periodo_fine)}`;
+        el.innerHTML = `
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:14px">
+            ${[
+              ['👥 Follower', m.follower],
+              ['▶️ Views reel', m.visualizzazioni_reel],
+              ['❤️ Mi piace', m.mi_piace],
+              ['🔖 Salvataggi', m.salvataggi],
+              ['↗️ Condivisioni', m.condivisioni],
+              ['🔁 Repost', m.repost],
+            ].map(([label,val]) => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center">
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text)">${val ?? '—'}</div>
+              <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px">${label}</div>
+            </div>`).join('')}
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:0.8rem;color:var(--text-muted)">
+            <span>🎂 <strong>${m.eta_top || '—'}</strong></span>
+            <span>👩 Donne <strong>${m.genere_donne_pct ? m.genere_donne_pct+'%' : '—'}</strong></span>
+            <span>🌍 <strong>${m.paese_top || '—'}</strong></span>
+            <span>📍 <strong>${m.citta_top || '—'}</strong></span>
+          </div>
+          ${m.note ? `<div style="margin-top:10px;font-size:0.72rem;color:var(--text-muted)">📎 ${m.note}</div>` : ''}
+        `;
+      } catch(e) { document.getElementById('igMetriche').innerHTML = '<div class="placeholder">Errore caricamento metriche.</div>'; }
     }
 
     // Variabile condivisa tra Finanze e Vita & Casa
@@ -1059,6 +1093,7 @@
       caricaGoal();
       caricaPortafoglio();
       caricaSocial();
+      caricaMetricheIG();
       renderMovimenti();
       await precaricaEsempio();
       renderReport('tutti');
