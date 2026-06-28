@@ -263,17 +263,26 @@
     let filtroAttivi = false;
     let filtroScarto = ''; // '' | 'ok' | 'warn' | 'bad'
 
-    function scartoLabel(s) {
-      if (s === null || s === undefined) return '';
-      if (s <= 15) return 'ok';
-      if (s <= 40) return 'warn';
+    function calcolaScarto(p) {
+      const prezzo = parseFloat(p.prezzo);
+      const bench = parseFloat(p.benchmark_mq);
+      const mq = parseFloat(p.mq);
+      if (!prezzo || !bench || !mq) return null;
+      return Math.round(((prezzo / mq) - bench) / bench * 100);
+    }
+    function scartoLabel(scarto) {
+      if (scarto === null || scarto === undefined) return '';
+      if (scarto <= 5) return 'ok';
+      if (scarto <= 40) return 'warn';
       return 'bad';
     }
     function semaforo(p) {
-      const lbl = scartoLabel(p.scarto_pct);
+      const scarto = calcolaScarto(p);
+      const lbl = scartoLabel(scarto);
       if (!lbl) return '';
       const col = lbl === 'ok' ? '#27ae60' : lbl === 'warn' ? '#e67e22' : '#e74c3c';
-      const title = lbl === 'ok' ? 'Allineato ≤15%' : lbl === 'warn' ? 'Alto 16-40%' : 'Fuori mercato >40%';
+      const title = lbl === 'ok' ? 'Spingere (≤5%)' : lbl === 'warn' ? 'Abbassare (6-40%)' : 'Fuori mercato (>40%)';
+      const scartoStr = scarto > 0 ? '+' + scarto + '%' : scarto + '%';
       return `<span title="${title}" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${col};margin-left:6px;vertical-align:middle;flex-shrink:0"></span>`;
     }
     let _lista = [];
@@ -323,7 +332,7 @@
         const [min, max] = prezzoFascia.split('-').map(Number);
         lista = lista.filter(p => { const pr = Number(p.prezzo)||0; return pr >= min && pr <= max; });
       }
-      if (filtroScarto) lista = lista.filter(p => scartoLabel(p.scarto_pct) === filtroScarto);
+      if (filtroScarto) lista = lista.filter(p => scartoLabel(calcolaScarto(p)) === filtroScarto);
 
       const el = document.getElementById('propGrid');
       if (lista.length === 0) { el.innerHTML = '<div class="placeholder">Nessuna proprietà trovata.</div>'; return; }
@@ -340,7 +349,7 @@
           </div>
           <span class="prop-stato ${classeStato[p.stato] || ''}">${p.stato || ''}</span>
           <div class="prop-numeri">
-            ${p.prezzo ? '<span><strong>€ ' + Number(p.prezzo).toLocaleString('it-IT') + '</strong>' + semaforo(p) + '<br><span style="font-size:0.68rem;color:var(--text-muted)">Prezzo' + (p.scarto_pct !== null && p.scarto_pct !== undefined ? ' · scarto ' + p.scarto_pct + '%' : '') + '</span></span>' : ''}
+            ${p.prezzo ? (function(){ const sc = calcolaScarto(p); const scStr = sc !== null ? ' · ' + (sc > 0 ? '+' : '') + sc + '%' : ''; return '<span><strong>€ ' + Number(p.prezzo).toLocaleString('it-IT') + '</strong>' + semaforo(p) + '<br><span style="font-size:0.68rem;color:var(--text-muted)">Prezzo' + scStr + '</span></span>'; })() : ''}
           </div>
           <div class="prop-actions" onclick="event.stopPropagation()">
             <button class="btn-card" onclick="modificaProprietà(${p.id})">✏️</button>
