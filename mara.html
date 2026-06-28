@@ -837,15 +837,7 @@
       await renderMovimenti();
     }
 
-    async function salvaFinGoal() {
-      const val = document.getElementById('fin_goal_annuo').value;
-      await upsertAppunti('fin_goal_annuo', val);
-      aggiornaFinSaldi(_movimentiCache);
-    }
-
     function aggiornaFinSaldi(lista) {
-      const dbgEl = document.getElementById('fin_debug');
-      if (dbgEl) dbgEl.textContent = 'DEBUG lista='+lista.length+' | '+lista.map(m=>m.tipo+'='+m.importo).join(', ');
       const entrate = lista.filter(m=>m.tipo!=='spesa').reduce((s,m)=>s+parseFloat(m.importo||0),0);
       const spese   = lista.filter(m=>m.tipo==='spesa').reduce((s,m)=>s+parseFloat(m.importo||0),0);
       const saldo   = entrate - spese;
@@ -856,15 +848,6 @@
       saldoEl.textContent = fmtEur(saldo);
       saldoEl.className = 'saldo-val ' + (saldo>=0?'positivo':'negativo');
       document.getElementById('kpi_provv_incassata').textContent = fmtEur(entrate);
-      const nProvv = lista.filter(m=>m.tipo==='provvigione').length;
-      const goal = parseInt(document.getElementById('fin_goal_annuo').value) || 0;
-      if (goal>0) {
-        const p = Math.min(pct(nProvv,goal),100);
-        document.getElementById('fin_goal_pct').value = nProvv+'/'+goal+' ('+p+'%)';
-        document.getElementById('fin_goal_bar').style.width = p+'%';
-      } else {
-        document.getElementById('fin_goal_pct').value = '—';
-      }
     }
 
     async function renderMovimenti() {
@@ -1107,10 +1090,6 @@
 
     // ── INIT ──
     async function init() {
-      const [finGoalRow] = await Promise.all([
-        sbGet('social_appunti?chiave=eq.fin_goal_annuo&order=id.desc&limit=1')
-      ]);
-      document.getElementById('fin_goal_annuo').value = finGoalRow[0]?.valore || '';
       caricaFunnel();
       caricaGoal();
       caricaPortafoglio();
@@ -1123,9 +1102,6 @@
     }
     init();
 
-    document.getElementById('fin_goal_annuo').addEventListener('change', function() {
-      salvaFinGoal();
-    });
   </script>
 
 <script src="bottom-nav.js"></script>
