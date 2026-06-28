@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ework — Report & Mercato</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .blocco { background: var(--card); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; border: 1px solid var(--border); }
+    .blocco-header { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px; }
+    .fin-input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 0.85rem; font-family: inherit; color: var(--text); }
+    .btn-small { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 7px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .btn-small:hover { opacity: 0.88; }
+    .empty-state { color: var(--text-muted); font-size: 0.82rem; padding: 16px 0; text-align: center; }
+    .mercato-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .mercato-card { background: var(--bg); border-radius: 10px; padding: 14px; border: 1px solid var(--border); }
+    .mercato-zona { font-weight: 700; font-size: 0.8rem; margin-bottom: 8px; color: var(--accent); }
+    .mercato-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 3px 0; border-bottom: 1px solid var(--border); }
+    .mercato-row:last-child { border-bottom: none; }
+    .mercato-row .val { font-weight: 600; }
+    .mercato-trend { color: #27ae60; font-size: 0.7rem; }
+    .mara-insight { background: var(--bg); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 12px 14px; margin-top: 14px; }
+    .mara-insight-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 5px; }
+    .mara-insight-text { font-size: 0.82rem; line-height: 1.6; color: var(--text); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html"><h1>Ework</h1></a>
+      <div class="sub">Centro operativo</div>
+    </div>
+    <nav class="nav-section c-principale">
+      <div class="nav-label">Principale</div>
+      <a class="nav-item" href="index.html"><span class="icon">🎯</span> Dashboard</a>
+    </nav>
+    <nav class="nav-section c-operativo">
+      <div class="nav-label">Operativo</div>
+      <a class="nav-item" href="attivita.html"><span class="icon">✅</span> Task</a>
+      <a class="nav-item" href="agenti.html"><span class="icon">🤖</span> Agenti</a>
+      <a class="nav-item" href="chat.html"><span class="icon">💬</span> Chat</a>
+    </nav>
+    <nav class="nav-section c-lavoro">
+      <div class="nav-label">Lavoro</div>
+      <a class="nav-item" href="clienti.html"><span class="icon">👤</span> Clienti</a>
+      <a class="nav-item" href="richieste.html"><span class="icon">📞</span> Richieste</a>
+      <a class="nav-item" href="proprieta.html"><span class="icon">🏡</span> Proprietà</a>
+      <a class="nav-item" href="valutazione.html"><span class="icon">🧮</span> Valutazione</a>
+      <a class="nav-item" href="ricerca.html"><span class="icon">🔍</span> Ricerca Immobili</a>
+      <a class="nav-item" href="radar.html"><span class="icon">📡</span> Radar Lunedì</a>
+      <a class="nav-item" href="incarico.html"><span class="icon">📋</span> Scheda Incarico</a>
+    </nav>
+    <nav class="nav-section c-contenuti">
+      <div class="nav-label">Contenuti</div>
+      <a class="nav-item" href="social.html"><span class="icon">📸</span> Social</a>
+      <a class="nav-item" href="fonti.html"><span class="icon">🌿</span> Fonti</a>
+    </nav>
+    <nav class="nav-section c-analisi">
+      <div class="nav-label">Analisi</div>
+      <a class="nav-item" href="mara.html"><span class="icon">📊</span> Mara Analytics</a>
+      <a class="nav-item active" href="report-mercato.html"><span class="icon">📈</span> Report & Mercato</a>
+    </nav>
+    <div class="sidebar-bottom" id="dataOggi"></div>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <h2>Report & Mercato</h2>
+    </div>
+
+    <!-- IMPORT CSV -->
+    <div class="blocco">
+      <div class="blocco-header" style="display:flex;justify-content:space-between;align-items:center">
+        <span>📥 Statistiche portali</span>
+        <span id="mercato_mese_label" style="font-size:0.75rem;color:var(--text-muted)"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <div>
+          <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:4px">Mese di riferimento</label>
+          <input type="month" id="csv_mese" class="fin-input" style="width:140px" />
+        </div>
+        <div style="flex:1;min-width:200px">
+          <label style="font-size:0.75rem;color:var(--text-muted);display:block;margin-bottom:4px">File CSV dall'amministrazione</label>
+          <input type="file" id="csv_file" accept=".csv" style="font-size:0.8rem" />
+        </div>
+        <button type="button" class="btn-small" style="margin-top:18px" onclick="importaCSV()">Importa</button>
+      </div>
+      <div id="csv_status" style="font-size:0.8rem;color:var(--text-muted);min-height:18px"></div>
+    </div>
+
+    <!-- LISTA IMMOBILI -->
+    <div class="blocco">
+      <div class="blocco-header" style="display:flex;justify-content:space-between;align-items:center">
+        <span>🏡 Immobili attivi — metriche portale</span>
+        <select id="filtro_mese_portale" class="fin-input" style="width:140px;font-size:0.8rem" onchange="caricaMercato()">
+          <option value="">Ultimo disponibile</option>
+        </select>
+      </div>
+      <div id="portale_list" style="margin-top:8px"></div>
+    </div>
+
+    <!-- DATI MERCATO OMI -->
+    <div class="blocco">
+      <div class="blocco-header">📈 Dati mercato Maremma (OMI H1 2026)</div>
+      <div class="mercato-grid">
+        <div class="mercato-card">
+          <div class="mercato-zona">🌊 Costa Luxury</div>
+          <div class="mercato-row"><span>Monte Argentario</span><span class="val">€ 4.724/mq <span class="mercato-trend">+69% richieste</span></span></div>
+          <div class="mercato-row"><span>Castiglione Pescaia</span><span class="val">€ 4.624/mq</span></div>
+          <div class="mercato-row"><span>Capalbio</span><span class="val">€ 3.736/mq</span></div>
+          <div class="mercato-row"><span>Orbetello</span><span class="val">€ 3.184/mq</span></div>
+          <div class="mercato-row"><span>Budget acquirente</span><span class="val">€ 600k – €5M+</span></div>
+        </div>
+        <div class="mercato-card">
+          <div class="mercato-zona">🏙 Collina / Intermedia</div>
+          <div class="mercato-row"><span>Follonica</span><span class="val">€ 3.302/mq</span></div>
+          <div class="mercato-row"><span>Grosseto Marina</span><span class="val">€ 2.800/mq</span></div>
+          <div class="mercato-row"><span>Grosseto città</span><span class="val">€ 2.393/mq <span class="mercato-trend">+8%</span></span></div>
+          <div class="mercato-row"><span>Budget acquirente</span><span class="val">€ 150k – €700k</span></div>
+        </div>
+        <div class="mercato-card">
+          <div class="mercato-zona">🌿 Entroterra Value</div>
+          <div class="mercato-row"><span>Manciano</span><span class="val">€ 1.961/mq</span></div>
+          <div class="mercato-row"><span>Roccastrada</span><span class="val">€ 1.705/mq <span class="mercato-trend">+18%</span></span></div>
+          <div class="mercato-row"><span>Scansano</span><span class="val">€ 1.652/mq</span></div>
+          <div class="mercato-row"><span>Cinigiano</span><span class="val">€ 1.315/mq <span class="mercato-trend">+6%</span></span></div>
+          <div class="mercato-row"><span>Budget acquirente</span><span class="val">€ 100k – €500k</span></div>
+        </div>
+        <div class="mercato-card">
+          <div class="mercato-zona">🏔 Entroterra Deep</div>
+          <div class="mercato-row"><span>Semproniano</span><span class="val">€ 1.037/mq</span></div>
+          <div class="mercato-row"><span>Arcidosso</span><span class="val">€ 974/mq</span></div>
+          <div class="mercato-row"><span>Budget acquirente</span><span class="val">€ 50k – €200k</span></div>
+          <div class="mercato-row"><span>Rendimento locativo</span><span class="val mercato-trend">7,5–10,6%</span></div>
+        </div>
+        <div class="mercato-card">
+          <div class="mercato-zona">🌍 Acquirenti stranieri</div>
+          <div class="mercato-row"><span>🇺🇸 Americani</span><span class="val">€ 3,3M · 29,9%</span></div>
+          <div class="mercato-row"><span>🇨🇦 Canadesi</span><span class="val">€ 3,7M <span class="mercato-trend">+28,6%</span></span></div>
+          <div class="mercato-row"><span>🇧🇪 Belgi</span><span class="val">€ 3,5M <span class="mercato-trend">+36,7%</span></span></div>
+          <div class="mercato-row"><span>🇩🇪 Tedeschi</span><span class="val">€ 3,1M <span class="mercato-trend">+17,2%</span></span></div>
+          <div class="mercato-row"><span>🇨🇭 Svizzeri</span><span class="val">€ 3,4M <span class="mercato-trend">+24,5%</span></span></div>
+        </div>
+        <div class="mercato-card">
+          <div class="mercato-zona">📐 Parametri vendibilità 90-120 gg</div>
+          <div class="mercato-row"><span>Metratura minima</span><span class="val">120 mq (ideale 150–300)</span></div>
+          <div class="mercato-row"><span>Pronto uso</span><span class="val">81,6% richiesto</span></div>
+          <div class="mercato-row"><span>Giardino</span><span class="val">68% lo vuole</span></div>
+          <div class="mercato-row"><span>Piscina</span><span class="val">23% (in crescita)</span></div>
+          <div class="mercato-row"><span>Fibra/4G</span><span class="val">70% under 55</span></div>
+        </div>
+      </div>
+      <div class="mara-insight">
+        <div class="mara-insight-label">📊 Lettura Mara — Giugno 2026</div>
+        <div class="mara-insight-text">Il mercato Maremma è a due velocità: la costa luxury continua ad accelerare (+69% richieste su Argentario), trainata da americani e svizzeri con budget sopra €3M. L'entroterra value (Roccastrada +18%, Cinigiano +6%) sta recuperando terreno. Il profilo dominante vuole pronto uso con giardino — chi ha un rustico da ristrutturare deve posizionarlo sul segmento investimento, non su uso immediato.</div>
+      </div>
+    </div>
+  </main>
+
+<script>
+  const d = new Date();
+  const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+  const mesiNomi = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+  document.getElementById('dataOggi').textContent = giorni[d.getDay()] + ' ' + d.getDate() + ' ' + mesiNomi[d.getMonth()];
+
+  const SB = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
+  const KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
+  const H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
+
+  async function sbGet(path) {
+    const r = await fetch(`${SB}/rest/v1/${path}`, { headers: H });
+    return r.ok ? r.json() : [];
+  }
+
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    return lines.slice(1).map(line => {
+      const vals = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || line.split(',');
+      const obj = {};
+      headers.forEach((h, i) => {
+        let v = (vals[i] || '').replace(/^"|"$/g, '').trim();
+        obj[h] = v === '' ? null : v;
+      });
+      return obj;
+    });
+  }
+
+  async function importaCSV() {
+    const file = document.getElementById('csv_file').files[0];
+    const mese = document.getElementById('csv_mese').value;
+    const status = document.getElementById('csv_status');
+    if (!file) { status.textContent = '⚠ Seleziona un file CSV'; return; }
+    if (!mese) { status.textContent = '⚠ Seleziona il mese di riferimento'; return; }
+    status.textContent = 'Lettura file…';
+    const text = await file.text();
+    const rows = parseCSV(text);
+    status.textContent = `Preparazione ${rows.length} righe…`;
+    const records = rows
+      .filter(r => (r.riferimento_interno || '').trim())
+      .map(r => ({
+        ref: (r.riferimento_interno || '').trim(),
+        mese,
+        presente_idealista: r.presente_idealista === '1',
+        presente_immobiliare: r.presente_immobiliare === '1',
+        idealista_codice: r.idealista_codice || null,
+        idealista_visite_liste: parseFloat(r.idealista_visite_liste) || null,
+        idealista_visite_dettaglio: parseFloat(r.idealista_visite_dettaglio) || null,
+        idealista_condiviso: parseFloat(r.idealista_condiviso) || null,
+        idealista_invii_avvisi: parseFloat(r.idealista_invii_avvisi) || null,
+        idealista_preferiti: parseFloat(r.idealista_preferiti) || null,
+        idealista_contatti: parseFloat(r.idealista_contatti) || null,
+        imm_visibilita: r.imm_visibilita || null,
+        imm_posizione: parseFloat(r.imm_posizione) || null,
+        imm_pagina: r.imm_pagina || null,
+        imm_qualita_pct: parseFloat(r.imm_qualita_pct) || null,
+        imm_rank: r.imm_rank || null,
+        imm_variazione: r.imm_variazione || null,
+        imm_visite_dettaglio: parseFloat(r.imm_visite_dettaglio) || null,
+        imm_salvati: parseFloat(r.imm_salvati) || null,
+        imm_nascosti: parseFloat(r.imm_nascosti) || null,
+        imm_messaggi: parseFloat(r.imm_messaggi) || null,
+        imm_match: parseFloat(r.imm_match) || null
+      }));
+    status.textContent = `Importazione ${records.length} immobili…`;
+    const res = await fetch(`${SB}/rest/v1/analisi_portale`, {
+      method: 'POST',
+      headers: { ...H, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify(records)
+    });
+    if (res.ok) {
+      status.textContent = `✅ Importati ${records.length} immobili`;
+      caricaMercato();
+    } else {
+      const errText = await res.text();
+      status.textContent = `⚠ Errore: ${errText}`;
+    }
+  }
+
+  async function caricaMercato() {
+    const el = document.getElementById('portale_list');
+    el.innerHTML = '<div class="empty-state">Caricamento…</div>';
+    const mesiRaw = await sbGet('analisi_portale?select=mese&order=mese.desc');
+    const mesi = [...new Set((mesiRaw||[]).map(r=>r.mese))];
+    const sel = document.getElementById('filtro_mese_portale');
+    const valAttuale = sel.value;
+    sel.innerHTML = '<option value="">Ultimo disponibile</option>' + mesi.map(m=>`<option value="${m}">${m}</option>`).join('');
+    if (valAttuale) sel.value = valAttuale;
+    const meseTarget = sel.value || mesi[0];
+    if (!meseTarget) { el.innerHTML = '<div class="empty-state">Nessun dato importato. Carica il CSV dall\'amministrazione.</div>'; return; }
+    document.getElementById('mercato_mese_label').textContent = meseTarget;
+    const [props, portale] = await Promise.all([
+      sbGet('proprieta?stato=eq.Attivo&order=created_at.desc'),
+      sbGet(`analisi_portale?mese=eq.${meseTarget}&order=ref.asc`)
+    ]);
+    const portaleMap = {};
+    portale.forEach(p => portaleMap[p.ref] = p);
+    if (props.length === 0) { el.innerHTML = '<div class="empty-state">Nessun immobile attivo.</div>'; return; }
+    // Match ref: proprieta ha "016-33541050-96", portale ha "33541050-96"
+    el.innerHTML = props.map(p => {
+      const refCorto = (p.ref||'').replace(/^[\d\s\-]+/, '').trim();
+      const m = portaleMap[refCorto] || portaleMap[p.ref] || {};
+      const visite = (m.idealista_visite_dettaglio||0) + (m.imm_visite_dettaglio||0);
+      const contatti = (m.idealista_contatti||0) + (m.imm_messaggi||0);
+      const giorni = p.data_incarico ? Math.floor((new Date()-new Date(p.data_incarico))/86400000) : null;
+      const hasDati = Object.keys(m).length > 0;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.titolo||p.ref}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted)">${p.ref}${giorni!==null?' · '+giorni+' gg':''}</div>
+        </div>
+        ${hasDati ? `
+        <div style="text-align:center;min-width:48px"><div style="font-weight:700;font-size:1rem">${visite||'—'}</div><div style="font-size:0.65rem;color:var(--text-muted)">visite</div></div>
+        <div style="text-align:center;min-width:48px"><div style="font-weight:700;font-size:1rem;color:${contatti>0?'#27ae60':'var(--text)'}">${contatti||'—'}</div><div style="font-size:0.65rem;color:var(--text-muted)">contatti</div></div>
+        <div style="text-align:center;min-width:48px"><div style="font-weight:700;font-size:1rem">${m.imm_qualita_pct||'—'}<span style="font-size:0.65rem">%</span></div><div style="font-size:0.65rem;color:var(--text-muted)">qualità</div></div>
+        ` : `<div style="font-size:0.75rem;color:var(--text-muted)">nessun dato portale</div>`}
+        <a href="report-proprieta.html?ref=${encodeURIComponent(p.ref)}&mese=${meseTarget}" target="_blank" class="btn-small" style="text-decoration:none">📄 PDF</a>
+      </div>`;
+    }).join('');
+  }
+
+  caricaMercato();
+</script>
+</body>
+</html>
