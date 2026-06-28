@@ -359,6 +359,8 @@
           </div>
         </div>
 
+        <div id="fin_debug" style="font-size:0.7rem;color:red;padding:4px;word-break:break-all"></div>
+
         <!-- STORICO MOVIMENTI -->
         <div class="blocco">
           <div class="blocco-header" style="display:flex;justify-content:space-between;align-items:center">
@@ -862,7 +864,8 @@
     }
 
     function aggiornaFinSaldi(lista) {
-      console.log('[mara] aggiornaFinSaldi lista:', lista.length, lista.map(m=>({tipo:m.tipo,importo:m.importo})));
+      const dbgEl = document.getElementById('fin_debug');
+      if (dbgEl) dbgEl.textContent = 'DEBUG lista='+lista.length+' | '+lista.map(m=>m.tipo+'='+m.importo).join(', ');
       const entrate = lista.filter(m=>m.tipo!=='spesa').reduce((s,m)=>s+parseFloat(m.importo||0),0);
       const spese   = lista.filter(m=>m.tipo==='spesa').reduce((s,m)=>s+parseFloat(m.importo||0),0);
       const saldo   = entrate - spese;
