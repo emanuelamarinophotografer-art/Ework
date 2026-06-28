@@ -691,8 +691,13 @@
       const corrente = correnteArr[0] || {};
       const campi = ['vendite','incarichi_e','incarichi_ne','contatti'];
       const goal = { contatti:16, incarichi_e:1, incarichi_ne:1, vendite:1 };
+      const meseOra = d.getMonth(), annoOra = d.getFullYear();
+      const storicoMese = storico.filter(r => {
+        if (r.ts) { const t = new Date(r.ts); return t.getMonth()===meseOra && t.getFullYear()===annoOra; }
+        return false;
+      });
       const totali = {};
-      campi.forEach(c => { totali[c] = corrente[c] || 0; });
+      campi.forEach(c => { totali[c] = (corrente[c]||0) + storicoMese.reduce((s,r)=>s+(r[c]||0),0); });
       const inc_tot = (totali.incarichi_e||0) + (totali.incarichi_ne||0);
       document.getElementById('kpi_contatti').textContent = totali.contatti || 0;
       document.getElementById('kpi_incarichi').textContent = inc_tot;
