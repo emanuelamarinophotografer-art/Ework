@@ -197,8 +197,47 @@
                 </select>
               </div>
               <div class="form-group">
+                <label>Destinazione d'uso</label>
+                <select class="form-select" id="f_destinazione">
+                  <option value="residenziale">Residenziale</option>
+                  <option value="rurale">Rurale / Agricola</option>
+                  <option value="mista">Mista (res. + agr.)</option>
+                  <option value="agriturismo">Agriturismo</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
                 <label>Superficie coperta (mq)</label>
                 <input class="form-input" type="number" id="f_mq" placeholder="es. 180" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Anno di costruzione</label>
+                <input class="form-input" type="number" id="f_anno" placeholder="es. 1960" min="1800" max="2026" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>N° locali abitabili</label>
+                <input class="form-input" type="number" id="f_locali" placeholder="es. 5" min="1" />
+              </div>
+              <div class="form-group">
+                <label>N° bagni</label>
+                <input class="form-input" type="number" id="f_bagni" placeholder="es. 2" min="0" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>N° livelli</label>
+                <input class="form-input" type="number" id="f_livelli" placeholder="es. 2" min="1" />
+              </div>
+              <div class="form-group">
+                <label>Finiture</label>
+                <div class="toggle-row" id="finiture_toggle">
+                  <button class="toggle-btn" onclick="setToggle('finiture','base',this)">Base</button>
+                  <button class="toggle-btn on" onclick="setToggle('finiture','medio',this)">Medio</button>
+                  <button class="toggle-btn" onclick="setToggle('finiture','alto',this)">Alto</button>
+                </div>
               </div>
             </div>
             <div class="form-row-1">
@@ -209,6 +248,28 @@
                   <button class="toggle-btn" onclick="setToggle('stato', 'buono', this)">Buono</button>
                   <button class="toggle-btn" onclick="setToggle('stato', 'discreto', this)">Discreto</button>
                   <button class="toggle-btn" onclick="setToggle('stato', 'daristrutturare', this)">Da ristrutturare</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-row-1">
+              <div class="form-group">
+                <label>Riscaldamento</label>
+                <div class="toggle-row" id="riscaldamento_toggle">
+                  <button class="toggle-btn on" onclick="setToggle('riscaldamento','autonomo',this)">Autonomo</button>
+                  <button class="toggle-btn" onclick="setToggle('riscaldamento','pompa',this)">Pompa di calore</button>
+                  <button class="toggle-btn" onclick="setToggle('riscaldamento','caminetto',this)">Solo caminetto</button>
+                  <button class="toggle-btn" onclick="setToggle('riscaldamento','assente',this)">Assente</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-row-1">
+              <div class="form-group">
+                <label>Conformità urbanistica</label>
+                <div class="toggle-row" id="conformita_toggle">
+                  <button class="toggle-btn on" onclick="setToggle('conformita','si',this)">Conforme</button>
+                  <button class="toggle-btn" onclick="setToggle('conformita','parziale',this)">Parziale</button>
+                  <button class="toggle-btn" onclick="setToggle('conformita','no',this)">Non conforme</button>
+                  <button class="toggle-btn" onclick="setToggle('conformita','nd',this)">Da verificare</button>
                 </div>
               </div>
             </div>
@@ -772,7 +833,7 @@
     aggiungiTerreno();
 
     // Stato toggle
-    const toggleState = { stato: 'ottimo', vista: 'nessuna', piscina: 'no', accesso: 'comodo', classe: 'G' };
+    const toggleState = { stato: 'ottimo', vista: 'nessuna', piscina: 'no', accesso: 'comodo', classe: 'G', finiture: 'medio', riscaldamento: 'autonomo', conformita: 'si' };
     const plusAttivi = new Set(['piscina']);
 
     function setToggle(gruppo, valore, el) {
@@ -824,7 +885,12 @@
       const comune = document.getElementById('f_comune').value;
       const zona = document.getElementById('f_zona').value;
       const tipologia = document.getElementById('f_tipologia').value;
+      const destinazione = document.getElementById('f_destinazione').value;
       const mq = parseFloat(document.getElementById('f_mq').value) || 0;
+      const anno = parseInt(document.getElementById('f_anno').value) || null;
+      const locali = parseInt(document.getElementById('f_locali').value) || null;
+      const bagni = parseInt(document.getElementById('f_bagni').value) || null;
+      const livelli = parseInt(document.getElementById('f_livelli').value) || null;
       const annesso = parseFloat(document.getElementById('f_annesso').value) || 0;
       const prezzoRichiesto = parseFloat(document.getElementById('f_prezzo_richiesto').value) || 0;
       const giorniMercato = parseFloat(document.getElementById('f_giorni_mercato').value) || 0;
@@ -835,10 +901,13 @@
       const prezzi = OMI[comune].prezzi[zona][tipologia];
       const coeffStato = COEFF_STATO[toggleState.stato];
       const coeffClasse = COEFF_CLASSE[toggleState.classe];
+      const coeffFiniture = { base: 0.92, medio: 1.0, alto: 1.10 }[toggleState.finiture] || 1.0;
+      const coeffConformita = { si: 1.0, parziale: 0.93, no: 0.82, nd: 0.95 }[toggleState.conformita] || 1.0;
+      const coeffAnno = anno ? (anno < 1950 ? 0.95 : anno < 1980 ? 0.97 : anno < 2000 ? 1.0 : 1.03) : 1.0;
 
       // BASE FABBRICATO
-      const baseMin = prezzi[0] * mq * coeffStato;
-      const baseMax = prezzi[1] * mq * coeffStato;
+      const baseMin = prezzi[0] * mq * coeffStato * coeffFiniture * coeffConformita * coeffAnno;
+      const baseMax = prezzi[1] * mq * coeffStato * coeffFiniture * coeffConformita * coeffAnno;
 
       // ANNESSO
       const annMin = annesso > 0 ? annesso * OMI[comune].prezzi[zona].rustico[0] * 0.5 * coeffStato : 0;
@@ -1002,6 +1071,10 @@
         plus: [...plusAttivi],
         totMin, totMax,
         score, vendLabel,
+        destinazione, anno, locali, bagni, livelli,
+        finiture: toggleState.finiture,
+        riscaldamento: toggleState.riscaldamento,
+        conformita: toggleState.conformita,
         data: new Date().toLocaleDateString('it-IT')
       };
     }
