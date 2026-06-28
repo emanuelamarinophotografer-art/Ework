@@ -317,6 +317,21 @@
           </div>
         </div>
 
+        <!-- GOAL ANNUO -->
+        <div class="blocco" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="fin-sezione-label" style="margin:0">Goal annuo provvigioni</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label style="font-size:0.75rem;color:var(--text-muted)">Obiettivo n°</label>
+              <input type="number" class="fin-input" id="fin_goal_annuo" placeholder="es. 12" style="width:70px;text-align:center" oninput="salvaFinGoal()" />
+              <span id="fin_goal_pct" style="font-size:0.85rem;font-weight:700;color:var(--accent);min-width:60px;text-align:right">—</span>
+            </div>
+          </div>
+          <div class="goal-track" style="height:10px">
+            <div class="goal-fill ok" id="fin_goal_bar" style="width:0%"></div>
+          </div>
+        </div>
+
         <!-- CALCOLATORE PROVVIGIONE -->
         <div class="blocco" style="margin-bottom:16px">
           <div class="fin-sezione-label">Calcolatore provvigione</div>
@@ -848,6 +863,23 @@
       saldoEl.textContent = fmtEur(saldo);
       saldoEl.className = 'saldo-val ' + (saldo>=0?'positivo':'negativo');
       document.getElementById('kpi_provv_incassata').textContent = fmtEur(entrate);
+      const nProvv = lista.filter(m=>m.tipo==='provvigione').length;
+      const goalEl = document.getElementById('fin_goal_annuo');
+      const goal = goalEl ? (parseInt(goalEl.value) || 0) : 0;
+      if (goal > 0) {
+        const p = Math.min(pct(nProvv, goal), 100);
+        document.getElementById('fin_goal_pct').textContent = nProvv + '/' + goal + ' (' + p + '%)';
+        document.getElementById('fin_goal_bar').style.width = p + '%';
+      } else {
+        document.getElementById('fin_goal_pct').textContent = nProvv + ' provv.';
+        document.getElementById('fin_goal_bar').style.width = '0%';
+      }
+    }
+
+    async function salvaFinGoal() {
+      const val = document.getElementById('fin_goal_annuo').value;
+      await upsertAppunti('fin_goal_annuo', val);
+      aggiornaFinSaldi(_movimentiCache);
     }
 
     async function renderMovimenti() {
@@ -1090,6 +1122,8 @@
 
     // ── INIT ──
     async function init() {
+      const goalRows = await sbGet('social_appunti?chiave=eq.fin_goal_annuo&order=id.desc&limit=1');
+      if (goalRows[0]) document.getElementById('fin_goal_annuo').value = goalRows[0].valore || '';
       caricaFunnel();
       caricaGoal();
       caricaPortafoglio();
