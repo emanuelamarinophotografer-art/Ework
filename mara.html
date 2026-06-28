@@ -728,7 +728,10 @@
       const stati = { in_valutazione:0, contattato:0, incarico:0, archiviato:0 };
       let prezzoTot = 0, conPrezzo = 0;
       lista.forEach(s => { if (stati[s.stato_scheda]!==undefined) stati[s.stato_scheda]++; if (s.prezzoRichiesto>0){prezzoTot+=s.prezzoRichiesto;conPrezzo++;} });
-      const provvAttesa = lista.filter(s=>s.stato_scheda==='incarico'&&s.prezzoRichiesto>0).reduce((sum,s)=>sum+s.prezzoRichiesto*0.03,0);
+      // Provv attesa: da vendite non incassate (stessa formula di Attività)
+      const venditeRows = await sbGet('vendite?incassata=eq.false');
+      function calcolaIncasso(prezzo, doppia) { let p=parseFloat(prezzo)||0,provv=p<100000?3000:p*0.03; if(doppia)provv*=2; return (provv-provv*0.08)/2; }
+      const provvAttesa = venditeRows.reduce((s,v)=>s+calcolaIncasso(v.prezzo,v.doppia),0);
       document.getElementById('kpi_provv_attesa').textContent = fmtEur(provvAttesa);
       if (lista.length===0) return;
       const colori = { in_valutazione:'#2980b9', contattato:'#b7860b', incarico:'#27ae60', archiviato:'#888' };
@@ -739,7 +742,7 @@
       const fuoriMercato = lista.filter(s=>s.prezzoRichiesto>0&&s.totMax>0&&s.prezzoRichiesto>s.totMax*1.15).length;
       let ins = `<div class="mara-insight"><div class="mara-insight-label">— Mara 📊</div><div class="mara-insight-text">Portafoglio: ${lista.length} schede · prezzo medio ${fmtEur(prezzoMedio)}.`;
       if (fuoriMercato>0) ins += ` <strong style="color:#f4a460">⚠️ ${fuoriMercato} immobil${fuoriMercato>1?'i':'e'} >15% sopra stima OMI.</strong>`;
-      if (provvAttesa>0) ins += ` Provvigione potenziale: ${fmtEur(provvAttesa)} (3%).`;
+      if (provvAttesa>0) ins += ` Provvigione attesa (vendite in corso): ${fmtEur(provvAttesa)}.`;
       ins += `</div></div>`;
       document.getElementById('portInsight').innerHTML = ins;
     }
