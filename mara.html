@@ -142,6 +142,17 @@
 
     /* VITA & CASA */
     .vc-cat-header { font-size: 0.67rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; font-weight: 600; }
+    .vc-fisse-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .vc-fisse-tot-e { margin: 0; color: #27ae60; }
+    .vc-fisse-tot-u { margin: 0; color: #c0392b; }
+    .vc-fisse-add { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .vc-fisse-add .fin-input.flex { flex: 1; min-width: 120px; }
+    .vc-fisse-add .fin-input.sm { width: 80px; }
+    .vc-fisse-item { display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .vc-fisse-item:last-child { border-bottom: none; }
+    .vc-fisse-importo { font-weight: 700; color: var(--text); }
+    .vc-fisse-del { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0 4px; }
+    .vc-fisse-del:hover { color: #c0392b; }
     .vc-spesa-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; }
     .vc-spesa-data { font-size: 0.8rem; font-weight: 600; color: var(--text); min-width: 80px; }
     .vc-spesa-desc { flex: 1; font-size: 0.82rem; color: var(--text-muted); }
@@ -417,6 +428,39 @@
             <div><div class="saldo-label">Saldo disponibile</div><div class="saldo-val" id="vc_saldo">€ 0</div></div>
             <span style="font-size:1.6rem">⚖️</span>
           </div>
+        </div>
+
+        <!-- ENTRATE / USCITE FISSE -->
+        <div class="vc-fisse-grid">
+
+          <!-- ENTRATE FISSE -->
+          <div class="blocco">
+            <div class="blocco-header blocco-header-row">
+              <span>📥 Entrate fisse mensili</span>
+              <span class="fin-sezione-label vc-fisse-tot-e" id="vc_ef_tot">€ 0</span>
+            </div>
+            <div id="vc_ef_list"><div class="placeholder">Nessuna entrata fissa.</div></div>
+            <div class="vc-fisse-add">
+              <input type="text" class="fin-input flex" id="vc_ef_desc" placeholder="es. Stipendio, affitto attivo…" />
+              <input type="number" class="fin-input sm" id="vc_ef_importo" placeholder="€" />
+              <button type="button" class="btn-fin" onclick="aggiungiEF()">+</button>
+            </div>
+          </div>
+
+          <!-- USCITE FISSE -->
+          <div class="blocco">
+            <div class="blocco-header blocco-header-row">
+              <span>📤 Uscite fisse mensili</span>
+              <span class="fin-sezione-label vc-fisse-tot-u" id="vc_uf_tot">€ 0</span>
+            </div>
+            <div id="vc_uf_list"><div class="placeholder">Nessuna uscita fissa.</div></div>
+            <div class="vc-fisse-add">
+              <input type="text" class="fin-input flex" id="vc_uf_desc" placeholder="es. Mutuo, abbonamenti…" />
+              <input type="number" class="fin-input sm" id="vc_uf_importo" placeholder="€" />
+              <button type="button" class="btn-fin" onclick="aggiungiUF()">+</button>
+            </div>
+          </div>
+
         </div>
 
         <div class="mara-grid">
@@ -1016,6 +1060,69 @@
     async function caricaVcSpese() { return sbGet('mara_vc?categoria=eq.spesa&order=created_at.desc'); }
     async function caricaVcLavori() { return sbGet('mara_vc?categoria=eq.lavoro&order=created_at.desc'); }
 
+    // ── ENTRATE / USCITE FISSE ──────────────────────────────────────────
+    function loadFisse(key) {
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+    }
+    function saveFisse(key, arr) { localStorage.setItem(key, JSON.stringify(arr)); }
+
+    function renderFisse() {
+      const ef = loadFisse('vita_entrate_fisse');
+      const uf = loadFisse('vita_uscite_fisse');
+
+      const totEF = ef.reduce((s, x) => s + x.importo, 0);
+      const totUF = uf.reduce((s, x) => s + x.importo, 0);
+      document.getElementById('vc_ef_tot').textContent = fmtEur(totEF);
+      document.getElementById('vc_uf_tot').textContent = fmtEur(totUF);
+
+      const renderLista = (arr, key, elId) => {
+        const el = document.getElementById(elId);
+        if (!arr.length) { el.innerHTML = '<div class="placeholder">Nessuna voce.</div>'; return; }
+        el.innerHTML = arr.map((x, i) => `
+          <div class="vc-fisse-item">
+            <span>${x.desc}</span>
+            <span style="display:flex;align-items:center;gap:8px">
+              <span class="vc-fisse-importo">${fmtEur(x.importo)}</span>
+              <button class="vc-fisse-del" onclick="eliminaFissa('${key}',${i})">✕</button>
+            </span>
+          </div>`).join('');
+      };
+      renderLista(ef, 'vita_entrate_fisse', 'vc_ef_list');
+      renderLista(uf, 'vita_uscite_fisse', 'vc_uf_list');
+    }
+
+    function aggiungiEF() {
+      const desc = document.getElementById('vc_ef_desc').value.trim();
+      const importo = parseFloat(document.getElementById('vc_ef_importo').value) || 0;
+      if (!desc || importo <= 0) return;
+      const arr = loadFisse('vita_entrate_fisse');
+      arr.push({ desc, importo });
+      saveFisse('vita_entrate_fisse', arr);
+      document.getElementById('vc_ef_desc').value = '';
+      document.getElementById('vc_ef_importo').value = '';
+      renderFisse();
+    }
+
+    function aggiungiUF() {
+      const desc = document.getElementById('vc_uf_desc').value.trim();
+      const importo = parseFloat(document.getElementById('vc_uf_importo').value) || 0;
+      if (!desc || importo <= 0) return;
+      const arr = loadFisse('vita_uscite_fisse');
+      arr.push({ desc, importo });
+      saveFisse('vita_uscite_fisse', arr);
+      document.getElementById('vc_uf_desc').value = '';
+      document.getElementById('vc_uf_importo').value = '';
+      renderFisse();
+    }
+
+    function eliminaFissa(key, idx) {
+      const arr = loadFisse(key);
+      arr.splice(idx, 1);
+      saveFisse(key, arr);
+      renderFisse();
+    }
+    // ── fine entrate/uscite fisse ────────────────────────────────────────
+
     const vcCatLabel = { mutuo:'Mutuo/Affitto', utenze:'Utenze', casa:'Casa', lavori:'Lavori', altro:'Altro' };
     const vcCatCls   = { mutuo:'vc-cat-mutuo', utenze:'vc-cat-utenze', casa:'vc-cat-casa', lavori:'vc-cat-lavori', altro:'vc-cat-altro' };
     const vcLavStatoCls = { pianificato:'vc-stato-pianificato', in_corso:'vc-stato-in_corso', completato:'vc-stato-completato' };
@@ -1068,6 +1175,7 @@
     }
 
     async function renderVitaCasa() {
+      renderFisse();
       const [spese, lavori, budgetRow] = await Promise.all([
         caricaVcSpese(),
         caricaVcLavori(),
