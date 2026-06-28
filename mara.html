@@ -676,6 +676,14 @@
     async function sbPost(path, body) { const r = await fetch(`${SB_URL}/rest/v1/${path}`, { method:'POST', headers: SB_H, body: JSON.stringify(body) }); return r.json(); }
     async function sbPatch(path, body) { await fetch(`${SB_URL}/rest/v1/${path}`, { method:'PATCH', headers: SB_H, body: JSON.stringify(body) }); }
     async function sbDelete(path) { await fetch(`${SB_URL}/rest/v1/${path}`, { method:'DELETE', headers: SB_H }); }
+    async function upsertAppunti(chiave, valore) {
+      const existing = await sbGet(`social_appunti?chiave=eq.${chiave}&limit=1`);
+      if (existing && existing.length > 0) {
+        await sbPatch(`social_appunti?chiave=eq.${chiave}`, { valore });
+      } else {
+        await sbPost('social_appunti', { chiave, valore });
+      }
+    }
 
     // ── GOAL (Supabase) ──
     async function caricaGoal() {
@@ -849,7 +857,7 @@
 
     async function salvaFinGoal() {
       const val = document.getElementById('fin_goal_annuo').value;
-      await fetch(`${SB_URL}/rest/v1/social_appunti`, { method:'POST', headers: { ...SB_H, 'Prefer': 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ chiave:'fin_goal_annuo', valore: val }) });
+      await upsertAppunti('fin_goal_annuo', val);
       aggiornaFinSaldi(_movimentiCache);
     }
 
@@ -996,7 +1004,7 @@
 
     async function salvaVcBudget() {
       const val = document.getElementById('vc_budget').value;
-      await fetch(`${SB_URL}/rest/v1/social_appunti`, { method:'POST', headers: { ...SB_H, 'Prefer': 'resolution=merge-duplicates,return=representation' }, body: JSON.stringify({ chiave:'vc_budget', valore: val }) });
+      await upsertAppunti('vc_budget', val);
       renderVitaCasa();
     }
 
