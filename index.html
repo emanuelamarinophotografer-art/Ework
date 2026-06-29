@@ -254,7 +254,6 @@
       <a class="nav-item" href="ricerca.html">
         <span class="icon">🔍</span> Ricerca Immobili
       </a>
-      <a class="nav-item" href="radar.html">
         <span class="icon">📡</span> Radar Lunedì
       </a>
       <a class="nav-item" href="incarico.html">
@@ -393,11 +392,6 @@
           <a href="ricerca.html" class="link-goto">→ Vai a Ricerca Immobili</a>
         </div>
 
-        <div class="col-card">
-          <div class="col-card-title">📡 Radar — annunci interessanti</div>
-          <div id="radarInteressanti"><div class="placeholder">Nessun annuncio interessante nel Radar.</div></div>
-          <a href="radar.html" class="link-goto">→ Vai al Radar Lunedì</a>
-        </div>
 
       </div>
 
@@ -784,23 +778,6 @@
       }).join('');
     }
 
-    // OSSERVATORIO — RADAR
-    const radarAnnunci = JSON.parse(localStorage.getItem('radar_annunci') || '[]');
-    const interessanti = radarAnnunci.filter(a => a.stato === 'interessante');
-    const radarEl = document.getElementById('radarInteressanti');
-    if (interessanti.length === 0) {
-      radarEl.innerHTML = '<div class="placeholder">Nessun annuncio interessante nel Radar.</div>';
-    } else {
-      radarEl.innerHTML = interessanti.slice(0, 5).map(a => `
-        <div class="lista-item">
-          <div style="font-size:0.9rem">📡</div>
-          <div style="flex:1">
-            <div class="lista-testo">${a.url ? `<a href="${a.url}" target="_blank" style="color:inherit;text-decoration:none">${a.titolo}</a>` : a.titolo}</div>
-            <div class="lista-sub">${a.comune||''} ${a.prezzo ? '· ' + a.prezzo : ''}</div>
-          </div>
-          <a href="valutazione.html" style="font-size:0.72rem;color:var(--accent);text-decoration:none;font-weight:600">🧮 Valuta</a>
-        </div>`).join('');
-    }
   </script>
 
 <script src="bottom-nav.js"></script>

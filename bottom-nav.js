@@ -12,7 +12,6 @@
     { href: 'social.html',          icon: '📱', label: 'Social' },
     { href: 'mara.html',            icon: '📊', label: 'Mara' },
     { href: 'valutazione.html',     icon: '💶', label: 'OMI' },
-    { href: 'radar.html',           icon: '🔍', label: 'Radar' },
     { href: 'incarico.html',        icon: '📋', label: 'Incarico' },
     { href: 'agenti.html',          icon: '🤖', label: 'Agenti' },
     { href: 'chat.html',            icon: '💬', label: 'Chat' },
