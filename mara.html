@@ -328,7 +328,7 @@
       <div class="mara-panel" id="panel-finanze">
 
         <!-- SALDI -->
-        <div class="mara-grid-3" style="margin-bottom:20px;grid-template-columns:1fr 1fr">
+        <div class="mara-grid-3" style="margin-bottom:20px">
           <div class="saldo-card">
             <div><div class="saldo-label">Provvigioni incassate</div><div class="saldo-val positivo" id="fin_tot_entrate">€ 0</div></div>
             <span style="font-size:1.8rem">💰</span>
@@ -336,6 +336,10 @@
           <div class="saldo-card">
             <div><div class="saldo-label">Saldo netto</div><div class="saldo-val" id="fin_saldo">€ 0</div></div>
             <span style="font-size:1.8rem">⚖️</span>
+          </div>
+          <div class="saldo-card" style="cursor:pointer" onclick="modificaSaldoConto()" title="Clicca per aggiornare il saldo conto reale">
+            <div><div class="saldo-label">Proiezione (conto + provv. attesa)</div><div class="saldo-val" id="fin_proiezione">€ 0</div></div>
+            <span style="font-size:1.8rem">🔮</span>
           </div>
           <div id="fin_tot_spese" style="display:none">€ 0</div>
         </div>
@@ -674,7 +678,7 @@
       const provvAttesa = venditeRows.reduce((s,v)=>s+calcolaIncasso(v.prezzo,v.doppia),0);
       document.getElementById('kpi_provv_attesa').textContent = fmtEur(provvAttesa);
       _provvAttesa = provvAttesa;
-      renderVitaCasa();
+      caricaProiezione();
       if (props.length===0) return;
       const stati = { 'Attivo':0, 'Venduto':0, 'Ritirato':0 };
       let prezzoTot = 0, conPrezzo = 0, mqTot = 0, conMq = 0, eurMqTot = 0, conEurMq = 0;
@@ -1284,7 +1288,13 @@
       }
     }
 
-    // ── SALDO CONTO (base per Saldo disponibile in Vita&Casa) ──
+    // ── SALDO CONTO (base per Saldo disponibile in Vita&Casa e Proiezione in Finanze) ──
+    async function caricaProiezione() {
+      const rows = await sbGet('social_appunti?chiave=eq.saldo_conto&limit=1');
+      const saldoConto = parseFloat((rows[0] || {}).valore) || 0;
+      document.getElementById('fin_proiezione').textContent = fmtEur(saldoConto + _provvAttesa);
+    }
+
     async function modificaSaldoConto() {
       const rows = await sbGet('social_appunti?chiave=eq.saldo_conto&limit=1');
       const attuale = (rows[0] || {}).valore || '';
@@ -1293,6 +1303,7 @@
       await sbDelete('social_appunti?chiave=eq.saldo_conto');
       await sbPost('social_appunti', { chiave: 'saldo_conto', valore: nuovo.trim() });
       renderVitaCasa();
+      caricaProiezione();
     }
 
     // ── INIT ──
