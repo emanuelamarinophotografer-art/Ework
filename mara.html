@@ -1081,65 +1081,56 @@
     async function caricaVcSpese() { return sbGet('mara_vc?categoria=eq.spesa&order=created_at.desc'); }
     async function caricaVcLavori() { return sbGet('mara_vc?categoria=eq.lavoro&order=created_at.desc'); }
 
-    // ── ENTRATE / USCITE FISSE ──────────────────────────────────────────
-    function loadFisse(key) {
-      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
-    }
-    function saveFisse(key, arr) { localStorage.setItem(key, JSON.stringify(arr)); }
+    // ── ENTRATE / USCITE FISSE (Supabase mara_vc, categoria=entrata_fissa/uscita_fissa) ──
+    async function caricaEntrateFisse() { return sbGet('mara_vc?categoria=eq.entrata_fissa&order=created_at.asc'); }
+    async function caricaUsciteFisse() { return sbGet('mara_vc?categoria=eq.uscita_fissa&order=created_at.asc'); }
 
-    function renderFisse() {
-      const ef = loadFisse('vita_entrate_fisse');
-      const uf = loadFisse('vita_uscite_fisse');
+    async function renderFisse() {
+      const [ef, uf] = await Promise.all([caricaEntrateFisse(), caricaUsciteFisse()]);
 
-      const totEF = ef.reduce((s, x) => s + x.importo, 0);
-      const totUF = uf.reduce((s, x) => s + x.importo, 0);
+      const totEF = ef.reduce((s, x) => s + parseFloat(x.importo || 0), 0);
+      const totUF = uf.reduce((s, x) => s + parseFloat(x.importo || 0), 0);
       document.getElementById('vc_ef_tot').textContent = fmtEur(totEF);
       document.getElementById('vc_uf_tot').textContent = fmtEur(totUF);
 
-      const renderLista = (arr, key, elId) => {
+      const renderLista = (arr, elId) => {
         const el = document.getElementById(elId);
         if (!arr.length) { el.innerHTML = '<div class="placeholder">Nessuna voce.</div>'; return; }
-        el.innerHTML = arr.map((x, i) => `
+        el.innerHTML = arr.map(x => `
           <div class="vc-fisse-item">
-            <span>${x.desc}</span>
+            <span>${x.descrizione}</span>
             <span style="display:flex;align-items:center;gap:8px">
               <span class="vc-fisse-importo">${fmtEur(x.importo)}</span>
-              <button class="vc-fisse-del" onclick="eliminaFissa('${key}',${i})">✕</button>
+              <button class="vc-fisse-del" onclick="eliminaFissa(${x.id})">✕</button>
             </span>
           </div>`).join('');
       };
-      renderLista(ef, 'vita_entrate_fisse', 'vc_ef_list');
-      renderLista(uf, 'vita_uscite_fisse', 'vc_uf_list');
+      renderLista(ef, 'vc_ef_list');
+      renderLista(uf, 'vc_uf_list');
     }
 
-    function aggiungiEF() {
+    async function aggiungiEF() {
       const desc = document.getElementById('vc_ef_desc').value.trim();
       const importo = parseFloat(document.getElementById('vc_ef_importo').value) || 0;
       if (!desc || importo <= 0) return;
-      const arr = loadFisse('vita_entrate_fisse');
-      arr.push({ desc, importo });
-      saveFisse('vita_entrate_fisse', arr);
+      await sbPost('mara_vc', { categoria: 'entrata_fissa', descrizione: desc, importo });
       document.getElementById('vc_ef_desc').value = '';
       document.getElementById('vc_ef_importo').value = '';
       renderFisse();
     }
 
-    function aggiungiUF() {
+    async function aggiungiUF() {
       const desc = document.getElementById('vc_uf_desc').value.trim();
       const importo = parseFloat(document.getElementById('vc_uf_importo').value) || 0;
       if (!desc || importo <= 0) return;
-      const arr = loadFisse('vita_uscite_fisse');
-      arr.push({ desc, importo });
-      saveFisse('vita_uscite_fisse', arr);
+      await sbPost('mara_vc', { categoria: 'uscita_fissa', descrizione: desc, importo });
       document.getElementById('vc_uf_desc').value = '';
       document.getElementById('vc_uf_importo').value = '';
       renderFisse();
     }
 
-    function eliminaFissa(key, idx) {
-      const arr = loadFisse(key);
-      arr.splice(idx, 1);
-      saveFisse(key, arr);
+    async function eliminaFissa(id) {
+      await sbDelete(`mara_vc?id=eq.${id}`);
       renderFisse();
     }
     // ── fine entrate/uscite fisse ────────────────────────────────────────
