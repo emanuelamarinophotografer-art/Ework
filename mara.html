@@ -423,7 +423,7 @@
             <span style="font-size:1.6rem">🏠</span>
           </div>
           <div class="saldo-card" style="cursor:pointer" onclick="modificaSaldoConto()" title="Clicca per aggiornare il saldo conto reale">
-            <div><div class="saldo-label">Saldo disponibile (conto + provv. attesa)</div><div class="saldo-val" id="vc_saldo">€ 0</div></div>
+            <div><div class="saldo-label">Saldo disponibile (conto reale)</div><div class="saldo-val" id="vc_saldo">€ 0</div></div>
             <span style="font-size:1.6rem">⚖️</span>
           </div>
         </div>
@@ -1208,13 +1208,12 @@
       document.getElementById('vc_entrate_lavoro').textContent = fmtEur(entrateNum);
       document.getElementById('vc_spese_tot').textContent = fmtEur(totSpese);
 
-      // Saldo disponibile reale = saldo conto in banca + provvigioni attese
+      // Saldo disponibile = saldo conto reale in banca (aggiornato a mano ogni mese, niente proiezioni)
       const saldoRows = await sbGet('social_appunti?chiave=eq.saldo_conto&limit=1');
       const saldoConto = parseFloat((saldoRows[0] || {}).valore) || 0;
-      const saldo = saldoConto + _provvAttesa;
       const saldoEl = document.getElementById('vc_saldo');
-      saldoEl.textContent = fmtEur(saldo);
-      saldoEl.className = 'saldo-val ' + (saldo >= 0 ? 'positivo' : 'negativo');
+      saldoEl.textContent = fmtEur(saldoConto);
+      saldoEl.className = 'saldo-val ' + (saldoConto >= 0 ? 'positivo' : 'negativo');
 
       // Lista spese
       const speseEl = document.getElementById('vcSpeseList');
