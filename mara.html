@@ -30,9 +30,9 @@
     .mara-panel.active { display: block; }
 
     /* KPI */
-    .kpi-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 10px; margin-bottom: 14px; }
     .kpi-card { flex: 1; min-width: 100px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-align: center; }
-    .kpi-val { font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
+    .kpi-val { font-size: 1.5rem; font-weight: 700; color: var(--text); line-height: 1; white-space: nowrap; }
     .kpi-val.verde { color: #27ae60; } .kpi-val.arancio { color: #c07040; } .kpi-val.rosso { color: #c0392b; } .kpi-val.blu { color: #2980b9; }
     .kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 5px; font-weight: 600; }
 
@@ -417,7 +417,7 @@
       <div class="mara-panel" id="panel-vita">
 
         <!-- SALDI PERSONALI -->
-        <div class="vc-saldo-grid">
+        <div class="vc-saldo-grid" style="grid-template-columns:1fr 1fr">
           <div class="saldo-card">
             <div><div class="saldo-label">Entrate lavoro (mese)</div><div class="saldo-val positivo" id="vc_entrate_lavoro">€ 0</div></div>
             <span style="font-size:1.6rem">💼</span>
@@ -426,10 +426,7 @@
             <div><div class="saldo-label">Spese vita & casa</div><div class="saldo-val negativo" id="vc_spese_tot">€ 0</div></div>
             <span style="font-size:1.6rem">🏠</span>
           </div>
-          <div class="saldo-card">
-            <div><div class="saldo-label">Saldo disponibile</div><div class="saldo-val" id="vc_saldo">€ 0</div></div>
-            <span style="font-size:1.6rem">⚖️</span>
-          </div>
+          <div id="vc_saldo" style="display:none">€ 0</div>
         </div>
 
         <!-- ENTRATE / USCITE FISSE -->
