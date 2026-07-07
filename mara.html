@@ -332,19 +332,16 @@
       <div class="mara-panel" id="panel-finanze">
 
         <!-- SALDI -->
-        <div class="mara-grid-3" style="margin-bottom:20px">
+        <div class="mara-grid-3" style="margin-bottom:20px;grid-template-columns:1fr 1fr">
           <div class="saldo-card">
             <div><div class="saldo-label">Provvigioni incassate</div><div class="saldo-val positivo" id="fin_tot_entrate">€ 0</div></div>
             <span style="font-size:1.8rem">💰</span>
           </div>
           <div class="saldo-card">
-            <div><div class="saldo-label">Spese lavoro (da registrare qui sotto ↓)</div><div class="saldo-val negativo" id="fin_tot_spese">€ 0</div></div>
-            <span style="font-size:1.8rem">📤</span>
-          </div>
-          <div class="saldo-card">
             <div><div class="saldo-label">Saldo netto</div><div class="saldo-val" id="fin_saldo">€ 0</div></div>
             <span style="font-size:1.8rem">⚖️</span>
           </div>
+          <div id="fin_tot_spese" style="display:none">€ 0</div>
         </div>
 
         <!-- GOAL ANNUO -->
@@ -402,7 +399,6 @@
                 <label>Tipo</label>
                 <select id="fin_tipo">
                   <option value="provvigione">💰 Provvigione</option>
-                  <option value="spesa">📤 Spesa</option>
                   <option value="altro">📋 Altra entrata</option>
                 </select>
               </div>
