@@ -10,7 +10,7 @@
     /* PANORAMICA STRIP */
     .panoramica {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       margin-bottom: 24px;
     }
@@ -670,9 +670,15 @@
       try {
         const primoGiorno = new Date(); primoGiorno.setDate(1);
         const primoStr = primoGiorno.toISOString().split('T')[0];
-        const rSpese = await fetch(`${SB_URL}/rest/v1/mara_vc?categoria=eq.spesa&created_at=gte.${primoStr}&select=importo`, { headers: SB_H });
+        const [rSpese, rFisse] = await Promise.all([
+          fetch(`${SB_URL}/rest/v1/mara_vc?categoria=eq.spesa&created_at=gte.${primoStr}&select=importo`, { headers: SB_H }),
+          fetch(`${SB_URL}/rest/v1/mara_vc?categoria=eq.uscita_fissa&select=importo`, { headers: SB_H })
+        ]);
         const speseData = await rSpese.json();
-        const tot = Array.isArray(speseData) ? speseData.reduce((s,x)=>s+parseFloat(x.importo||0),0) : 0;
+        const fisseData = await rFisse.json();
+        const totSpese = Array.isArray(speseData) ? speseData.reduce((s,x)=>s+parseFloat(x.importo||0),0) : 0;
+        const totFisse = Array.isArray(fisseData) ? fisseData.reduce((s,x)=>s+parseFloat(x.importo||0),0) : 0;
+        const tot = totSpese + totFisse;
         document.getElementById('contSpeseVita').textContent = '€ ' + tot.toLocaleString('it-IT',{minimumFractionDigits:0,maximumFractionDigits:0});
       } catch(e) { console.error('Spese vita:', e); }
     }
