@@ -1192,16 +1192,19 @@
 
     async function renderVitaCasa() {
       renderFisse();
-      const [spese, lavori, budgetRow] = await Promise.all([
+      const [spese, lavori, budgetRow, uscitefisse] = await Promise.all([
         caricaVcSpese(),
         caricaVcLavori(),
-        sbGet('social_appunti?chiave=eq.vc_budget&limit=1')
+        sbGet('social_appunti?chiave=eq.vc_budget&limit=1'),
+        caricaUsciteFisse()
       ]);
       const budget = parseFloat((budgetRow[0] || {}).valore) || 0;
       document.getElementById('vc_budget').value = budgetRow[0]?.valore || '';
 
-      // Saldi
-      const totSpese = spese.reduce((s, sp) => s + (sp.importo || 0), 0);
+      // Saldi (spese puntuali + uscite fisse mensili)
+      const totSpesePuntuali = spese.reduce((s, sp) => s + (sp.importo || 0), 0);
+      const totUscitefisse = uscitefisse.reduce((s, x) => s + parseFloat(x.importo || 0), 0);
+      const totSpese = totSpesePuntuali + totUscitefisse;
       const entrateNum = _totEntrate;
       const saldo = entrateNum - totSpese;
 
