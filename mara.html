@@ -249,10 +249,6 @@
           <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_attesa">—</div><div class="kpi-label">Provv. attesa</div></div>
           <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_incassata">—</div><div class="kpi-label">Provv. incassata</div></div>
           <div class="kpi-card"><div class="kpi-val" id="kpi_immobili">—</div><div class="kpi-label">Portafoglio</div></div>
-          <div class="kpi-card" style="cursor:pointer" onclick="modificaSaldoConto()" title="Clicca per aggiornare il saldo">
-            <div class="kpi-val blu" id="kpi_saldo_conto">—</div>
-            <div class="kpi-label">💰 Saldo conto</div>
-          </div>
         </div>
       </div>
 
@@ -417,7 +413,7 @@
       <div class="mara-panel" id="panel-vita">
 
         <!-- SALDI PERSONALI -->
-        <div class="vc-saldo-grid" style="grid-template-columns:1fr 1fr">
+        <div class="vc-saldo-grid">
           <div class="saldo-card">
             <div><div class="saldo-label">Entrate lavoro (mese)</div><div class="saldo-val positivo" id="vc_entrate_lavoro">€ 0</div></div>
             <span style="font-size:1.6rem">💼</span>
@@ -426,7 +422,10 @@
             <div><div class="saldo-label">Spese vita & casa</div><div class="saldo-val negativo" id="vc_spese_tot">€ 0</div></div>
             <span style="font-size:1.6rem">🏠</span>
           </div>
-          <div id="vc_saldo" style="display:none">€ 0</div>
+          <div class="saldo-card" style="cursor:pointer" onclick="modificaSaldoConto()" title="Clicca per aggiornare il saldo conto reale">
+            <div><div class="saldo-label">Saldo disponibile (conto + provv. attesa)</div><div class="saldo-val" id="vc_saldo">€ 0</div></div>
+            <span style="font-size:1.6rem">⚖️</span>
+          </div>
         </div>
 
         <!-- ENTRATE / USCITE FISSE -->
@@ -674,6 +673,8 @@
       function calcolaIncasso(prezzo, doppia) { let p=parseFloat(prezzo)||0,provv=p<100000?3000:p*0.03; if(doppia)provv*=2; return (provv-provv*0.08)/2; }
       const provvAttesa = venditeRows.reduce((s,v)=>s+calcolaIncasso(v.prezzo,v.doppia),0);
       document.getElementById('kpi_provv_attesa').textContent = fmtEur(provvAttesa);
+      _provvAttesa = provvAttesa;
+      renderVitaCasa();
       if (props.length===0) return;
       const stati = { 'Attivo':0, 'Venduto':0, 'Ritirato':0 };
       let prezzoTot = 0, conPrezzo = 0, mqTot = 0, conMq = 0, eurMqTot = 0, conEurMq = 0;
@@ -849,6 +850,7 @@
 
     // Variabile condivisa tra Finanze e Vita & Casa
     let _totEntrate = 0;
+    let _provvAttesa = 0;
     let _movimentiCache = [];
 
     // ── FINANZE (Supabase) ──
@@ -1202,10 +1204,14 @@
       const totUscitefisse = uscitefisse.reduce((s, x) => s + parseFloat(x.importo || 0), 0);
       const totSpese = totSpesePuntuali + totUscitefisse;
       const entrateNum = _totEntrate;
-      const saldo = entrateNum - totSpese;
 
       document.getElementById('vc_entrate_lavoro').textContent = fmtEur(entrateNum);
       document.getElementById('vc_spese_tot').textContent = fmtEur(totSpese);
+
+      // Saldo disponibile reale = saldo conto in banca + provvigioni attese
+      const saldoRows = await sbGet('social_appunti?chiave=eq.saldo_conto&limit=1');
+      const saldoConto = parseFloat((saldoRows[0] || {}).valore) || 0;
+      const saldo = saldoConto + _provvAttesa;
       const saldoEl = document.getElementById('vc_saldo');
       saldoEl.textContent = fmtEur(saldo);
       saldoEl.className = 'saldo-val ' + (saldo >= 0 ? 'positivo' : 'negativo');
@@ -1279,21 +1285,15 @@
       }
     }
 
-    // ── SALDO CONTO (KPI colpo d'occhio) ──
-    async function caricaSaldoKpi() {
-      const rows = await sbGet('social_appunti?chiave=eq.saldo_conto&limit=1');
-      const val = parseFloat((rows[0] || {}).valore);
-      document.getElementById('kpi_saldo_conto').textContent = isNaN(val) ? '—' : fmtEur(val);
-    }
-
+    // ── SALDO CONTO (base per Saldo disponibile in Vita&Casa) ──
     async function modificaSaldoConto() {
       const rows = await sbGet('social_appunti?chiave=eq.saldo_conto&limit=1');
       const attuale = (rows[0] || {}).valore || '';
-      const nuovo = prompt('Saldo conto attuale (€):', attuale);
+      const nuovo = prompt('Saldo conto attuale in banca (€):', attuale);
       if (nuovo === null || nuovo.trim() === '') return;
       await sbDelete('social_appunti?chiave=eq.saldo_conto');
       await sbPost('social_appunti', { chiave: 'saldo_conto', valore: nuovo.trim() });
-      caricaSaldoKpi();
+      renderVitaCasa();
     }
 
     // ── INIT ──
@@ -1308,7 +1308,6 @@
       await renderMovimenti();
       caricaMercato();
       renderVitaCasa();
-      caricaSaldoKpi();
     }
     init();
 
