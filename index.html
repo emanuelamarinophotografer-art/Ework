@@ -306,6 +306,14 @@
           <div class="pan-label" style="color:#4a9e6b">Vendite chiuse</div>
           <div class="pan-val verde" id="contVendite">—</div>
         </div>
+        <div class="pan-card" style="border-color:#2e86de">
+          <div class="pan-label" style="color:#2e86de">💰 Saldo conto</div>
+          <input type="number" id="saldoContoInput" class="pan-val" style="border:none;background:transparent;width:100%;padding:0;color:#2e86de" placeholder="—" onchange="salvaSaldoConto()" />
+        </div>
+        <div class="pan-card" style="border-color:#c0392b">
+          <div class="pan-label" style="color:#c0392b">🏠 Spese Vita & Casa (mese)</div>
+          <div class="pan-val" style="color:#c0392b" id="contSpeseVita">—</div>
+        </div>
       </div>
 
       <!-- BRIEFING GEGGI — full width -->
@@ -649,6 +657,37 @@
     }
     caricaContatori();
     setInterval(caricaContatori, 60 * 1000);
+
+    // SALDO CONTO + SPESE VITA & CASA
+    async function caricaSaldoVita() {
+      try {
+        const rSaldo = await fetch(`${SB_URL}/rest/v1/social_appunti?chiave=eq.saldo_conto&limit=1`, { headers: SB_H });
+        const saldoRow = await rSaldo.json();
+        const input = document.getElementById('saldoContoInput');
+        if (input && Array.isArray(saldoRow) && saldoRow[0]) input.value = saldoRow[0].valore;
+      } catch(e) { console.error('Saldo conto:', e); }
+
+      try {
+        const primoGiorno = new Date(); primoGiorno.setDate(1);
+        const primoStr = primoGiorno.toISOString().split('T')[0];
+        const rSpese = await fetch(`${SB_URL}/rest/v1/mara_vc?categoria=eq.spesa&created_at=gte.${primoStr}&select=importo`, { headers: SB_H });
+        const speseData = await rSpese.json();
+        const tot = Array.isArray(speseData) ? speseData.reduce((s,x)=>s+parseFloat(x.importo||0),0) : 0;
+        document.getElementById('contSpeseVita').textContent = '€ ' + tot.toLocaleString('it-IT',{minimumFractionDigits:0,maximumFractionDigits:0});
+      } catch(e) { console.error('Spese vita:', e); }
+    }
+
+    async function salvaSaldoConto() {
+      const val = document.getElementById('saldoContoInput').value;
+      if (val === '') return;
+      await fetch(`${SB_URL}/rest/v1/social_appunti?chiave=eq.saldo_conto`, { method:'DELETE', headers: SB_H });
+      await fetch(`${SB_URL}/rest/v1/social_appunti`, {
+        method:'POST',
+        headers: { ...SB_H, 'Content-Type':'application/json', 'Prefer':'return=representation' },
+        body: JSON.stringify({ chiave:'saldo_conto', valore: val })
+      });
+    }
+    caricaSaldoVita();
 
     // AGENDA
     function caricaAgenda() { return JSON.parse(localStorage.getItem('agenda_' + d.toDateString()) || '[]'); }
