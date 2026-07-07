@@ -246,6 +246,10 @@
           <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_attesa">—</div><div class="kpi-label">Provv. attesa</div></div>
           <div class="kpi-card"><div class="kpi-val verde" id="kpi_provv_incassata">—</div><div class="kpi-label">Provv. incassata</div></div>
           <div class="kpi-card"><div class="kpi-val" id="kpi_immobili">—</div><div class="kpi-label">Portafoglio</div></div>
+          <div class="kpi-card" style="cursor:pointer" onclick="modificaSaldoConto()" title="Clicca per aggiornare il saldo">
+            <div class="kpi-val blu" id="kpi_saldo_conto">—</div>
+            <div class="kpi-label">💰 Saldo conto</div>
+          </div>
         </div>
       </div>
 
@@ -1276,6 +1280,23 @@
       }
     }
 
+    // ── SALDO CONTO (KPI colpo d'occhio) ──
+    async function caricaSaldoKpi() {
+      const rows = await sbGet('social_appunti?chiave=eq.saldo_conto&limit=1');
+      const val = parseFloat((rows[0] || {}).valore);
+      document.getElementById('kpi_saldo_conto').textContent = isNaN(val) ? '—' : fmtEur(val);
+    }
+
+    async function modificaSaldoConto() {
+      const rows = await sbGet('social_appunti?chiave=eq.saldo_conto&limit=1');
+      const attuale = (rows[0] || {}).valore || '';
+      const nuovo = prompt('Saldo conto attuale (€):', attuale);
+      if (nuovo === null || nuovo.trim() === '') return;
+      await sbDelete('social_appunti?chiave=eq.saldo_conto');
+      await sbPost('social_appunti', { chiave: 'saldo_conto', valore: nuovo.trim() });
+      caricaSaldoKpi();
+    }
+
     // ── INIT ──
     async function init() {
       const goalRows = await sbGet('social_appunti?chiave=eq.fin_goal_annuo&order=id.desc&limit=1');
@@ -1288,6 +1309,7 @@
       await renderMovimenti();
       caricaMercato();
       renderVitaCasa();
+      caricaSaldoKpi();
     }
     init();
 
