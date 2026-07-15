@@ -943,10 +943,13 @@
     async function renderStati() { await renderLista(); }
 
     /* ── TRENDISTA ── */
-    const TREND_KEY = 'trend_idee';
+    let trendCache = [];
 
-    function caricaTrend() { return JSON.parse(localStorage.getItem(TREND_KEY) || '[]'); }
-    function salvaTrendList(lista) { localStorage.setItem(TREND_KEY, JSON.stringify(lista)); }
+    async function caricaTrend() {
+      const r = await fetch(`${SB_URL}/rest/v1/trend_idee?order=created_at.desc&limit=200`, { headers: SB_HEADERS_GET });
+      trendCache = await r.json();
+      return trendCache;
+    }
 
     const rubricaLabel = { proprieta:'Proprietà', personal:'Personal Brand', territorio:'Territorio', educativo:'Educativo' };
     const rubricaCls = { proprieta:'rubr-proprieta', personal:'rubr-personal', territorio:'rubr-territorio', educativo:'rubr-educativo' };
@@ -965,12 +968,10 @@
       document.getElementById('trendAddForm').classList.toggle('aperta');
     }
 
-    function salvaTrend() {
+    async function salvaTrend() {
       const titolo = document.getElementById('t_titolo').value.trim();
       if (!titolo) return;
-      const lista = caricaTrend();
-      lista.unshift({
-        id: Date.now(),
+      await fetch(`${SB_URL}/rest/v1/trend_idee`, { method: 'POST', headers: SB_HEADERS_WRITE, body: JSON.stringify({
         titolo,
         formato: document.getElementById('t_formato').value,
         rubrica: document.getElementById('t_rubrica').value,
@@ -978,28 +979,26 @@
         fonte: document.getElementById('t_fonte').value.trim(),
         usata: false,
         data: new Date().toLocaleDateString('it-IT')
-      });
-      salvaTrendList(lista);
+      }) });
       document.getElementById('t_titolo').value = '';
       document.getElementById('t_gancio').value = '';
       document.getElementById('t_fonte').value = '';
       document.getElementById('trendAddForm').classList.remove('aperta');
-      renderTrend();
+      await renderTrend();
     }
 
-    function usaTrend(id) {
-      const lista = caricaTrend().map(t => t.id === id ? { ...t, usata: true } : t);
-      salvaTrendList(lista);
-      renderTrend();
+    async function usaTrend(id) {
+      await fetch(`${SB_URL}/rest/v1/trend_idee?id=eq.${id}`, { method: 'PATCH', headers: SB_HEADERS_WRITE, body: JSON.stringify({ usata: true }) });
+      await renderTrend();
     }
 
-    function eliminaTrend(id) {
-      salvaTrendList(caricaTrend().filter(t => t.id !== id));
-      renderTrend();
+    async function eliminaTrend(id) {
+      await fetch(`${SB_URL}/rest/v1/trend_idee?id=eq.${id}`, { method: 'DELETE', headers: SB_HEADERS_GET });
+      await renderTrend();
     }
 
-    function renderTrend() {
-      const lista = caricaTrend();
+    async function renderTrend() {
+      const lista = await caricaTrend();
       let filtrata = lista;
       if (trendFiltro === 'da_usare') filtrata = lista.filter(t => !t.usata);
       else if (trendFiltro !== 'tutti') filtrata = lista.filter(t => t.formato === trendFiltro);
