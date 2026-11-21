@@ -15,7 +15,6 @@
     { href: 'incarico.html',        icon: '📋', label: 'Incarico' },
     { href: 'agenti.html',          icon: '🤖', label: 'Agenti' },
     { href: 'fonti.html',           icon: '🗞', label: 'Fonti' },
-    { href: 'storico-metriche.html',icon: '📈', label: 'Storico' },
   ];
 
   const current = location.pathname.split('/').pop() || 'index.html';
