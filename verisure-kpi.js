@@ -250,10 +250,14 @@
       if (r.fase.includes('parziale')) altro.push('Carburante formazione 110 €');
       if (r.y === 2026 && r.m === 11) altro.push(`Bonus formazione ${b3 ? eur(b3) : '(0 vendite finora)'}`);
       if (r.fase === 'M4') altro.push('Certificazione specialista 200 € (a fine mese)');
+      const nomiP = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+      const pag = new Date(r.y, r.m + 1, 15);
+      const totMese = (minimo || 0) + (rimbAuto || 0) + (r.fase.includes('parziale') ? 110 : 0);
       const auto = nuovo ? '100% coperta' : `70% coperta${auto30 !== null ? ` · a tuo carico ~${eur(auto30)}/mese` : ' · 30% a tuo carico'}`;
       return `<tr><td><b>${r.label}</b><br><span class="vk-k">${r.fase}${r.presenti ? ` · ${r.presenti} gg su ${r.giorni}` : ''}</span></td>
         <td>${minimo !== null ? eur(minimo) : '—'}</td><td>${rimbAuto !== null ? eur(rimbAuto) : '—'}</td>
-        <td style="text-align:left">${altro.join('<br>') || '—'}</td><td style="text-align:left">${auto}</td></tr>`;
+        <td style="text-align:left">${altro.join('<br>') || '—'}</td><td style="text-align:left">${auto}</td>
+        <td><b>15 ${nomiP[pag.getMonth()]} ${pag.getFullYear()}</b>${totMese ? `<br><span class="vk-k">almeno ${eur(totMese)}</span>` : ''}</td></tr>`;
     }).join('');
 
     el.innerHTML = `<div class="vk-wrap">
@@ -281,8 +285,8 @@
 
       <div class="vk-box" style="margin-top:12px;overflow-x:auto">
         <h4>📅 Mese per mese: cosa ti spetta oltre alle vendite</h4>
-        <table class="vk-storico"><tr><th style="text-align:left">Mese</th><th>Minimo garantito</th><th>Rimborso auto</th><th style="text-align:left">Altro</th><th style="text-align:left">Auto aziendale</th></tr>${righe}</table>
-        <div class="vk-note">Il minimo di 1.000 € scatta solo se provvigioni e bonus del mese restano sotto quella cifra. Data di inserimento: <input type="date" value="${x.inserimento}" onchange="VK.setExtra('inserimento', this.value)" style="font:inherit;font-size:0.76rem;border:1px solid var(--border);border-radius:6px;padding:2px 4px;background:var(--bg-card)">. Se nel primo mese fai meno di 15 giorni, conta in proporzione e anche il mese dopo vale come 1° mese. Da confermare con Francesco: firma del contratto (20/11) o inizio formazione (16/11).</div>
+        <table class="vk-storico"><tr><th style="text-align:left">Mese</th><th>Minimo garantito</th><th>Rimborso auto</th><th style="text-align:left">Altro</th><th style="text-align:left">Auto aziendale</th><th>Pagato il</th></tr>${righe}</table>
+        <div class="vk-note">Ogni mese si paga il 15 del mese dopo. "Almeno" = minimo + rimborso auto (+ carburante a novembre), senza contare vendite e bonus. Il minimo scatta solo se provvigioni e bonus del mese restano sotto quella cifra. Data di inserimento: <input type="date" value="${x.inserimento}" onchange="VK.setExtra('inserimento', this.value)" style="font:inherit;font-size:0.76rem;border:1px solid var(--border);border-radius:6px;padding:2px 4px;background:var(--bg-card)">. Se nel primo mese fai meno di 15 giorni, conta in proporzione e anche il mese dopo vale come 1° mese. Da confermare con Francesco: firma del contratto (20/11) o inizio formazione (16/11).</div>
       </div>
 
       <div class="vk-bottom" style="margin-top:12px">
