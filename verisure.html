@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ework — Calcolatore Verisure</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .vs-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 20px; align-items: start; }
+    .vs-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+    .vs-card h3 { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
+    .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .seg button { border: none; background: var(--bg); color: var(--text-muted); padding: 8px 14px; font: inherit; font-size: 0.85rem; cursor: pointer; min-height: 40px; }
+    .seg button.on { background: var(--accent); color: #fff; font-weight: 600; }
+    .row-opts { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+    .opt-label { font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px; }
+    .chk { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; min-height: 36px; }
+    .chk input { width: 18px; height: 18px; }
+
+    .grp { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin: 16px 0 6px; font-weight: 700; }
+    .item { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); }
+    .item.zero .item-nome { color: var(--text-muted); }
+    .item-nome { font-size: 0.88rem; font-weight: 600; }
+    .item-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .qty { display: inline-flex; align-items: center; gap: 6px; }
+    .qty button { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); font-size: 1.1rem; cursor: pointer; color: var(--text); }
+    .qty span { min-width: 18px; text-align: center; font-weight: 700; }
+    .mode { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .mode button { border: none; background: var(--bg); color: var(--text-muted); padding: 6px 9px; font: inherit; font-size: 0.74rem; cursor: pointer; min-height: 34px; }
+    .mode button.on { background: var(--accent); color: #fff; }
+    .mode button.on.omg { background: #8b3a3a; }
+    .mode button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .sum-line { display: flex; justify-content: space-between; gap: 12px; font-size: 0.86rem; padding: 5px 0; }
+    .sum-line .k { color: var(--text-muted); }
+    .sum-line .v { font-weight: 600; white-space: nowrap; }
+    .sum-tot { border-top: 2px solid var(--border); margin-top: 8px; padding-top: 10px; font-size: 1rem; }
+    .sum-tot .v { font-size: 1.25rem; }
+    .pos { color: #2e7d4f; } .neg { color: #8b3a3a; }
+    .big { font-size: 2rem; font-weight: 800; color: #2e7d4f; line-height: 1.1; }
+    .note { font-size: 0.78rem; line-height: 1.5; padding: 10px 12px; border-radius: 8px; background: var(--bg); border-left: 3px solid var(--accent); margin-top: 10px; }
+    .note.warn { border-left-color: #8b3a3a; }
+    .note.ok { border-left-color: #2e7d4f; }
+    .num-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .num-grid input { width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); font: inherit; font-size: 0.95rem; }
+    .offer-line { display: flex; justify-content: space-between; gap: 10px; font-size: 0.82rem; padding: 4px 0; }
+    .tag { font-size: 0.66rem; padding: 2px 6px; border-radius: 6px; background: var(--bg); color: var(--text-muted); margin-left: 6px; }
+    .tag.omg { background: #f3e1e1; color: #8b3a3a; }
+    .btn-reset { border: 1px solid var(--border); background: var(--bg); border-radius: 8px; padding: 8px 14px; font: inherit; font-size: 0.8rem; cursor: pointer; color: var(--text-muted); }
+    .sticky { position: sticky; top: 16px; }
+    @media (max-width: 1000px) { .vs-grid { grid-template-columns: 1fr; } .sticky { position: static; } }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html"><h1>Ework</h1></a>
+      <div class="sub">Centro operativo</div>
+    </div>
+    <nav class="nav-section c-principale">
+      <div class="nav-label">Principale</div>
+      <a class="nav-item" href="index.html"><span class="icon">🎯</span> Dashboard</a>
+    </nav>
+    <nav class="nav-section c-operativo">
+      <div class="nav-label">Operativo</div>
+      <a class="nav-item" href="attivita.html"><span class="icon">✅</span> Task</a>
+      <a class="nav-item" href="agenti.html"><span class="icon">🤖</span> Agenti</a>
+    </nav>
+    <nav class="nav-section c-lavoro">
+      <div class="nav-label">Lavoro</div>
+      <a class="nav-item active" href="verisure.html"><span class="icon">🛡️</span> Calcolatore Verisure</a>
+      <a class="nav-item" href="clienti.html"><span class="icon">👤</span> Clienti</a>
+      <a class="nav-item" href="richieste.html"><span class="icon">📞</span> Richieste</a>
+      <a class="nav-item" href="proprieta.html"><span class="icon">🏡</span> Proprietà</a>
+      <a class="nav-item" href="valutazione.html"><span class="icon">🧮</span> Valutazione</a>
+      <a class="nav-item" href="ricerca.html"><span class="icon">🔍</span> Ricerca Immobili</a>
+      <a class="nav-item" href="incarico.html"><span class="icon">📋</span> Scheda Incarico</a>
+    </nav>
+    <nav class="nav-section c-contenuti">
+      <div class="nav-label">Contenuti</div>
+      <a class="nav-item" href="social.html"><span class="icon">📸</span> Social</a>
+      <a class="nav-item" href="fonti.html"><span class="icon">🌿</span> Fonti</a>
+    </nav>
+    <nav class="nav-section c-analisi">
+      <div class="nav-label">Analisi</div>
+      <a class="nav-item" href="mara.html"><span class="icon">📊</span> Mara Analytics</a>
+    </nav>
+    <div class="sidebar-bottom" id="dataOggi"></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h2>🛡️ Calcolatore Verisure</h2>
+      <div class="date">Listino e piano provvigionale novembre 2026 · nuovo venditore (M1-M4)</div>
+    </div>
+
+    <div class="content">
+
+      <!-- IMPOSTAZIONI VENDITA -->
+      <div class="vs-card">
+        <h3>Questa vendita</h3>
+        <div class="row-opts">
+          <div>
+            <span class="opt-label">Cliente</span>
+            <div class="seg" id="segCliente">
+              <button type="button" data-v="res" class="on">🏠 Home</button>
+              <button type="button" data-v="bus">🏪 Business</button>
+            </div>
+          </div>
+          <div>
+            <span class="opt-label">Appuntamento</span>
+            <div class="seg" id="segOrigine">
+              <button type="button" data-v="rp" class="on">Personale (RP)</button>
+              <button type="button" data-v="re">Dall'azienda (RE)</button>
+            </div>
+          </div>
+          <label class="chk"><input type="checkbox" id="optInstallo" /> Installo io</label>
+          <label class="chk"><input type="checkbox" id="optGrandiConti" /> Grandi Conti</label>
+          <label class="chk"><input type="checkbox" id="opt3wp" /> Sono nelle 3 settimane di formazione</label>
+          <button type="button" class="btn-reset" onclick="resetOfferta()">↺ Svuota offerta</button>
+        </div>
+      </div>
+
+      <div class="vs-grid">
+
+        <!-- SINISTRA: OFFERTA -->
+        <div>
+          <div class="vs-card">
+            <h3>L'offerta: articoli</h3>
+            <div id="listaArticoli"></div>
+          </div>
+
+          <div class="vs-card">
+            <h3>Il mio mese finora (prima di questa vendita)</h3>
+            <div class="num-grid">
+              <label><span class="opt-label">Vendite RP Home</span><input type="number" min="0" id="mRp" value="0" inputmode="numeric" /></label>
+              <label><span class="opt-label">Vendite RP Business</span><input type="number" min="0" id="mRpb" value="0" inputmode="numeric" /></label>
+              <label><span class="opt-label">Vendite RE</span><input type="number" min="0" id="mRe" value="0" inputmode="numeric" /></label>
+              <label><span class="opt-label">Appuntamenti RP (booking)</span><input type="number" min="0" id="mBooking" value="0" inputmode="numeric" /></label>
+              <label><span class="opt-label">Provvigioni + installazioni già maturate (€)</span><input type="number" min="0" id="mProvv" value="0" inputmode="decimal" /></label>
+            </div>
+            <div class="note">Solo numeri, nessun dato del cliente. Restano salvati su questo dispositivo. Nel booking conta anche l'appuntamento di questa vendita.</div>
+          </div>
+        </div>
+
+        <!-- DESTRA: RISULTATI -->
+        <div class="sticky">
+          <div class="vs-card">
+            <h3>Il cliente paga</h3>
+            <div id="offertaRighe"></div>
+            <div class="sum-line sum-tot"><span class="k">Totale installazione</span><span class="v" id="totCliente">€ 0</span></div>
+            <div class="note" id="noteIva"></div>
+          </div>
+
+          <div class="vs-card">
+            <h3>Il mio guadagno su questa vendita</h3>
+            <div id="guadagnoRighe"></div>
+            <div class="sum-line sum-tot"><span class="k">Totale maturato</span><span class="v" id="totMaturato">€ 0</span></div>
+            <div id="minimoBox"></div>
+            <div id="avvisi"></div>
+          </div>
+
+          <div class="vs-card">
+            <h3>Bonus del mese</h3>
+            <div id="bonusRighe"></div>
+            <div class="note" style="margin-top:12px">Regole da verificare con Francesco: se i bonus contano per il minimo di 1.000 €, e come si calcolano il rapporto RP/booking e il numero di elementi per l'installazione.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ── LISTINO novembre 2026 (Allegato contratto, pag. 28) ──
+    // [id, nome, gruppo, RES: pieno, provPieno, scontato, provScontato, BUS: pieno, provPieno, scontato, provScontato, extra]
+    // null = N.D. (non disponibile)
+    const RAW = [
+      ['kit','Kit Verisure','Kit', 299,100,null,null, 299,100,199,50, {kit:true, max:1}],
+      ['shock','Shock Sensor','Essenziali', 60,15,40,10, 60,15,40,10],
+      ['movimento','Sensore di movimento con fotocamera','Essenziali', 159,40,119,20, 159,40,119,20],
+      ['zerovision','ZeroVision PRO','Essenziali', 199,50,99,35, 199,50,99,35],
+      ['mok','Lettore chiavi da esterno (Mok)','Essenziali', 99,40,null,null, 99,40,null,null, {mok:true}],
+      ['packsos','Pack SOS (pulsante + telecomando)','Sicurezza in più', 158,60,79,25, 158,60,79,25, {packsos:true}],
+      ['smartlock','Smartlock','Sicurezza in più', 179,50,null,null, 179,50,null,null],
+      ['scudo','Sensore Scudo Perimetrale','Sicurezza in più', 249,30,199,25, 249,30,199,25],
+      ['pulsante','Pulsante SOS','Sicurezza in più', 99,40,49.5,15, 99,40,49.5,15],
+      ['telecomando','Telecomando con pulsante SOS','Sicurezza in più', 59,20,29.5,10, 59,20,29.5,10],
+      ['lettore','Lettore chiavi','Sicurezza in più', 149,40,74.5,15, 149,40,74.5,15],
+      ['fumo','Rilevatore di fumo','Sicurezza in più', 79,20,39.5,10, 79,20,39.5,10],
+      ['wiredprima','Telecamera Wired · 1ª (omaggio di listino)','Telecamere', 0,0,null,null, 0,0,null,null, {listinoFree:true, max:1}],
+      ['wired','Telecamera Wired','Telecamere', 99,25,null,null, 119,40,null,null],
+      ['xlprima','Telecamera XL · 1ª venduta (upgrade)','Telecamere', 49,25,null,null, null,null,null,null, {max:1}],
+      ['xl','Telecamera XL','Telecamere', 119,30,null,null, 119,30,null,null],
+      ['doorbell','Video Doorbell Wire-free','Telecamere', 129,50,null,null, 129,50,null,null],
+      ['pannello','Pannello solare','Telecamere', 40,20,29,10, 40,20,29,10],
+      ['wifiext','Wi-fi extender','Accessori', 15,0,null,null, 15,0,null,null],
+      ['chiave','Chiave','Accessori', 15,0,7.5,0, 15,0,7.5,0],
+      ['pack3chiavi','Pack 3 chiavi','Accessori', 39,20,19.5,10, 39,20,19.5,10],
+      ['sticker','Smart sticker','Accessori', 15,0,null,null, 15,0,null,null],
+      ['pack3sticker','Pack 3 smart sticker','Accessori', 45,0,30,0, 45,0,30,0],
+      ['smartservice','Pack Smart Service (canone)','Servizi', null,20,null,null, null,20,null,null, {servizio:true, max:1}],
+      ['wifisensing','Wi-fi Sensing (canone)','Servizi', null,20,null,null, null,20,null,null, {servizio:true, max:1}],
+    ];
+    const ART = RAW.map(r => ({ id:r[0], nome:r[1], gruppo:r[2],
+      res:{ p:r[3], pp:r[4], s:r[5], ps:r[6] }, bus:{ p:r[7], pp:r[8], s:r[9], ps:r[10] }, x:r[11]||{} }));
+
+    // ── STATO (solo su questo dispositivo) ──
+    const KEY = 'verisure_calc_v1';
+    let st = { cliente:'res', origine:'rp', installo:false, grandiConti:false, wp3:false, righe:{}, mese:{ rp:0, rpb:0, re:0, booking:0, provv:0 } };
+    try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) st = Object.assign(st, s); } catch(e) {}
+    function salva() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e) {} }
+
+    const eur = n => '€ ' + (Math.round(n * 100) / 100).toLocaleString('it-IT', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+    const segno = n => (n > 0 ? '+ ' : n < 0 ? '− ' : '') + eur(Math.abs(n));
+
+    function riga(id) { return st.righe[id] || { q:0, m:'pieno' }; }
+    function listino(a) { return a[st.cliente]; }
+    function disponibile(a) { const l = listino(a); return l.p !== null || a.x.servizio; }
+
+    // ── LISTA ARTICOLI ──
+    function renderArticoli() {
+      const el = document.getElementById('listaArticoli');
+      let html = '', gruppo = '';
+      ART.forEach(a => {
+        if (!disponibile(a)) return;
+        if (a.gruppo !== gruppo) { gruppo = a.gruppo; html += `<div class="grp">${gruppo}</div>`; }
+        const l = listino(a), r = riga(a.id);
+        const sub = a.x.servizio ? `provvigione ${eur(l.pp)}`
+          : a.x.listinoFree ? 'gratis per il cliente · nessuna provvigione'
+          : `pieno ${eur(l.p)} → ${eur(l.pp)}` + (l.s !== null ? ` · scontato ${eur(l.s)} → ${eur(l.ps)}` : '');
+        const puoSconto = l.s !== null, puoOmaggio = !a.x.servizio && !a.x.listinoFree && !a.x.kit;
+        const modi = (a.x.servizio || a.x.listinoFree) ? '' : `<div class="mode">
+            <button type="button" class="${r.m==='pieno'?'on':''}" onclick="setMode('${a.id}','pieno')">Pieno</button>
+            <button type="button" class="${r.m==='scontato'?'on':''}" ${puoSconto?'':'disabled'} onclick="setMode('${a.id}','scontato')">Scontato</button>
+            <button type="button" class="omg ${r.m==='omaggio'?'on':''}" ${puoOmaggio?'':'disabled'} onclick="setMode('${a.id}','omaggio')">Omaggio</button>
+          </div>`;
+        html += `<div class="item ${r.q? '' : 'zero'}">
+          <div><div class="item-nome">${a.nome}</div><div class="item-sub">${sub}</div></div>
+          ${modi || '<span></span>'}
+          <div class="qty"><button type="button" onclick="cambiaQ('${a.id}',-1)">−</button><span>${r.q}</span><button type="button" onclick="cambiaQ('${a.id}',1)">+</button></div>
+        </div>`;
+      });
+      el.innerHTML = html;
+    }
+    function cambiaQ(id, d) {
+      const a = ART.find(x => x.id === id), r = Object.assign({}, riga(id));
+      r.q = Math.max(0, Math.min(a.x.max || 99, r.q + d));
+      st.righe[id] = r; salva(); aggiorna();
+    }
+    function setMode(id, m) {
+      const r = Object.assign({}, riga(id)); r.m = m; if (!r.q) r.q = 1;
+      st.righe[id] = r; salva(); aggiorna();
+    }
+    function resetOfferta() { st.righe = {}; salva(); aggiorna(); }
+
+    // ── CALCOLO VENDITA ──
+    function calcolaVendita() {
+      const righeOff = [], avvisi = [];
+      let totCliente = 0, provv = 0, penale = 0, elementi = 0, valoreOmaggi = 0;
+      const kitSel = riga('kit').q > 0;
+      // omaggi consentiti: Mok con Kit; per Business in alternativa il Pack SOS (uno solo dei due)
+      const omg = id => riga(id).q > 0 && riga(id).m === 'omaggio';
+      const omaggioAmmesso = !kitSel ? null : omg('mok') ? 'mok' : (st.cliente === 'bus' && omg('packsos')) ? 'packsos' : null;
+      ART.forEach(a => {
+        const r = riga(a.id); if (!r.q || !disponibile(a)) return;
+        const l = listino(a);
+        if (a.x.servizio) { provv += l.pp * r.q; righeOff.push({ nome:a.nome, q:r.q, prezzo:null, tag:'canone' }); return; }
+        if (!a.x.servizio) elementi += r.q;
+        if (a.x.listinoFree) { righeOff.push({ nome:a.nome, q:r.q, prezzo:0, tag:'omaggio di listino' }); return; }
+        if (r.m === 'omaggio') {
+          const liberi = a.id === omaggioAmmesso ? 1 : 0;
+          const penalizzati = r.q - liberi;
+          valoreOmaggi += l.p * r.q;
+          if (penalizzati > 0) {
+            penale += l.p * penalizzati;
+            avvisi.push(`Omaggio non consentito: ${a.nome}${penalizzati>1?' ×'+penalizzati:''}. Penale pari al valore del bene: ${eur(l.p * penalizzati)}.`);
+          }
+          righeOff.push({ nome:a.nome, q:r.q, prezzo:0, tag: liberi && !penalizzati ? 'omaggio consentito' : 'omaggio', omg: !!penalizzati });
+          return;
+        }
+        const usaSconto = r.m === 'scontato' && l.s !== null;
+        const prezzo = usaSconto ? l.s : l.p, pv = usaSconto ? l.ps : l.pp;
+        totCliente += prezzo * r.q; provv += (pv || 0) * r.q;
+        righeOff.push({ nome:a.nome, q:r.q, prezzo: prezzo * r.q, tag: usaSconto ? 'scontato' : '' });
+      });
+      if (!kitSel && Object.values(st.righe).some(r => r.q)) avvisi.push('Manca il Kit Verisure: senza Kit non ci sono omaggi consentiti e la vendita non è completa.');
+      // Grandi Conti: −50 € sulle commissioni dirette, minimo 50 €
+      let adjGC = 0;
+      if (st.grandiConti && provv > 0) { const dopo = Math.max(50, provv - 50); adjGC = dopo - provv; }
+      // Formazione 3 settimane: niente provvigioni dirette
+      let adj3wp = 0;
+      if (st.wp3) adj3wp = -(provv + adjGC);
+      const install = st.installo && elementi > 0 ? (elementi >= 13 ? 100 : 60) : 0;
+      return { righeOff, avvisi, totCliente, provv, penale, adjGC, adj3wp, install, elementi, valoreOmaggi };
+    }
+
+    // ── BONUS (piano nuovo venditore) ──
+    const bonusRP  = n => n < 2 ? 0 : n <= 9 ? 300 + (n - 2) * 100 : 1000 + (n - 9) * 100;
+    const bonusRE  = n => n < 2 ? 0 : Math.min(n, 5) * 100;
+    const bonusRPB = (n, rp) => rp >= 2 ? Math.min(n, 3) * 200 : 0;           // solo con target minimo RP (M1-M4: 2 RP)
+    const bonusBook = (rp, rpb, book) => (rp >= 2 && book > 0 && (rp + rpb) / book >= 0.5) ? 150 : 0;
+    const bonus3wp = n => n >= 2 ? 1000 : n === 1 ? 500 : 0;
+    function bonusTot(m) {
+      if (st.wp3) return { tot: bonus3wp(m.rp + m.rpb + m.re), det: [['Bonus formazione (3 settimane)', bonus3wp(m.rp + m.rpb + m.re)]] };
+      const det = [
+        ['Bonus RP Home', bonusRP(m.rp)],
+        ['Bonus RP Business', bonusRPB(m.rpb, m.rp)],
+        ['Bonus RE', bonusRE(m.re)],
+        ['Bonus RP/booking ≥ 0,5', bonusBook(m.rp, m.rpb, m.booking)],
+      ];
+      return { tot: det.reduce((s, d) => s + d[1], 0), det };
+    }
+
+    // ── RENDER RISULTATI ──
+    function aggiorna() {
+      renderArticoli();
+      ['segCliente','segOrigine'].forEach(id => document.querySelectorAll('#'+id+' button').forEach(b =>
+        b.classList.toggle('on', b.dataset.v === (id==='segCliente' ? st.cliente : st.origine))));
+      document.getElementById('optInstallo').checked = st.installo;
+      document.getElementById('optGrandiConti').checked = st.grandiConti;
+      document.getElementById('opt3wp').checked = st.wp3;
+      ['rp','rpb','re','booking','provv'].forEach(k => { const el = document.getElementById('m' + k[0].toUpperCase() + k.slice(1)); if (document.activeElement !== el) el.value = st.mese[k]; });
+
+      const v = calcolaVendita();
+      const ha = v.righeOff.length > 0;
+
+      // cliente
+      document.getElementById('offertaRighe').innerHTML = ha ? v.righeOff.map(r =>
+        `<div class="offer-line"><span>${r.q>1?r.q+'× ':''}${r.nome}${r.tag?`<span class="tag ${r.omg?'omg':''}">${r.tag}</span>`:''}</span><span>${r.prezzo===null?'—':eur(r.prezzo)}</span></div>`).join('')
+        : '<div class="placeholder">Aggiungi gli articoli a sinistra.</div>';
+      document.getElementById('totCliente').textContent = eur(v.totCliente);
+      document.getElementById('noteIva').textContent = st.cliente === 'res'
+        ? 'Cliente Home: prezzi IVA inclusa. In più c\'è il canone mensile dei servizi.'
+        : 'Cliente Business: prezzi IVA esclusa. In più c\'è il canone mensile dei servizi.';
+
+      // tipo vendita per i bonus
+      const tipo = st.origine === 're' ? 're' : (st.cliente === 'bus' ? 'rpb' : 'rp');
+      const prima = Object.assign({}, st.mese);
+      const dopo = Object.assign({}, st.mese); if (ha) dopo[tipo] += 1;
+      const bPrima = bonusTot(prima), bDopo = bonusTot(dopo);
+      const deltaBonus = bDopo.tot - bPrima.tot;
+
+      const diretta = v.provv + v.adjGC + v.adj3wp - v.penale;
+      const maturato = diretta + v.install + deltaBonus;
+      const g = [
+        ['Provvigioni articoli', v.provv],
+        v.adjGC ? ['Grandi Conti (−50 €)', v.adjGC] : null,
+        v.adj3wp ? ['In formazione: niente provvigioni dirette', v.adj3wp] : null,
+        v.penale ? ['Penale omaggi non consentiti', -v.penale] : null,
+        st.installo ? [`Installazione (${v.elementi} elementi)`, v.install] : null,
+        ['Bonus sbloccato da questa vendita', deltaBonus],
+      ].filter(Boolean);
+      document.getElementById('guadagnoRighe').innerHTML = ha ? g.map(([k, n]) =>
+        `<div class="sum-line"><span class="k">${k}</span><span class="v ${n>0?'pos':n<0?'neg':''}">${segno(n)}</span></div>`).join('')
+        : '<div class="placeholder">—</div>';
+      document.getElementById('totMaturato').textContent = eur(maturato);
+      document.getElementById('totMaturato').className = 'v ' + (maturato >= 0 ? 'pos' : 'neg');
+
+      // minimo garantito 1.000 € (M1-M4): conta solo la parte sopra i 1.000
+      const matPrima = st.mese.provv + bPrima.tot;
+      const matDopo = matPrima + maturato;
+      const pagPrima = Math.max(1000, matPrima), pagDopo = Math.max(1000, matDopo);
+      const reale = pagDopo - pagPrima;
+      let mb = '';
+      if (ha && !st.wp3) {
+        if (matDopo <= 1000) mb = `<div class="note ok">Minimo garantito: questo mese hai maturato ${eur(matDopo)} su 1.000 €. Prendi comunque 1.000 €, quindi uno sconto su questa vendita <strong>non ti costa niente</strong>. Conta chiudere il contratto, perché fa numero per i bonus.</div>`;
+        else if (matPrima < 1000) mb = `<div class="note">Con questa vendita superi il minimo: in tasca ti arrivano davvero <strong>${eur(reale)}</strong> in più rispetto ai 1.000 € garantiti.</div>`;
+        else mb = `<div class="note">Sei già sopra il minimo di 1.000 €: ogni euro di sconto o di penale ti costa per intero.</div>`;
+      }
+      document.getElementById('minimoBox').innerHTML = mb;
+      document.getElementById('avvisi').innerHTML = v.avvisi.map(a => `<div class="note warn">⚠️ ${a}</div>`).join('');
+
+      // bonus
+      const nomeTipo = { rp:'RP Home', rpb:'RP Business', re:'RE' }[tipo];
+      let bh = `<div class="sum-line"><span class="k">Questa vendita conta come</span><span class="v">${nomeTipo}</span></div>`;
+      bh += bDopo.det.map(([k, n], i) => {
+        const p = bPrima.det[i][1];
+        return `<div class="sum-line"><span class="k">${k}</span><span class="v">${eur(p)}${n!==p?` → <span class="pos">${eur(n)}</span>`:''}</span></div>`;
+      }).join('');
+      if (!st.wp3) {
+        const prossima = tipo === 'rp' ? (dopo.rp < 2 ? 2 : dopo.rp + 1) : tipo === 're' ? (dopo.re < 2 ? 2 : dopo.re < 5 ? dopo.re + 1 : null) : (dopo.rpb < 3 ? dopo.rpb + 1 : null);
+        if (prossima) {
+          const m2 = Object.assign({}, dopo); m2[tipo] = prossima;
+          const salto = bonusTot(m2).tot - bDopo.tot;
+          if (salto > 0) bh += `<div class="note">Prossima soglia ${nomeTipo}: <strong>${prossima} vendite</strong> → +${eur(salto)}.</div>`;
+        }
+        if (tipo === 'rpb' && dopo.rp < 2) bh += `<div class="note warn">Il bonus RP Business scatta solo con almeno 2 vendite RP Home nel mese.</div>`;
+      }
+      bh += `<div class="sum-line sum-tot"><span class="k">Totale bonus del mese</span><span class="v pos">${eur(bDopo.tot)}</span></div>`;
+      document.getElementById('bonusRighe').innerHTML = bh;
+    }
+
+    // ── EVENTI ──
+    document.querySelectorAll('#segCliente button').forEach(b => b.onclick = () => { st.cliente = b.dataset.v; salva(); aggiorna(); });
+    document.querySelectorAll('#segOrigine button').forEach(b => b.onclick = () => { st.origine = b.dataset.v; salva(); aggiorna(); });
+    document.getElementById('optInstallo').onchange = e => { st.installo = e.target.checked; salva(); aggiorna(); };
+    document.getElementById('optGrandiConti').onchange = e => { st.grandiConti = e.target.checked; salva(); aggiorna(); };
+    document.getElementById('opt3wp').onchange = e => { st.wp3 = e.target.checked; salva(); aggiorna(); };
+    ['rp','rpb','re','booking','provv'].forEach(k => {
+      document.getElementById('m' + k[0].toUpperCase() + k.slice(1)).oninput = e => { st.mese[k] = Math.max(0, parseFloat(e.target.value) || 0); salva(); aggiorna(); };
+    });
+
+    const d = new Date();
+    document.getElementById('dataOggi').textContent = d.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+    aggiorna();
+  </script>
+
+<script src="bottom-nav.js"></script>
+</body>
+</html>

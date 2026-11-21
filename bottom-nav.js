@@ -8,6 +8,7 @@
   ];
 
   const DRAWER_ITEMS = [
+    { href: 'verisure.html',        icon: '🛡️', label: 'Verisure' },
     { href: 'proprieta.html',       icon: '🏡', label: 'Proprietà' },
     { href: 'social.html',          icon: '📱', label: 'Social' },
     { href: 'mara.html',            icon: '📊', label: 'Mara' },
