@@ -400,7 +400,7 @@
       const bozze = attive.filter(r => r.stato_follow === 'Bozza creata' || r.stato_follow === 'Da generare');
 
       const totale = tutte.length;
-      const nAttive = tutte.filter(r => !['Annullato','Perso','Venduto'].includes(r.stato_cliente)).length;
+      const nAttive = tutte.filter(r => !['Annullato','Perso','Venduto','Chiuso'].includes(r.stato_cliente)).length;
       const questoMese = tutte.filter(r => r.data_richiesta && r.data_richiesta >= meseFine).length;
 
       document.getElementById('nr_tot').textContent = totale;
