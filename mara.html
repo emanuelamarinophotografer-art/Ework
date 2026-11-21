@@ -418,7 +418,7 @@
     const KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
     const H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json' };
 
-    function fmtEur(n) { return '€ ' + Math.round(n).toLocaleString('it-IT'); }
+    function fmtEur(n) { return (n < 0 ? '−' : '') + '€ ' + String(Math.round(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
     function pct(a, b) { return b > 0 ? Math.round((a/b)*100) : 0; }
     function fmtData(s) { if (!s) return ''; const [y,mo,dd] = s.split('-'); return dd + '/' + mo + '/' + y; }
 
@@ -644,7 +644,7 @@
           <div class="mara-insight">
             <div class="mara-insight-label">— Mara 📊</div>
             <div class="mara-insight-text">
-              Entrate lavoro: <strong>${fmtEur(entrateNum)}</strong> · Spese vita: <strong>${fmtEur(totSpese)}</strong> → saldo conto <strong>${fmtEur(saldoConto)}</strong>.
+              Entrate Verisure: <strong>${fmtEur(entrateNum)}</strong> · Spese vita: <strong>${fmtEur(totSpese)}</strong> → saldo conto <strong>${fmtEur(saldoConto)}</strong>.
               ${costoLavoriPianificati > 0 ? ` Lavori casa pianificati: <strong>${fmtEur(costoLavoriPianificati)}</strong>. Saldo residuo post-lavori: <strong style="color:${saldoDopoLavori>=0?'#27ae60':'#c0392b'}">${fmtEur(saldoDopoLavori)}</strong>.` : ''}
               ${budget > 0 ? ` Budget mensile: ${fmtEur(budget)} — ${totSpese > budget ? '⚠️ sforato di ' + fmtEur(totSpese - budget) : 'nei limiti ✅'}.` : ''}
             </div>
