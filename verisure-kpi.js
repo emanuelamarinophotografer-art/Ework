@@ -93,7 +93,7 @@
   }
 
   // ── UI ──
-  const eur = n => '€ ' + Math.round(n).toLocaleString('it-IT');
+  const eur = n => (n < 0 ? '− ' : '') + '€ ' + String(Math.round(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const pct = (a, b) => b > 0 ? Math.round(a / b * 100) : 0;
 
   function avanzamentoMese() {
