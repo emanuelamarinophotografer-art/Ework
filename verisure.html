@@ -268,7 +268,7 @@
           : `pieno ${eur(l.p)} → ${eur(l.pp)}` + (l.s !== null ? ` · scontato ${eur(l.s)} → ${eur(l.ps)}` : '');
         const can = canoneDi(a.id) ? ` · canone +${eur(canoneDi(a.id))}/mese` : '';
         const cv = convenienza(l);
-        const badge = cv ? `<div class="conv ${cv.liv}">Sconto: cliente −${eur(cv.scontoCliente)} · tu −${eur(cv.perdita)} → ${cv.liv === 'verde' ? 'conviene' : cv.liv === 'giallo' ? 'così così' : 'non conviene'}</div>` : '';
+        const badge = cv ? `<div class="conv ${cv.liv}">${cv.liv === 'verde' ? '✓ Sconto conveniente' : cv.liv === 'giallo' ? '~ Sconto così così' : '✕ Sconto sconveniente'} · cliente −${eur(cv.scontoCliente)}, tu −${eur(cv.perdita)}</div>` : '';
         const puoSconto = l.s !== null, puoOmaggio = !a.x.servizio && !a.x.listinoFree && !a.x.kit;
         const modi = (a.x.servizio || a.x.listinoFree) ? '' : `<div class="mode">
             <button type="button" class="${r.m==='pieno'?'on':''}" onclick="setMode('${a.id}','pieno')">Pieno</button>
