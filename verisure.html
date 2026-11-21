@@ -440,6 +440,7 @@
       if (!_ultimo) return;
       const { tipo, guadagno } = _ultimo;
       st.mese[tipo] = (st.mese[tipo] || 0) + 1;
+      if (st.wp3) { st.extra = Object.assign({ fine3wp: '2026-12-06', vendite3wp: 0, costoAuto: 0, certInstallatore: false }, st.extra || {}); st.extra.vendite3wp = Math.min(2, (st.extra.vendite3wp || 0) + 1); }
       st.mese.provv = Math.round(((st.mese.provv || 0) + guadagno) * 100) / 100;
       st.righe = {}; st.zvAutorizzato = false;
       salva(); aggiorna();

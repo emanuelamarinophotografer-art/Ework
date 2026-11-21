@@ -262,6 +262,10 @@
           <div class="blocco-header">Verisure — analisi del mese</div>
           <div id="maraVerisure"><div class="placeholder">Caricamento…</div></div>
         </div>
+        <div class="blocco">
+          <div class="blocco-header">Bonus, rimborsi e auto</div>
+          <div id="maraBonus"><div class="placeholder">Caricamento…</div></div>
+        </div>
       </div>
 
       <!-- ═══════ TAB VITA & CASA ═══════ -->
@@ -672,6 +676,7 @@
       document.getElementById('kpi_maturato').textContent = fmtEur(c.maturato);
       document.getElementById('kpi_pagato').textContent = fmtEur(c.pagato);
       await VK.montaKPI(document.getElementById('maraVerisure'));
+      await VK.montaBonus(document.getElementById('maraBonus'));
     }
 
     async function init() {

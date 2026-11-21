@@ -88,8 +88,9 @@
     const m = s.mese;
     const bonus = bonusTot(m, s.wp3);
     const maturato = (m.provv || 0) + bonus.tot;
-    const pagato = s.minimo ? Math.max(1000, maturato) : maturato;
-    return { bonus, maturato, pagato };
+    const minimo = s.minimo ? minimoMese(m.periodo, insDi(s)) : 0;
+    const pagato = Math.max(minimo, maturato);
+    return { bonus, maturato, pagato, minimo };
   }
 
   // ── UI ──
@@ -172,8 +173,8 @@
           <div class="vk-row"><span class="vk-k">Provvigioni + installazioni</span><span>${eur(m.provv)}</span></div>
           ${c.bonus.det.filter(d => d[1]).map(d => `<div class="vk-row"><span class="vk-k">${d[0]}</span><span>${eur(d[1])}</span></div>`).join('') || '<div class="vk-row"><span class="vk-k">Bonus</span><span>€ 0</span></div>'}
           <div class="vk-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:6px"><span>Maturato</span><b>${eur(c.maturato)}</b></div>
-          <div class="vk-row"><span>${s.minimo ? 'Ti arriva (minimo 1.000 €)' : 'Ti arriva'}</span><span class="vk-big">${eur(c.pagato)}</span></div>
-          <label class="vk-note" style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" ${s.minimo ? 'checked' : ''} onchange="VK.setMinimo(this.checked)"> Minimo garantito attivo (primi 4 mesi)</label>
+          <div class="vk-row"><span>${c.minimo ? `Ti arriva (minimo ${eur(c.minimo)})` : 'Ti arriva'}</span><span class="vk-big">${eur(c.pagato)}</span></div>
+          <label class="vk-note" style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" ${s.minimo ? 'checked' : ''} onchange="VK.setMinimo(this.checked)"> Conta il minimo garantito (si calcola da solo mese per mese)</label>
         </div>
       </div>
       ${storico.length ? `<div class="vk-box" style="margin-top:12px"><h4>Mesi chiusi</h4>
@@ -195,16 +196,125 @@
       <div class="vk-row"><span>Vendite</span><b>${totV} / ${gV}</b></div>${barra(totV, gV)}
       <div class="vk-note">RE ${m.re}/${GOAL.vend.re} · RP Home ${m.rp}/${GOAL.vend.rp} · RP Business ${m.rpb}/${GOAL.vend.rpb}</div>
       <div class="vk-row" style="margin-top:8px"><span>Guadagno del mese</span><span class="vk-big">${eur(c.pagato)}</span></div>
-      <div class="vk-note">Maturato ${eur(c.maturato)}${s.minimo && c.maturato < 1000 ? ' · coperto dal minimo di 1.000 €' : ''}</div>
-      <a class="vk-link" href="attivita.html">→ KPI completi</a>
+      <div class="vk-note">Maturato ${eur(c.maturato)}${c.minimo && c.maturato < c.minimo ? ` · coperto dal minimo di ${eur(c.minimo)}` : ''}</div>
+      ${(() => { const b = stato3wp(s); return b.mancano >= 0 ? `<div class="vk-note" style="color:#c8102e;font-weight:600">🎯 Bonus formazione: ${b.vendite3wp}/2 vendite · ${eur(b.bonus)} · mancano ${b.mancano} giorni</div>` : ''; })()}
+      <a class="vk-link" href="mara.html">→ Bonus e rimborsi</a> · <a class="vk-link" href="attivita.html">KPI completi</a>
+    </div>`;
+  }
+
+  // ── BONUS, RIMBORSI E AUTO (piano provvigionale nuovo venditore + addendum newbies, firmati 20/11/2026) ──
+  const INSERIMENTO = '2026-11-20';
+  const extraBase = () => ({ inserimento: INSERIMENTO, fine3wp: '2026-12-06', vendite3wp: 0, costoAuto: 0, certInstallatore: false });
+  const insDi = s => ((s && s.extra && s.extra.inserimento) || INSERIMENTO);
+  const gg = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+  const fmtData = iso => { const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; };
+
+  // Mesi di permanenza: il mese di inserimento conta come 1° solo se si sono fatte almeno 2 settimane + 1 giorno
+  // entro la chiusura contabile; altrimenti anche il mese dopo è "1° mese".
+  function pianoMesi(insIso) {
+    const ins = new Date(insIso || INSERIMENTO), y = ins.getFullYear(), m = ins.getMonth();
+    const fineMese = new Date(y, m + 1, 0), giorni = fineMese.getDate();
+    const presenti = giorni - ins.getDate() + 1;
+    const nomi = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+    const out = [{ y, m, fase: presenti >= 15 ? 'M1' : 'M1 (parziale)', quota: presenti / giorni, presenti, giorni }];
+    let n = presenti >= 15 ? 2 : 1;
+    for (let i = 1; out.length < 6; i++) {
+      const dt = new Date(y, m + i, 1);
+      out.push({ y: dt.getFullYear(), m: dt.getMonth(), fase: n <= 4 ? 'M' + n : 'dal 5° mese', quota: 1 });
+      n++;
+    }
+    return out.map(r => ({ ...r, label: nomi[r.m] + ' ' + r.y }));
+  }
+
+  // minimo garantito del mese: 1.000 € da M1 a M4, in proporzione ai giorni nel mese di inserimento, 0 dopo
+  function minimoMese(periodo, insIso) {
+    const r = pianoMesi(insIso).find(x => x.y + '-' + String(x.m + 1).padStart(2, '0') === periodo);
+    if (!r) return new Date(periodo + '-01') < new Date(INSERIMENTO) ? 0 : 0;
+    return /^M[1-4]/.test(r.fase) ? Math.round(1000 * r.quota) : 0;
+  }
+
+  function renderBonus(el, s) {
+    css();
+    const x = Object.assign(extraBase(), s.extra || {});
+    const oggi = new Date().toISOString().slice(0, 10);
+    const mancano = gg(oggi, x.fine3wp);
+    const b3 = x.vendite3wp >= 2 ? 1000 : x.vendite3wp === 1 ? 500 : 0;
+    const mesi = pianoMesi(x.inserimento);
+    const auto30 = x.costoAuto ? Math.round(x.costoAuto * 0.3) : null;
+
+    const righe = mesi.map(r => {
+      const nuovo = /^M[1-4]/.test(r.fase);
+      const minimo = nuovo ? Math.round(1000 * r.quota) : null;
+      const rimbAuto = nuovo ? Math.round(150 * r.quota) : null;
+      const altro = [];
+      if (r.fase.includes('parziale')) altro.push('Carburante formazione 110 €');
+      if (r.y === 2026 && r.m === 11) altro.push(`Bonus formazione ${b3 ? eur(b3) : '(0 vendite finora)'}`);
+      if (r.fase === 'M4') altro.push('Certificazione specialista 200 € (a fine mese)');
+      const auto = nuovo ? '100% coperta' : `70% coperta${auto30 !== null ? ` · a tuo carico ~${eur(auto30)}/mese` : ' · 30% a tuo carico'}`;
+      return `<tr><td><b>${r.label}</b><br><span class="vk-k">${r.fase}${r.presenti ? ` · ${r.presenti} gg su ${r.giorni}` : ''}</span></td>
+        <td>${minimo !== null ? eur(minimo) : '—'}</td><td>${rimbAuto !== null ? eur(rimbAuto) : '—'}</td>
+        <td style="text-align:left">${altro.join('<br>') || '—'}</td><td style="text-align:left">${auto}</td></tr>`;
+    }).join('');
+
+    el.innerHTML = `<div class="vk-wrap">
+      <div class="vk-bottom">
+        <div class="vk-box" style="border-color:${mancano >= 0 ? '#c8102e' : 'var(--border)'}">
+          <h4>🎯 Bonus formazione (3 Week Program)</h4>
+          <div class="vk-row"><span>Scadenza</span><b>${fmtData(x.fine3wp)} ${mancano >= 0 ? `· mancano ${mancano} giorni` : '· chiusa'}</b></div>
+          <div class="vk-row"><span class="vk-k">Vendite fatte in formazione</span>
+            <span class="vk-step"><button type="button" onclick="VK.setExtra('vendite3wp', Math.max(0, ${x.vendite3wp} - 1))">−</button><b>${x.vendite3wp} / 2</b><button type="button" onclick="VK.setExtra('vendite3wp', Math.min(2, ${x.vendite3wp} + 1))">+</button></span></div>
+          ${barra(x.vendite3wp, 2)}
+          <div class="vk-row"><span>Bonus</span><span class="vk-big">${eur(b3)}</span></div>
+          <div class="vk-note">1 vendita = 500 € · 2 vendite = 1.000 €. Pagato 3 settimane dopo l'inizio della formazione. Queste vendite non danno provvigione diretta.
+            <br>Fine formazione: <input type="date" value="${x.fine3wp}" onchange="VK.setExtra('fine3wp', this.value)" style="font:inherit;font-size:0.76rem;border:1px solid var(--border);border-radius:6px;padding:2px 4px;background:var(--bg-card)"></div>
+        </div>
+        <div class="vk-box">
+          <h4>🚗 Auto e rimborsi</h4>
+          <div class="vk-row"><span class="vk-k">Carburante formazione (una tantum)</span><b>110 €</b></div>
+          <div class="vk-row"><span class="vk-k">Rimborso auto (primi 4 mesi)</span><b>150 €/mese</b></div>
+          <div class="vk-row"><span class="vk-k">Auto aziendale, primi 4 mesi</span><b>100% coperta</b></div>
+          <div class="vk-row"><span class="vk-k">Auto aziendale, dopo</span><b>70% (100% se Elite/Executive)</b></div>
+          <div class="vk-row"><span class="vk-k">Costo mensile auto (€)</span><input type="number" min="0" value="${x.costoAuto || ''}" placeholder="da sapere" onchange="VK.setExtra('costoAuto', parseFloat(this.value)||0)" style="width:90px;font:inherit;border:1px solid var(--border);border-radius:6px;padding:4px 6px;background:var(--bg-card)"></div>
+          <div class="vk-note">Il carburante (110 €) copre i 4 giorni di formazione in aula a Livorno, dal 16 al 19/11: si riconosce dopo la prima settimana e arriva con le provvigioni di fine mese. Rimborso auto pieno solo per i mesi interi, altrimenti in proporzione ai giorni.</div>
+        </div>
+      </div>
+
+      <div class="vk-box" style="margin-top:12px;overflow-x:auto">
+        <h4>📅 Mese per mese: cosa ti spetta oltre alle vendite</h4>
+        <table class="vk-storico"><tr><th style="text-align:left">Mese</th><th>Minimo garantito</th><th>Rimborso auto</th><th style="text-align:left">Altro</th><th style="text-align:left">Auto aziendale</th></tr>${righe}</table>
+        <div class="vk-note">Il minimo di 1.000 € scatta solo se provvigioni e bonus del mese restano sotto quella cifra. Data di inserimento: <input type="date" value="${x.inserimento}" onchange="VK.setExtra('inserimento', this.value)" style="font:inherit;font-size:0.76rem;border:1px solid var(--border);border-radius:6px;padding:2px 4px;background:var(--bg-card)">. Se nel primo mese fai meno di 15 giorni, conta in proporzione e anche il mese dopo vale come 1° mese. Da confermare con Francesco: firma del contratto (20/11) o inizio formazione (16/11).</div>
+      </div>
+
+      <div class="vk-bottom" style="margin-top:12px">
+        <div class="vk-box">
+          <h4>🏅 Certificazioni</h4>
+          <div class="vk-row"><span class="vk-k">Specialista di sicurezza (fine 4° mese)</span><b>200 €</b></div>
+          <div class="vk-row"><span class="vk-k">Corso venditore installatore</span><b>300 €</b></div>
+          <label class="vk-note" style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" ${x.certInstallatore ? 'checked' : ''} onchange="VK.setExtra('certInstallatore', this.checked)"> Ho la certificazione da installatrice</label>
+          <div class="vk-row"><span class="vk-k">Installazione fino a 12 elementi / da 13</span><b>60 € / 100 €</b></div>
+          <div class="vk-row"><span class="vk-k">Manutenzione con / senza ampliamento</span><b>25 € / 15 €</b></div>
+        </div>
+        <div class="vk-box">
+          <h4>⭐ Più avanti</h4>
+          <div class="vk-row"><span class="vk-k">Elite: 12 RP in 2 mesi (min. 4 al mese)</span><b>carburante 300 €/mese</b></div>
+          <div class="vk-row"><span class="vk-k">Executive</span><b>+ bonus vacanza 500 €</b></div>
+          <div class="vk-row"><span class="vk-k">Porti una persona che vende il 1° mese</span><b>500 € (750 € con 3 vendite)</b></div>
+          <div class="vk-row"><span class="vk-k">…e arriva al target al 4° mese</span><b>premio 750 € o 500 €</b></div>
+          <div class="vk-row"><span class="vk-k">Agente di commercio, 100 vendite l'anno per 3 anni</span><b>2.000 €</b></div>
+        </div>
+      </div>
     </div>`;
   }
 
   // azioni dalla pagina Task
-  let _el = null;
+  let _el = null, _elB = null;
   async function montaKPI(el) { _el = el; const s = await load(); renderKPI(el, s); }
-  function step(campo, d) { const s = _st; s.mese[campo] = Math.max(0, (s.mese[campo] || 0) + d); save(s); if (_el) renderKPI(_el, s); }
-  function setMinimo(v) { const s = _st; s.minimo = v; save(s); if (_el) renderKPI(_el, s); }
+  async function montaBonus(el) { _elB = el; const s = await load(); renderBonus(el, s); }
+  function ridisegna(s) { if (_el) renderKPI(_el, s); if (_elB) renderBonus(_elB, s); }
+  function step(campo, d) { const s = _st; s.mese[campo] = Math.max(0, (s.mese[campo] || 0) + d); save(s); ridisegna(s); }
+  function setMinimo(v) { const s = _st; s.minimo = v; save(s); ridisegna(s); }
+  function setExtra(k, v) { const s = _st; s.extra = Object.assign(extraBase(), s.extra || {}, { [k]: v }); save(s); ridisegna(s); }
+  function stato3wp(s) { const x = Object.assign(extraBase(), s.extra || {}); return { ...x, bonus: x.vendite3wp >= 2 ? 1000 : x.vendite3wp === 1 ? 500 : 0, mancano: gg(new Date().toISOString().slice(0, 10), x.fine3wp) }; }
 
-  window.VK = { GOAL, NOMI, load, loadLocale, save, normalizza, bonusTot, calcola, booking, renderKPI, renderMini, montaKPI, step, setMinimo };
+  window.VK = { GOAL, NOMI, load, loadLocale, save, normalizza, bonusTot, calcola, booking, renderKPI, renderMini, renderBonus, montaKPI, montaBonus, step, setMinimo, setExtra, stato3wp };
 })();
