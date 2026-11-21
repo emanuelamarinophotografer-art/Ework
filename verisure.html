@@ -259,6 +259,9 @@
 
     function riga(id) { return st.righe[id] || { q:0, m:'pieno' }; }
     function listino(a) { return a[st.cliente]; }
+    // Omaggi consentiti: Mok con il Kit (Business: Mok oppure Pack SOS), 1ª telecamera già omaggio di listino.
+    // ZeroVision solo come eccezione autorizzata da Francesco.
+    function puoOmaggio(a) { return !!(a.x.mok || (a.x.packsos && st.cliente === 'bus') || a.id === 'zerovision'); }
     function disponibile(a) { const l = listino(a); return l.p !== null || a.x.servizio; }
 
     // ── LISTA ARTICOLI ──
@@ -275,14 +278,14 @@
         const can = canoneDi(a.id) ? `<div class="item-can">canone +${eur(canoneDi(a.id))}/mese</div>` : '';
         const cv = convenienza(l);
         const badge = cv ? `<div class="conv ${cv.liv}">cliente −${eur(cv.scontoCliente)} · tu −${eur(cv.perdita)}</div>` : '';
-        const puoSconto = l.s !== null, puoOmaggio = !a.x.servizio && !a.x.listinoFree && !a.x.kit;
+        const puoSconto = l.s !== null, omOk = puoOmaggio(a);
         const modi = (a.x.servizio || a.x.listinoFree) ? '' : `<div class="mode">
             <button type="button" class="${r.m==='pieno'?'on':''}" onclick="setMode('${a.id}','pieno')">Pieno</button>
             <button type="button" class="${r.m==='scontato'?'on':''} ${cv ? 's-' + cv.liv : ''}" ${puoSconto?'':'disabled'} onclick="setMode('${a.id}','scontato')">Scontato</button>
-            <button type="button" class="omg ${r.m==='omaggio'?'on':''}" ${puoOmaggio?'':'disabled'} onclick="setMode('${a.id}','omaggio')">Omaggio</button>
+            <button type="button" class="omg ${r.m==='omaggio'?'on':''}" ${omOk?'':'disabled'} onclick="setMode('${a.id}','omaggio')">Omaggio</button>
           </div>`;
         html += `<div class="item ${r.q? '' : 'zero'}">
-          <div><div class="item-nome">${a.nome}</div><div class="item-sub">${sub}</div>${can}${badge}</div>
+          <div><div class="item-nome">${a.nome}</div><div class="item-sub">${sub}</div>${can}${badge}${a.id === 'zerovision' && r.m === 'omaggio' && r.q ? `<label class="chk" style="font-size:0.78rem;min-height:28px"><input type="checkbox" ${st.zvAutorizzato?'checked':''} onchange="st.zvAutorizzato=this.checked;salva();aggiorna()"> Omaggio autorizzato da Francesco</label>` : ''}</div>
           ${modi || '<span></span>'}
           <div class="qty"><button type="button" onclick="cambiaQ('${a.id}',-1)">−</button><span>${r.q}</span><button type="button" onclick="cambiaQ('${a.id}',1)">+</button></div>
         </div>`;
@@ -298,7 +301,7 @@
       const r = Object.assign({}, riga(id)); r.m = m; if (!r.q) r.q = 1;
       st.righe[id] = r; salva(); aggiorna();
     }
-    function resetOfferta() { st.righe = {}; salva(); aggiorna(); }
+    function resetOfferta() { st.righe = {}; st.zvAutorizzato = false; salva(); aggiorna(); }
 
     // ── CALCOLO VENDITA ──
     function calcolaVendita() {
@@ -316,15 +319,15 @@
         if (a.x.servizio) { provv += l.pp * r.q; righeOff.push({ nome:a.nome, q:r.q, prezzo:null, tag:'servizio', can:canRiga }); return; }
         if (!a.x.servizio) elementi += r.q;
         if (a.x.listinoFree) { righeOff.push({ nome:a.nome, q:r.q, prezzo:0, tag:'omaggio di listino', can:canRiga }); return; }
-        if (r.m === 'omaggio') {
-          const liberi = a.id === omaggioAmmesso ? 1 : 0;
+        if (r.m === 'omaggio' && puoOmaggio(a)) {
+          const liberi = (a.id === omaggioAmmesso || (a.id === 'zerovision' && st.zvAutorizzato)) ? 1 : 0;
           const penalizzati = r.q - liberi;
           valoreOmaggi += l.p * r.q;
           if (penalizzati > 0) {
             penale += l.p * penalizzati;
-            avvisi.push(`Omaggio non consentito: ${a.nome}${penalizzati>1?' ×'+penalizzati:''}. Penale pari al valore del bene: ${eur(l.p * penalizzati)}.`);
+            avvisi.push(a.id === 'zerovision' && !st.zvAutorizzato ? `ZeroVision in omaggio senza autorizzazione di Francesco: penale pari al valore del bene, ${eur(l.p * penalizzati)}.` : `Omaggio non consentito: ${a.nome}${penalizzati>1?' ×'+penalizzati:''}. Penale pari al valore del bene: ${eur(l.p * penalizzati)}.`);
           }
-          righeOff.push({ nome:a.nome, q:r.q, prezzo:0, tag: liberi && !penalizzati ? 'omaggio consentito' : 'omaggio', omg: !!penalizzati, can:canRiga });
+          righeOff.push({ nome:a.nome, q:r.q, prezzo:0, tag: liberi && !penalizzati ? (a.id === 'zerovision' ? 'omaggio autorizzato' : 'omaggio consentito') : 'omaggio', omg: !!penalizzati, can:canRiga });
           return;
         }
         const usaSconto = r.m === 'scontato' && l.s !== null;
@@ -438,7 +441,7 @@
       const { tipo, guadagno } = _ultimo;
       st.mese[tipo] = (st.mese[tipo] || 0) + 1;
       st.mese.provv = Math.round(((st.mese.provv || 0) + guadagno) * 100) / 100;
-      st.righe = {};
+      st.righe = {}; st.zvAutorizzato = false;
       salva(); aggiorna();
       const nome = { rp:'RP Home', rpb:'RP Business', re:'RE' }[tipo];
       document.getElementById('registraMsg').innerHTML = `<div class="note ok">Vendita ${nome} registrata: ${segno(guadagno)} tra provvigioni e installazione. Il bonus si aggiorna da solo nei KPI.</div>`;
