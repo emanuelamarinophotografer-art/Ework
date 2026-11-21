@@ -174,7 +174,7 @@
     /* FONDO — metriche + newspepper */
     .dash-bottom {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 2fr;
       gap: 20px;
       margin-bottom: 20px;
     }
@@ -396,8 +396,13 @@
 
       </div>
 
-      <!-- FONDO: NEWSPEPPER -->
+      <!-- FONDO: VERISURE + NEWSPEPPER -->
       <div class="dash-bottom">
+
+        <div class="col-card">
+          <div class="col-card-title">🛡️ Verisure — mese in corso</div>
+          <div id="kpiVerisureMini"><div class="placeholder">Caricamento…</div></div>
+        </div>
 
         <div class="col-card">
           <div class="col-card-title">📰 Ultimo briefing Newspepper</div>
@@ -752,6 +757,8 @@
 
   </script>
 
+<script src="verisure-kpi.js"></script>
+<script>VK.load().then(s => VK.renderMini(document.getElementById('kpiVerisureMini'), s));</script>
 <script src="bottom-nav.js"></script>
 </body>
 </html>

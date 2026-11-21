@@ -49,6 +49,8 @@
     .tag.omg { background: #f3e1e1; color: #8b3a3a; }
     .btn-reset { border: 1px solid var(--border); background: var(--bg); border-radius: 8px; padding: 8px 14px; font: inherit; font-size: 0.8rem; cursor: pointer; color: var(--text-muted); }
     .sticky { position: sticky; top: 16px; }
+    .btn-registra { width: 100%; margin-top: 14px; padding: 13px; border: none; border-radius: 10px; background: #2e7d4f; color: #fff; font: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+    .btn-registra:disabled { opacity: 0.4; cursor: not-allowed; }
     @media (max-width: 1000px) { .vs-grid { grid-template-columns: 1fr; } .sticky { position: static; } }
   </style>
 </head>
@@ -135,13 +137,15 @@
           <div class="vs-card">
             <h3>Il mio mese finora (prima di questa vendita)</h3>
             <div class="num-grid">
-              <label><span class="opt-label">Vendite RP Home</span><input type="number" min="0" id="mRp" value="0" inputmode="numeric" /></label>
-              <label><span class="opt-label">Vendite RP Business</span><input type="number" min="0" id="mRpb" value="0" inputmode="numeric" /></label>
-              <label><span class="opt-label">Vendite RE</span><input type="number" min="0" id="mRe" value="0" inputmode="numeric" /></label>
-              <label><span class="opt-label">Appuntamenti RP (booking)</span><input type="number" min="0" id="mBooking" value="0" inputmode="numeric" /></label>
-              <label><span class="opt-label">Provvigioni + installazioni già maturate (€)</span><input type="number" min="0" id="mProvv" value="0" inputmode="decimal" /></label>
+              <label><span class="opt-label">Vendite RP Home</span><input type="number" min="0" id="m_rp" inputmode="numeric" /></label>
+              <label><span class="opt-label">Vendite RP Business</span><input type="number" min="0" id="m_rpb" inputmode="numeric" /></label>
+              <label><span class="opt-label">Vendite RE</span><input type="number" min="0" id="m_re" inputmode="numeric" /></label>
+              <label><span class="opt-label">Appuntamenti RP Home</span><input type="number" min="0" id="m_app_rp" inputmode="numeric" /></label>
+              <label><span class="opt-label">Appuntamenti RP Business</span><input type="number" min="0" id="m_app_rpb" inputmode="numeric" /></label>
+              <label><span class="opt-label">Appuntamenti RE</span><input type="number" min="0" id="m_app_re" inputmode="numeric" /></label>
+              <label><span class="opt-label">Provvigioni + installazioni maturate (€)</span><input type="number" min="0" id="m_provv" inputmode="decimal" /></label>
             </div>
-            <div class="note">Si salvano da soli e li ritrovi uguali su tablet e computer. Nel booking conta anche l'appuntamento di questa vendita.</div>
+            <div class="note">Si salvano da soli e li ritrovi uguali su tablet e computer. Sono gli stessi numeri della sezione KPI in Task. Con «Registra vendita» si aggiornano da soli.</div>
           </div>
         </div>
 
@@ -160,6 +164,8 @@
             <div class="sum-line sum-tot"><span class="k">Totale maturato</span><span class="v" id="totMaturato">€ 0</span></div>
             <div id="minimoBox"></div>
             <div id="avvisi"></div>
+            <button type="button" class="btn-registra" id="btnRegistra" onclick="registraVendita()">✓ Registra vendita</button>
+            <div id="registraMsg"></div>
           </div>
 
           <div class="vs-card">
@@ -173,6 +179,7 @@
     </div>
   </main>
 
+  <script src="verisure-kpi.js"></script>
   <script>
     // ── LISTINO novembre 2026 (Allegato contratto, pag. 28) ──
     // [id, nome, gruppo, RES: pieno, provPieno, scontato, provScontato, BUS: pieno, provPieno, scontato, provScontato, extra]
@@ -207,34 +214,10 @@
     const ART = RAW.map(r => ({ id:r[0], nome:r[1], gruppo:r[2],
       res:{ p:r[3], pp:r[4], s:r[5], ps:r[6] }, bus:{ p:r[7], pp:r[8], s:r[9], ps:r[10] }, x:r[11]||{} }));
 
-    // ── STATO: salvato su Supabase (social_appunti, chiave verisure_calc) → uguale su tablet e computer ──
-    // localStorage resta solo come copia di riserva se manca la connessione
-    const KEY = 'verisure_calc_v1';
-    const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
-    const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
-    const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
-    const SB_CHIAVE = 'verisure_calc';
-    let st = { cliente:'res', origine:'rp', installo:false, grandiConti:false, wp3:false, righe:{}, mese:{ rp:0, rpb:0, re:0, booking:0, provv:0 } };
-    try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) st = Object.assign(st, s); } catch(e) {}
-    let _sbEsiste = false, _sbTimer = null;
-    async function caricaDaSupabase() {
-      try {
-        const r = await fetch(`${SB_URL}/rest/v1/social_appunti?chiave=eq.${SB_CHIAVE}&limit=1`, { headers: SB_H });
-        const rows = await r.json();
-        if (Array.isArray(rows) && rows[0]) { _sbEsiste = true; st = Object.assign(st, JSON.parse(rows[0].valore || '{}')); aggiorna(); }
-      } catch(e) {}
-    }
-    async function salvaSupabase() {
-      const body = JSON.stringify({ chiave: SB_CHIAVE, valore: JSON.stringify(st) });
-      try {
-        if (_sbEsiste) await fetch(`${SB_URL}/rest/v1/social_appunti?chiave=eq.${SB_CHIAVE}`, { method:'PATCH', headers: SB_H, body });
-        else { const r = await fetch(`${SB_URL}/rest/v1/social_appunti`, { method:'POST', headers: SB_H, body }); if (r.ok) _sbEsiste = true; }
-      } catch(e) {}
-    }
-    function salva() {
-      try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e) {}
-      clearTimeout(_sbTimer); _sbTimer = setTimeout(salvaSupabase, 700);
-    }
+    // ── STATO: condiviso con KPI (verisure-kpi.js → Supabase social_appunti 'verisure_calc') ──
+    let st = VK.loadLocale();
+    function salva() { VK.save(st); }
+    async function caricaDaSupabase() { st = await VK.load(); aggiorna(); }
 
     const eur = n => '€ ' + (Math.round(n * 100) / 100).toLocaleString('it-IT', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
     const segno = n => (n > 0 ? '+ ' : n < 0 ? '− ' : '') + eur(Math.abs(n));
@@ -320,22 +303,8 @@
       return { righeOff, avvisi, totCliente, provv, penale, adjGC, adj3wp, install, elementi, valoreOmaggi };
     }
 
-    // ── BONUS (piano nuovo venditore) ──
-    const bonusRP  = n => n < 2 ? 0 : n <= 9 ? 300 + (n - 2) * 100 : 1000 + (n - 9) * 100;
-    const bonusRE  = n => n < 2 ? 0 : Math.min(n, 5) * 100;
-    const bonusRPB = (n, rp) => rp >= 2 ? Math.min(n, 3) * 200 : 0;           // solo con target minimo RP (M1-M4: 2 RP)
-    const bonusBook = (rp, rpb, book) => (rp >= 2 && book > 0 && (rp + rpb) / book >= 0.5) ? 150 : 0;
-    const bonus3wp = n => n >= 2 ? 1000 : n === 1 ? 500 : 0;
-    function bonusTot(m) {
-      if (st.wp3) return { tot: bonus3wp(m.rp + m.rpb + m.re), det: [['Bonus formazione (3 settimane)', bonus3wp(m.rp + m.rpb + m.re)]] };
-      const det = [
-        ['Bonus RP Home', bonusRP(m.rp)],
-        ['Bonus RP Business', bonusRPB(m.rpb, m.rp)],
-        ['Bonus RE', bonusRE(m.re)],
-        ['Bonus RP/booking ≥ 0,5', bonusBook(m.rp, m.rpb, m.booking)],
-      ];
-      return { tot: det.reduce((s, d) => s + d[1], 0), det };
-    }
+    // ── BONUS (piano nuovo venditore, in verisure-kpi.js) ──
+    const bonusTot = m => VK.bonusTot(m, st.wp3);
 
     // ── RENDER RISULTATI ──
     function aggiorna() {
@@ -345,7 +314,7 @@
       document.getElementById('optInstallo').checked = st.installo;
       document.getElementById('optGrandiConti').checked = st.grandiConti;
       document.getElementById('opt3wp').checked = st.wp3;
-      ['rp','rpb','re','booking','provv'].forEach(k => { const el = document.getElementById('m' + k[0].toUpperCase() + k.slice(1)); if (document.activeElement !== el) el.value = st.mese[k]; });
+      ['rp','rpb','re','app_rp','app_rpb','app_re','provv'].forEach(k => { const el = document.getElementById('m_' + k); if (document.activeElement !== el) el.value = st.mese[k] || 0; });
 
       const v = calcolaVendita();
       const ha = v.righeOff.length > 0;
@@ -367,6 +336,8 @@
       const deltaBonus = bDopo.tot - bPrima.tot;
 
       const diretta = v.provv + v.adjGC + v.adj3wp - v.penale;
+      _ultimo = ha ? { tipo, guadagno: diretta + v.install } : null;
+      document.getElementById('btnRegistra').disabled = !ha;
       const maturato = diretta + v.install + deltaBonus;
       const g = [
         ['Provvigioni articoli', v.provv],
@@ -416,14 +387,28 @@
       document.getElementById('bonusRighe').innerHTML = bh;
     }
 
+    // ── REGISTRA VENDITA → numeri del mese (KPI) ──
+    let _ultimo = null;
+    function registraVendita() {
+      if (!_ultimo) return;
+      const { tipo, guadagno } = _ultimo;
+      st.mese[tipo] = (st.mese[tipo] || 0) + 1;
+      st.mese.provv = Math.round(((st.mese.provv || 0) + guadagno) * 100) / 100;
+      st.righe = {};
+      salva(); aggiorna();
+      const nome = { rp:'RP Home', rpb:'RP Business', re:'RE' }[tipo];
+      document.getElementById('registraMsg').innerHTML = `<div class="note ok">Vendita ${nome} registrata: ${segno(guadagno)} tra provvigioni e installazione. Il bonus si aggiorna da solo nei KPI.</div>`;
+      setTimeout(() => { const m = document.getElementById('registraMsg'); if (m) m.innerHTML = ''; }, 6000);
+    }
+
     // ── EVENTI ──
     document.querySelectorAll('#segCliente button').forEach(b => b.onclick = () => { st.cliente = b.dataset.v; salva(); aggiorna(); });
     document.querySelectorAll('#segOrigine button').forEach(b => b.onclick = () => { st.origine = b.dataset.v; salva(); aggiorna(); });
     document.getElementById('optInstallo').onchange = e => { st.installo = e.target.checked; salva(); aggiorna(); };
     document.getElementById('optGrandiConti').onchange = e => { st.grandiConti = e.target.checked; salva(); aggiorna(); };
     document.getElementById('opt3wp').onchange = e => { st.wp3 = e.target.checked; salva(); aggiorna(); };
-    ['rp','rpb','re','booking','provv'].forEach(k => {
-      document.getElementById('m' + k[0].toUpperCase() + k.slice(1)).oninput = e => { st.mese[k] = Math.max(0, parseFloat(e.target.value) || 0); salva(); aggiorna(); };
+    ['rp','rpb','re','app_rp','app_rpb','app_re','provv'].forEach(k => {
+      document.getElementById('m_' + k).oninput = e => { st.mese[k] = Math.max(0, parseFloat(e.target.value) || 0); salva(); aggiorna(); };
     });
 
     const d = new Date();
