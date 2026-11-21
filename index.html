@@ -288,18 +288,6 @@
       <!-- PANORAMICA -->
       <div class="panoramica">
         <div class="pan-card">
-          <div class="pan-label">Clienti attivi</div>
-          <div class="pan-val accent" id="contClienti">—</div>
-        </div>
-        <div class="pan-card">
-          <div class="pan-label">Proprietà in gestione</div>
-          <div class="pan-val" id="contProprieta">—</div>
-        </div>
-        <div class="pan-card">
-          <div class="pan-label">Follow-up scaduti</div>
-          <div class="pan-val warn" id="contFollowup">—</div>
-        </div>
-        <div class="pan-card">
           <div class="pan-label">Prossimo evento</div>
           <div class="pan-val" id="contEvento" style="font-size:1rem;padding-top:4px">—</div>
         </div>
@@ -313,16 +301,7 @@
         </div>
       </div>
 
-      <!-- BRIEFING GEGGI — full width -->
-      <div class="briefing-card">
-        <div class="col-card-title">👨‍💼 Briefing Geggi</div>
-        <div class="briefing-body" id="geggiBriefing">Nessun briefing — arriva automaticamente ogni mattina alle 08:00.</div>
-        <div class="briefing-meta">
-          <span id="geggiData"></span>
-        </div>
-      </div>
-
-      <!-- GRIGLIA TOP: AGENDA | PRIORITÀ + DA SEGUIRE -->
+      <!-- GRIGLIA: AGENDA | VERISURE + PRIORITÀ -->
       <div class="dash-top">
 
         <!-- AGENDA -->
@@ -337,79 +316,21 @@
             <button class="btn-sm" onclick="aggiungiAgenda()">+</button>
           </div>
           <div id="listaAgenda"><div class="placeholder">Nessun appuntamento oggi.</div></div>
-          <a href="attivita.html" class="link-goto">→ Vai ad Attività</a>
+          <a href="attivita.html" class="link-goto">→ Vai a Task</a>
         </div>
 
-        <!-- DESTRA: PRIORITÀ + DA SEGUIRE -->
+        <!-- DESTRA: VERISURE + PRIORITÀ -->
         <div>
+          <div class="col-card">
+            <div class="col-card-title">🛡️ Verisure — mese in corso</div>
+            <div id="kpiVerisureMini"><div class="placeholder">Caricamento…</div></div>
+          </div>
+
           <div class="col-card">
             <div class="col-card-title">🔴 Priorità aperte</div>
             <div id="recapPriorita"><div class="placeholder">Nessuna priorità aperta.</div></div>
-            <a href="attivita.html" class="link-goto">→ Vai ad Attività</a>
+            <a href="attivita.html" class="link-goto">→ Vai a Task</a>
           </div>
-
-          <div class="col-card">
-            <div class="col-card-title" style="display:flex;justify-content:space-between;align-items:center">
-              <span>⭐ Da fare oggi</span>
-              <span id="dsfCount" style="font-size:0.72rem;font-weight:700;background:var(--accent);color:white;padding:2px 8px;border-radius:10px;display:none"></span>
-            </div>
-            <div id="recapStellati"><div class="placeholder">Tutto in ordine.</div></div>
-            <a href="richieste.html" class="link-goto">→ Vai alle Richieste</a>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- SEMAFORI OPERATIVI -->
-      <div class="semafori">
-
-        <div class="semaforo-card">
-          <div class="semaforo-header">
-            <div class="semaforo-title">📩 Richieste aperte</div>
-            <div class="semaforo-count warn" id="countNuoveRichieste">0</div>
-          </div>
-          <div id="richiesteList"><div class="placeholder">Nessuna richiesta nuova.</div></div>
-          <a href="richieste.html" class="link-goto">→ Vai alle Richieste</a>
-        </div>
-
-        <div class="semaforo-card">
-          <div class="semaforo-header">
-            <div class="semaforo-title">✉️ Bozze da inviare</div>
-            <div class="semaforo-count" id="countBozze">0</div>
-          </div>
-          <div id="schedeCaricare"><div class="placeholder">Nessuna bozza in attesa.</div></div>
-          <a href="incarico.html" class="link-goto">→ Vai a Scheda Incarico</a>
-        </div>
-
-      </div>
-
-      <!-- OSSERVATORIO -->
-      <div class="blocco-header" style="margin-bottom:12px;">🔭 Osservatorio acquisizioni</div>
-      <div class="osservatorio">
-
-        <div class="col-card">
-          <div class="col-card-title">🏆 Top 3 da acquisire</div>
-          <div id="top3Ricerca"><div class="placeholder">Nessuna scheda in Ricerca Immobili.</div></div>
-          <a href="ricerca.html" class="link-goto">→ Vai a Ricerca Immobili</a>
-        </div>
-
-
-      </div>
-
-      <!-- FONDO: VERISURE + NEWSPEPPER -->
-      <div class="dash-bottom">
-
-        <div class="col-card">
-          <div class="col-card-title">🛡️ Verisure — mese in corso</div>
-          <div id="kpiVerisureMini"><div class="placeholder">Caricamento…</div></div>
-        </div>
-
-        <div class="col-card">
-          <div class="col-card-title">📰 Ultimo briefing Newspepper</div>
-          <div id="newspepperBriefing" style="font-size:0.82rem;color:var(--text);line-height:1.7;max-height:200px;overflow-y:auto">
-            <div class="placeholder">Nessun briefing disponibile — arriva automaticamente ogni mattina.</div>
-          </div>
-          <div id="newspepperData" style="margin-top:10px;font-size:0.68rem;color:var(--text-faint);"></div>
         </div>
 
       </div>
@@ -417,6 +338,7 @@
     </div>
   </main>
 
+  <script src="verisure-kpi.js"></script>
   <script>
     const d = new Date();
     const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
@@ -431,26 +353,8 @@
 
 
     async function caricaContatori() {
+      // Prossimo evento
       try {
-        // Clienti attivi
-        const rC = await fetch(`${SB_URL}/rest/v1/clienti?stato=neq.Perso&stato=neq.Chiuso&select=id`, { headers: SB_H });
-        const clienti = await rC.json();
-        document.getElementById('contClienti').textContent = Array.isArray(clienti) ? clienti.length : '—';
-
-        // Proprietà in gestione
-        const rP = await fetch(`${SB_URL}/rest/v1/proprieta?stato=neq.Venduto&stato=neq.Annullato&select=id`, { headers: SB_H });
-        const prop = await rP.json();
-        document.getElementById('contProprieta').textContent = Array.isArray(prop) ? prop.length : '—';
-
-        // Follow-up scaduti (richieste con ultimo_contatto < 3 giorni fa e stato attivo)
-        const tre = new Date(); tre.setDate(tre.getDate() - 3);
-        const treStr = tre.toISOString().split('T')[0];
-        const rF = await fetch(`${SB_URL}/rest/v1/richieste?stato_cliente=in.("Risposto","Follow-up 1","Follow-up 2")&ultimo_contatto=lte.${treStr}&select=id`, { headers: SB_H });
-        const followScad = await rF.json();
-        const nFollow = Array.isArray(followScad) ? followScad.length : 0;
-        document.getElementById('contFollowup').textContent = nFollow;
-
-        // Prossimo evento
         const oggi = new Date().toISOString().split('T')[0];
         const rEv = await fetch(`${SB_URL}/rest/v1/eventi_calendario?data_inizio=gte.${oggi}T00:00:00&order=data_inizio.asc&limit=1`, { headers: SB_H });
         const evList = await rEv.json();
@@ -462,186 +366,20 @@
           document.getElementById('contEvento').textContent = (isOggi ? 'Oggi' : dt.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })) + oraStr;
           document.getElementById('contEvento').title = ev.titolo;
         }
+      } catch(e) { console.error('Prossimo evento:', e); }
 
-
-        // Piano editoriale settimana da Supabase
-        const lunedi = new Date(); lunedi.setDate(lunedi.getDate() - ((lunedi.getDay() + 6) % 7));
-        const domenica = new Date(lunedi); domenica.setDate(lunedi.getDate() + 6);
-        const rPiano = await fetch(`${SB_URL}/rest/v1/piano_editoriale?data=gte.${lunedi.toISOString().split('T')[0]}&data=lte.${domenica.toISOString().split('T')[0]}&order=data.asc`, { headers: SB_H });
-        const pianoData = await rPiano.json();
-        const socialEl = document.getElementById('socialSettimana');
-        const coloreRubrica = { nero: '#222', bianco: '#888', oro: '#c9a227', grigio: '#666' };
-        const emojiStato = { bozza: '📋', prodotto: '🔧', pubblicato: '✅' };
-        const giorniCortissimi = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-        if (socialEl && Array.isArray(pianoData) && pianoData.length > 0) {
-          socialEl.innerHTML = pianoData.map(p => {
-            const dp = new Date(p.data + 'T12:00:00');
-            const col = coloreRubrica[p.rubrica] || '#888';
-            const st = emojiStato[p.stato] || '📋';
-            return `<div class="priorita-recap-item">
-              <div style="width:32px;font-size:0.72rem;font-weight:700;color:${col};text-align:center">${giorniCortissimi[dp.getDay()]}<br>${dp.getDate()}</div>
-              <div style="flex:1">
-                <div class="priorita-recap-testo">${p.titolo}</div>
-                <div style="font-size:0.7rem;color:var(--text-muted)">${p.formato || ''}</div>
-              </div>
-              <div style="font-size:0.85rem">${st}</div>
-            </div>`;
-          }).join('');
-        } else if (socialEl) {
-          socialEl.innerHTML = '<div class="placeholder">Nessun contenuto questa settimana.</div>';
-        }
-
-        // Geggi — ultimo briefing (messaggi mittente='segretario')
-        // NOTA: fetch separato per non dipendere da errori precedenti
-        try {
-          const rGeggi = await fetch(`${SB_URL}/rest/v1/messaggi?mittente=eq.segretario&order=created_at.desc&limit=1`, { headers: SB_H });
-          const geggiMsg = await rGeggi.json();
-          const geggiEl = document.getElementById('geggiBriefing');
-          const geggiDataEl = document.getElementById('geggiData');
-          if (Array.isArray(geggiMsg) && geggiMsg.length > 0) {
-            geggiEl.innerHTML = `<div style="font-size:0.82rem;color:var(--text);line-height:1.7;white-space:pre-wrap">${geggiMsg[0].testo}</div>`;
-            const dtG = new Date(geggiMsg[0].created_at);
-            geggiDataEl.textContent = dtG.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }) + ' ore ' + dtG.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-          }
-        } catch(eGeggi) { console.error('Briefing Geggi:', eGeggi); }
-
-        // Newspepper — ultimo briefing (messaggi mittente='newspepper')
-        try {
-          const rNews = await fetch(`${SB_URL}/rest/v1/messaggi?mittente=eq.newspepper&order=created_at.desc&limit=1`, { headers: SB_H });
-          const news = await rNews.json();
-          const newsEl = document.getElementById('newspepperBriefing');
-          const newsDataEl = document.getElementById('newspepperData');
-          if (Array.isArray(news) && news.length > 0) {
-            newsEl.innerHTML = `<div style="font-size:0.82rem;color:var(--text);line-height:1.7;white-space:pre-wrap">${news[0].testo}</div>`;
-            const dtN = new Date(news[0].created_at);
-            newsDataEl.textContent = 'Ultimo aggiornamento: ' + dtN.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }) + ' ore ' + dtN.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-          }
-        } catch(eNews) { console.error('Briefing Newspepper:', eNews); }
-
-        // Priorità da Supabase
+      // Priorità aperte
+      try {
         const rPr = await fetch(`${SB_URL}/rest/v1/attivita?completata=eq.false&categoria=eq.priorita&order=created_at.desc&limit=6`, { headers: SB_H, cache: 'no-store' });
         const prList = await rPr.json();
         const prEl = document.getElementById('recapPriorita');
-        if (Array.isArray(prList) && prList.length > 0) {
-          prEl.innerHTML = prList.map(p => `
-            <div class="lista-item">
-              <div class="dot dot-accent"></div>
-              <div class="lista-testo">${p.testo}</div>
-            </div>`).join('');
-        } else {
-          prEl.innerHTML = '<div class="placeholder">Nessuna priorità aperta.</div>';
-        }
+        prEl.innerHTML = Array.isArray(prList) && prList.length > 0
+          ? prList.map(p => `<div class="lista-item"><div class="dot dot-accent"></div><div class="lista-testo">${p.testo}</div></div>`).join('')
+          : '<div class="placeholder">Nessuna priorità aperta.</div>';
+      } catch(e) { console.error('Priorità:', e); }
 
-        // SEMAFORO: Richieste aperte (fetch tutto, filtro JS)
-        const STATI_CHIUSI = new Set(['Chiuso','Perso','Non interessato','Non procedere']);
-        const rRich = await fetch(`${SB_URL}/rest/v1/richieste?order=data_richiesta.asc&limit=200`, { headers: SB_H, cache: 'no-store' });
-        const richAll = await rRich.json();
-
-        // Da rispondere: richieste con bozza Gmail pronta
-        const daRispondere = Array.isArray(richAll) ? richAll.filter(r =>
-          r.stato_follow === 'Bozza creata' || (r.stato_cliente === 'Nuova richiesta' && r.stato_follow === 'Nuovo')
-        ) : [];
-        const schedeEl = document.getElementById('schedeCaricare');
-        document.getElementById('countBozze').textContent = daRispondere.length;
-        if (daRispondere.length > 0) {
-          schedeEl.innerHTML = daRispondere.map(r => `
-            <div class="lista-item" style="cursor:pointer" onclick="location.href='richieste.html'">
-              <div class="dot dot-warn"></div>
-              <div style="flex:1">
-                <div class="lista-testo">${r.nome_cliente || '—'}</div>
-                <div class="lista-sub">${r.immobile || ''}</div>
-              </div>
-            </div>`).join('');
-        } else {
-          schedeEl.innerHTML = '<div class="placeholder">Nessuna risposta in attesa.</div>';
-        }
-        const richList = Array.isArray(richAll) ? richAll.filter(r => !STATI_CHIUSI.has(r.stato_cliente)) : [];
-        const richEl = document.getElementById('richiesteList');
-        document.getElementById('countNuoveRichieste').textContent = richList.length;
-        const richMostRecent = [...richList].sort((a,b) => new Date(b.data_richiesta) - new Date(a.data_richiesta)).slice(0,4);
-        const STATO_COLORE = {
-          'Nuova richiesta': '#e74c3c',
-          'Risposto': '#e67e22', 'Follow-up 1': '#e67e22', 'Follow-up 2': '#e67e22', 'Follow-up 3': '#e67e22',
-          'In attesa risposta': '#2980b9', 'Da richiamare': '#8e44ad',
-          'Visita proposta': '#27ae60', 'Visita fissata': '#27ae60', 'Visita effettuata': '#145a30',
-          'Interessato': '#145a30'
-        };
-        if (richMostRecent.length > 0) {
-          richEl.innerHTML = richMostRecent.map(r => {
-            const col = STATO_COLORE[r.stato_cliente] || '#888';
-            const gg = r.data_richiesta ? Math.floor((Date.now() - new Date(r.data_richiesta)) / 86400000) : '—';
-            return `<div class="lista-item" style="cursor:pointer" onclick="location.href='richieste.html'">
-              <div class="dot" style="background:${col};flex-shrink:0"></div>
-              <div style="flex:1;min-width:0">
-                <div class="lista-testo">${r.nome_cliente || '—'}</div>
-                <div class="lista-sub" style="display:flex;gap:8px;flex-wrap:wrap">
-                  <span style="color:${col};font-weight:600">${r.stato_cliente}</span>
-                  <span>${r.immobile || ''}</span>
-                  <span style="margin-left:auto;color:var(--text-faint)">${gg}gg</span>
-                </div>
-              </div>
-            </div>`;
-          }).join('');
-        } else {
-          richEl.innerHTML = '<div class="placeholder">Nessuna richiesta aperta.</div>';
-        }
-
-        // ── DA FARE OGGI: aggregato da tutte le fonti ──
-        const dsEl = document.getElementById('recapStellati');
-        const azioni = [];
-
-        // 1. Bozze pronte da inviare (massima priorità)
-        if (Array.isArray(richAll)) {
-          richAll.filter(r => r.stato_follow === 'Bozza creata' || (r.stato_cliente === 'Nuova richiesta' && r.stato_follow === 'Nuovo'))
-            .forEach(r => azioni.push({ tipo: 'bozza', label: '✉️ Rispondi', nome: r.nome_cliente || '—', sub: r.immobile || r.stato_follow, urgenza: 0 }));
-        }
-
-        // 2. Follow-up scaduti — solo stati che richiedono azione attiva
-        const STATI_DA_CONTATTARE = new Set(['Risposto','Follow-up 1','Follow-up 2','Follow-up 3','Da richiamare','In attesa risposta']);
-        if (Array.isArray(richAll)) {
-          richAll.filter(r => r.prossimo_follow && r.prossimo_follow < oggi && STATI_DA_CONTATTARE.has(r.stato_cliente))
-            .forEach(r => {
-              const gg = Math.floor((Date.now() - new Date(r.prossimo_follow)) / 86400000);
-              azioni.push({ tipo: 'scaduto', label: `⏰ Da contattare (${gg}gg)`, nome: r.nome_cliente || '—', sub: r.stato_cliente + (r.immobile ? ' · ' + r.immobile : ''), urgenza: 1 });
-            });
-        }
-
-        // 3. Pianificati per oggi (prossimo_follow = oggi)
-        if (Array.isArray(richAll)) {
-          richAll.filter(r => r.prossimo_follow === oggi && !STATI_CHIUSI.has(r.stato_cliente))
-            .forEach(r => azioni.push({ tipo: 'oggi', label: '📅 Oggi', nome: r.nome_cliente || '—', sub: r.stato_cliente + (r.immobile ? ' · ' + r.immobile : ''), urgenza: 2 }));
-        }
-
-        // 4. Priorità aperte da Supabase
-        if (Array.isArray(prList)) {
-          prList.slice(0, 3).forEach(p => azioni.push({ tipo: 'task', label: '🔴 Task', nome: p.testo, sub: '', urgenza: 3 }));
-        }
-
-        const colore = { bozza: '#e74c3c', scaduto: '#e67e22', oggi: '#c9a84c', task: '#8e44ad' };
-        const countEl = document.getElementById('dsfCount');
-
-        if (azioni.length > 0) {
-          countEl.textContent = azioni.length;
-          countEl.style.display = '';
-          dsEl.innerHTML = azioni.map(a => `
-            <div class="lista-item" style="cursor:pointer" onclick="location.href='richieste.html'">
-              <div class="dot" style="background:${colore[a.tipo]};flex-shrink:0"></div>
-              <div style="flex:1;min-width:0">
-                <div class="lista-testo" style="display:flex;gap:6px;align-items:center">
-                  <span style="font-size:0.65rem;font-weight:700;color:${colore[a.tipo]}">${a.label}</span>
-                  <span>${a.nome}</span>
-                </div>
-                ${a.sub ? `<div class="lista-sub">${a.sub}</div>` : ''}
-              </div>
-            </div>`).join('');
-        } else {
-          countEl.style.display = 'none';
-          dsEl.innerHTML = '<div class="placeholder">Tutto in ordine. ✅</div>';
-        }
-
-      } catch(e) {
-        console.error('Errore Supabase:', e);
-      }
+      // Verisure — riepilogo del mese
+      try { VK.renderMini(document.getElementById('kpiVerisureMini'), await VK.load()); } catch(e) { console.error('Verisure:', e); }
     }
     caricaContatori();
     setInterval(caricaContatori, 60 * 1000);
@@ -734,31 +472,8 @@
     }
     caricaEventiCalendar();
 
-    // OSSERVATORIO — TOP 3
-    const ricercaImmobili = JSON.parse(localStorage.getItem('ricerca_immobili') || '[]');
-    const top3 = ricercaImmobili.filter(s => s.stato_scheda !== 'incarico' && s.stato_scheda !== 'archiviato').sort((a, b) => (b.score||0) - (a.score||0)).slice(0, 3);
-    const top3El = document.getElementById('top3Ricerca');
-    if (top3.length === 0) {
-      top3El.innerHTML = '<div class="placeholder">Nessuna scheda in Ricerca Immobili.</div>';
-    } else {
-      top3El.innerHTML = top3.map((s, i) => {
-        const vc = (s.score||0) >= 72 ? '#27ae60' : (s.score||0) >= 45 ? '#b7860b' : '#c0392b';
-        const em = (s.score||0) >= 72 ? '🟢' : (s.score||0) >= 45 ? '🟡' : '🔴';
-        return `<div class="lista-item">
-          <div style="font-size:0.78rem;font-weight:700;color:var(--text-faint);width:16px">${i+1}.</div>
-          <div style="flex:1">
-            <div class="lista-testo">${s.nome}</div>
-            <div class="lista-sub">${s.comuneLabel||''} · ${s.tipoLabel||''}</div>
-          </div>
-          <div style="font-size:0.78rem;font-weight:700;color:${vc}">${em} ${s.score||0}/100</div>
-        </div>`;
-      }).join('');
-    }
-
   </script>
 
-<script src="verisure-kpi.js"></script>
-<script>VK.load().then(s => VK.renderMini(document.getElementById('kpiVerisureMini'), s));</script>
 <script src="bottom-nav.js"></script>
 </body>
 </html>
