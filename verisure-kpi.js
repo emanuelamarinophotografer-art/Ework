@@ -248,11 +248,11 @@
       const rimbAuto = nuovo ? Math.round(150 * r.quota) : null;
       const altro = [];
       if (r.fase.includes('parziale')) altro.push('Carburante formazione 110 €');
-      if (r.y === 2026 && r.m === 11) altro.push(`Bonus formazione ${b3 ? eur(b3) : '(0 vendite finora)'}`);
+      if (r.fase.includes('parziale')) altro.push(`Bonus formazione ${b3 ? eur(b3) : '(0 vendite finora)'}`);
       if (r.fase === 'M4') altro.push('Certificazione specialista 200 € (a fine mese)');
       const nomiP = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
       const pag = new Date(r.y, r.m + 1, 15);
-      const totMese = (minimo || 0) + (rimbAuto || 0) + (r.fase.includes('parziale') ? 110 : 0);
+      const totMese = (minimo || 0) + (rimbAuto || 0) + (r.fase.includes('parziale') ? 110 + b3 : 0);
       const auto = nuovo ? '100% coperta' : `70% coperta${auto30 !== null ? ` · a tuo carico ~${eur(auto30)}/mese` : ' · 30% a tuo carico'}`;
       return `<tr><td><b>${r.label}</b><br><span class="vk-k">${r.fase}${r.presenti ? ` · ${r.presenti} gg su ${r.giorni}` : ''}</span></td>
         <td>${minimo !== null ? eur(minimo) : '—'}</td><td>${rimbAuto !== null ? eur(rimbAuto) : '—'}</td>
@@ -269,7 +269,7 @@
             <span class="vk-step"><button type="button" onclick="VK.setExtra('vendite3wp', Math.max(0, ${x.vendite3wp} - 1))">−</button><b>${x.vendite3wp} / 2</b><button type="button" onclick="VK.setExtra('vendite3wp', Math.min(2, ${x.vendite3wp} + 1))">+</button></span></div>
           ${barra(x.vendite3wp, 2)}
           <div class="vk-row"><span>Bonus</span><span class="vk-big">${eur(b3)}</span></div>
-          <div class="vk-note">1 vendita = 500 € · 2 vendite = 1.000 €. Pagato 3 settimane dopo l'inizio della formazione. Queste vendite non danno provvigione diretta.
+          <div class="vk-note">1 vendita = 500 € · 2 vendite = 1.000 €. Arriva con il pagamento del 15 dicembre. Queste vendite non danno provvigione diretta.
             <br>Fine formazione: <input type="date" value="${x.fine3wp}" onchange="VK.setExtra('fine3wp', this.value)" style="font:inherit;font-size:0.76rem;border:1px solid var(--border);border-radius:6px;padding:2px 4px;background:var(--bg-card)"></div>
         </div>
         <div class="vk-box">
@@ -286,7 +286,7 @@
       <div class="vk-box" style="margin-top:12px;overflow-x:auto">
         <h4>📅 Mese per mese: cosa ti spetta oltre alle vendite</h4>
         <table class="vk-storico"><tr><th style="text-align:left">Mese</th><th>Minimo garantito</th><th>Rimborso auto</th><th style="text-align:left">Altro</th><th style="text-align:left">Auto aziendale</th><th>Pagato il</th></tr>${righe}</table>
-        <div class="vk-note">Ogni mese si paga il 15 del mese dopo. "Almeno" = minimo + rimborso auto (+ carburante a novembre), senza contare vendite e bonus. Il minimo scatta solo se provvigioni e bonus del mese restano sotto quella cifra. Data di inserimento: <input type="date" value="${x.inserimento}" onchange="VK.setExtra('inserimento', this.value)" style="font:inherit;font-size:0.76rem;border:1px solid var(--border);border-radius:6px;padding:2px 4px;background:var(--bg-card)">. Se nel primo mese fai meno di 15 giorni, conta in proporzione e anche il mese dopo vale come 1° mese. Da confermare con Francesco: firma del contratto (20/11) o inizio formazione (16/11).</div>
+        <div class="vk-note">Ogni mese si paga il 15 del mese dopo. "Almeno" = minimo + rimborso auto (a novembre anche carburante e bonus formazione), senza contare provvigioni e bonus delle vendite. Il minimo scatta solo se provvigioni e bonus del mese restano sotto quella cifra. Data di inserimento: <input type="date" value="${x.inserimento}" onchange="VK.setExtra('inserimento', this.value)" style="font:inherit;font-size:0.76rem;border:1px solid var(--border);border-radius:6px;padding:2px 4px;background:var(--bg-card)">. Se nel primo mese fai meno di 15 giorni, conta in proporzione e anche il mese dopo vale come 1° mese. Da confermare con Francesco: firma del contratto (20/11) o inizio formazione (16/11).</div>
       </div>
 
       <div class="vk-bottom" style="margin-top:12px">
