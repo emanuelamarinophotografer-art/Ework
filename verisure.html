@@ -26,6 +26,7 @@
     .mode button.s-giallo { box-shadow: inset 0 0 0 2px #d39b2a; }
     .mode button.s-rosso { box-shadow: inset 0 0 0 2px #c0392b; }
     .mode button.on.s-verde { background: #2e7d4f; } .mode button.on.s-giallo { background: #b8860b; } .mode button.on.s-rosso { background: #a33; }
+    .item-can { font-size: 0.72rem; color: #2e5a88; margin-top: 2px; }
     .canone-tot { background: var(--accent-bg); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
     .item { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); }
     .item.zero .item-nome { color: var(--text-muted); }
@@ -57,7 +58,7 @@
     .tag { font-size: 0.66rem; padding: 2px 6px; border-radius: 6px; background: var(--bg); color: var(--text-muted); margin-left: 6px; }
     .tag.omg { background: #f3e1e1; color: #8b3a3a; }
     .btn-reset { border: 1px solid var(--border); background: var(--bg); border-radius: 8px; padding: 8px 14px; font: inherit; font-size: 0.8rem; cursor: pointer; color: var(--text-muted); }
-    .sticky { position: sticky; top: 16px; }
+    .sticky { }
     .btn-registra { width: 100%; margin-top: 14px; padding: 13px; border: none; border-radius: 10px; background: #2e7d4f; color: #fff; font: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
     .btn-registra:disabled { opacity: 0.4; cursor: not-allowed; }
     @media (max-width: 1000px) { .vs-grid { grid-template-columns: 1fr; } .sticky { position: static; } }
@@ -161,10 +162,15 @@
         <!-- DESTRA: RISULTATI -->
         <div class="sticky">
           <div class="vs-card">
-            <h3>Il cliente paga</h3>
+            <h3>Il cliente paga: installazione</h3>
             <div id="offertaRighe"></div>
             <div class="sum-line sum-tot"><span class="k">Totale installazione (una volta)</span><span class="v" id="totCliente">€ 0</span></div>
-            <div class="sum-line canone-tot"><span class="k">Canone mensile</span><span class="v" id="totCanone">€ 0 /mese</span></div>
+          </div>
+
+          <div class="vs-card">
+            <h3>Canone mensile del cliente</h3>
+            <div id="canoneRighe"></div>
+            <div class="sum-line sum-tot"><span class="k">Totale canone</span><span class="v" id="totCanone">€ 0 /mese</span></div>
             <div class="note" id="noteIva"></div>
           </div>
 
@@ -266,9 +272,9 @@
         const sub = a.x.servizio ? `provvigione ${eur(l.pp)}`
           : a.x.listinoFree ? 'gratis per il cliente · nessuna provvigione'
           : `pieno ${eur(l.p)} → ${eur(l.pp)}` + (l.s !== null ? ` · scontato ${eur(l.s)} → ${eur(l.ps)}` : '');
-        const can = canoneDi(a.id) ? ` · canone +${eur(canoneDi(a.id))}/mese` : '';
+        const can = canoneDi(a.id) ? `<div class="item-can">canone +${eur(canoneDi(a.id))}/mese</div>` : '';
         const cv = convenienza(l);
-        const badge = cv ? `<div class="conv ${cv.liv}">${cv.liv === 'verde' ? '✓ Sconto conveniente' : cv.liv === 'giallo' ? '~ Sconto così così' : '✕ Sconto sconveniente'} · cliente −${eur(cv.scontoCliente)}, tu −${eur(cv.perdita)}</div>` : '';
+        const badge = cv ? `<div class="conv ${cv.liv}">cliente −${eur(cv.scontoCliente)} · tu −${eur(cv.perdita)}</div>` : '';
         const puoSconto = l.s !== null, puoOmaggio = !a.x.servizio && !a.x.listinoFree && !a.x.kit;
         const modi = (a.x.servizio || a.x.listinoFree) ? '' : `<div class="mode">
             <button type="button" class="${r.m==='pieno'?'on':''}" onclick="setMode('${a.id}','pieno')">Pieno</button>
@@ -276,7 +282,7 @@
             <button type="button" class="omg ${r.m==='omaggio'?'on':''}" ${puoOmaggio?'':'disabled'} onclick="setMode('${a.id}','omaggio')">Omaggio</button>
           </div>`;
         html += `<div class="item ${r.q? '' : 'zero'}">
-          <div><div class="item-nome">${a.nome}</div><div class="item-sub">${sub}${can}</div>${badge}</div>
+          <div><div class="item-nome">${a.nome}</div><div class="item-sub">${sub}</div>${can}${badge}</div>
           ${modi || '<span></span>'}
           <div class="qty"><button type="button" onclick="cambiaQ('${a.id}',-1)">−</button><span>${r.q}</span><button type="button" onclick="cambiaQ('${a.id}',1)">+</button></div>
         </div>`;
@@ -355,10 +361,14 @@
 
       // cliente
       document.getElementById('offertaRighe').innerHTML = ha ? v.righeOff.map(r =>
-        `<div class="offer-line"><span>${r.q>1?r.q+'× ':''}${r.nome}${r.tag?`<span class="tag ${r.omg?'omg':''}">${r.tag}</span>`:''}</span><span>${r.prezzo===null?'—':eur(r.prezzo)}${r.can?` <small style="color:var(--text-muted)">+${eur(r.can)}/m</small>`:''}</span></div>`).join('')
+        `<div class="offer-line"><span>${r.q>1?r.q+'× ':''}${r.nome}${r.tag?`<span class="tag ${r.omg?'omg':''}">${r.tag}</span>`:''}</span><span>${r.prezzo===null?'—':eur(r.prezzo)}</span></div>`).join('')
         : '<div class="placeholder">Aggiungi gli articoli a sinistra.</div>';
       document.getElementById('totCliente').textContent = eur(v.totCliente);
       document.getElementById('totCanone').textContent = eur(v.canone) + ' /mese';
+      const conCanone = v.righeOff.filter(r => r.can);
+      document.getElementById('canoneRighe').innerHTML = conCanone.length ? conCanone.map(r =>
+        `<div class="offer-line"><span>${r.q>1?r.q+'× ':''}${r.nome}${r.nome==='Kit Verisure'?' (servizi base)':''}</span><span>${eur(r.can)}</span></div>`).join('')
+        : '<div class="placeholder">—</div>';
       document.getElementById('noteIva').textContent = (st.cliente === 'res' ? 'Cliente Home: prezzi e canone IVA inclusa.' : 'Cliente Business: prezzi e canone IVA esclusa.')
         + (v.canone && !riga('kit').q ? ' Manca il Kit: il canone base di 38,90 € non è conteggiato.' : '');
 
