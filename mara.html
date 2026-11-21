@@ -233,7 +233,7 @@
           <div class="mara-avatar">📊</div>
           <div>
             <div class="mara-title">Mara — Analista Trasversale</div>
-            <div class="mara-sub">Lavoro · Vita & Casa</div>
+            <div class="mara-sub">Verisure · Vita & Casa</div>
           </div>
         </div>
         <div class="mara-update" id="maraUpdate"></div>
@@ -243,73 +243,25 @@
       <div class="blocco" style="margin-bottom:16px">
         <div class="blocco-header">Colpo d'occhio</div>
         <div class="kpi-row">
-          <div class="kpi-card"><div class="kpi-val blu" id="kpi_richieste">—</div><div class="kpi-label">Richieste attive</div></div>
-          <div class="kpi-card"><div class="kpi-val arancio" id="kpi_followscad">—</div><div class="kpi-label">Follow scaduti</div></div>
-          <div class="kpi-card"><div class="kpi-val" id="kpi_immobili">—</div><div class="kpi-label">Portafoglio</div></div>
+          <div class="kpi-card"><div class="kpi-val blu" id="kpi_app">—</div><div class="kpi-label">Appuntamenti / 25</div></div>
+          <div class="kpi-card"><div class="kpi-val" id="kpi_vend">—</div><div class="kpi-label">Vendite / 7</div></div>
+          <div class="kpi-card"><div class="kpi-val arancio" id="kpi_maturato">—</div><div class="kpi-label">Maturato Verisure</div></div>
+          <div class="kpi-card"><div class="kpi-val verde" id="kpi_pagato">—</div><div class="kpi-label">Ti arriva questo mese</div></div>
         </div>
       </div>
 
       <!-- TAB BAR -->
       <div class="mara-tabs">
-        <button type="button" class="mara-tab active" onclick="switchTab('lavoro', this)">📋 Lavoro</button>
+        <button type="button" class="mara-tab active" onclick="switchTab('lavoro', this)">🛡️ Verisure</button>
         <button type="button" class="mara-tab" onclick="switchTab('vita', this)">🏠 Vita & Casa</button>
       </div>
 
-      <!-- ═══════ TAB LAVORO ═══════ -->
+      <!-- ═══════ TAB VERISURE ═══════ -->
       <div class="mara-panel active" id="panel-lavoro">
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
-
-          <!-- COLONNA SX — LAVORO -->
-          <div style="display:flex;flex-direction:column;gap:16px">
-            <div class="blocco">
-              <div class="blocco-header">Funnel richieste</div>
-              <div class="funnel-wrap" id="funnelWrap"><div class="placeholder">Caricamento…</div></div>
-              <div class="mara-insight" id="funnelInsight" style="display:none">
-                <div class="mara-insight-label">— Mara 📊</div>
-                <div class="mara-insight-text" id="funnelInsightText"></div>
-              </div>
-            </div>
-            <div class="blocco">
-              <div class="blocco-header">Portafoglio immobili</div>
-              <div class="kpi-row" id="portKpi"></div>
-              <div id="portInsight"><div class="placeholder">Nessuna scheda in ricerca immobili.</div></div>
-            </div>
-          </div>
-
-          <!-- COLONNA DX — SOCIAL -->
-          <div style="display:flex;flex-direction:column;gap:16px">
-            <div class="blocco">
-              <div class="blocco-header">Piano social — distribuzione rubriche</div>
-              <div class="social-rubrica-row" id="socialRubriche"><div class="placeholder">Nessun post nel piano social.</div></div>
-              <div class="mara-insight" id="socialInsight" style="display:none">
-                <div class="mara-insight-label">— Mara 📊</div>
-                <div class="mara-insight-text" id="socialInsightText"></div>
-              </div>
-            </div>
-            <div class="blocco">
-              <div class="blocco-header">Metriche Instagram <span id="igPeriodo" style="font-weight:400;font-size:0.75rem;color:var(--text-muted)"></span></div>
-              <div id="igMetriche"><div class="placeholder">Caricamento...</div></div>
-              <div class="mara-insight" id="igInsight" style="display:none;margin-top:12px">
-                <div class="mara-insight-label">— Mara 📊</div>
-                <div class="mara-insight-text" id="igInsightText"></div>
-              </div>
-            </div>
-            <div class="blocco hidden" id="bloccoMaraChicca">
-              <div class="blocco-header">Analisi Mara · Chicca</div>
-              <div class="mara-insight" style="margin-bottom:10px">
-                <div class="mara-insight-label">📊 Mara — Numeri</div>
-                <div class="mara-insight-text" id="mcMaraText"></div>
-              </div>
-              <div class="chicca-insight">
-                <div class="mara-insight-label">✨ Chicca — Strategia</div>
-                <div class="mara-insight-text" id="mcChiccaText"></div>
-              </div>
-            </div>
-          </div>
-
+        <div class="blocco">
+          <div class="blocco-header">Verisure — analisi del mese</div>
+          <div id="maraVerisure"><div class="placeholder">Caricamento…</div></div>
         </div>
-
       </div>
 
       <!-- ═══════ TAB VITA & CASA ═══════ -->
@@ -318,7 +270,7 @@
         <!-- SALDI PERSONALI -->
         <div class="vc-saldo-grid">
           <div class="saldo-card">
-            <div><div class="saldo-label">Entrate lavoro (mese)</div><div class="saldo-val positivo" id="vc_entrate_lavoro">€ 0</div></div>
+            <div><div class="saldo-label">Entrate Verisure (mese)</div><div class="saldo-val positivo" id="vc_entrate_lavoro">€ 0</div></div>
             <span style="font-size:1.6rem">💼</span>
           </div>
           <div class="saldo-card">
@@ -453,6 +405,7 @@
     </div>
   </main>
 
+  <script src="verisure-kpi.js"></script>
   <script>
     const d = new Date();
     const giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
@@ -477,38 +430,6 @@
       btn.classList.add('active');
     }
 
-    // ── FUNNEL (Supabase) ──
-    async function caricaFunnel() {
-      const oggi = new Date().toISOString().split('T')[0];
-      const res = await fetch(`${SB}/rest/v1/richieste?select=stato_follow,stato_cliente,prossimo_follow`, { headers: H });
-      const lista = await res.json();
-      const tot = lista.length;
-      const attive = lista.filter(r => !['Annullato','Perso','Venduto'].includes(r.stato_cliente)).length;
-      const risposte = lista.filter(r => r.stato_follow !== 'Da generare').length;
-      const inVisita = lista.filter(r => ['Visita fissata','Visita effettuata'].includes(r.stato_follow)).length;
-      const followScad = lista.filter(r => r.prossimo_follow && r.prossimo_follow <= oggi && !['Annullato','Perso','Venduto'].includes(r.stato_cliente)).length;
-      document.getElementById('kpi_richieste').textContent = attive;
-      document.getElementById('kpi_followscad').textContent = followScad;
-      const steps = [
-        { label: 'Richieste totali', val: tot, ref: tot },
-        { label: 'Richieste attive', val: attive, ref: tot },
-        { label: 'Risposte inviate', val: risposte, ref: tot },
-        { label: 'In visita / da visitare', val: inVisita, ref: tot },
-      ];
-      document.getElementById('funnelWrap').innerHTML = steps.map(s => {
-        const p = pct(s.val, s.ref);
-        return `<div class="funnel-step"><div class="funnel-label">${s.label}</div><div class="funnel-bar-wrap"><div class="funnel-track"><div class="funnel-fill" style="width:${p}%"></div></div></div><div class="funnel-num">${s.val}</div><div class="funnel-pct">${p}%</div></div>`;
-      }).join('');
-      const convPct = pct(risposte, tot);
-      let insight = followScad > 3 ? `${followScad} follow-up scaduti — priorità alta. Tasso risposta: ${convPct}%.`
-        : convPct < 70 ? `Solo il ${convPct}% ha ricevuto risposta. Verifica le bozze da inviare.`
-        : `Funnel in salute: ${convPct}% di risposta su ${tot} richieste totali.`;
-      if (followScad > 0) {
-        document.getElementById('funnelInsightText').textContent = insight;
-        document.getElementById('funnelInsight').style.display = '';
-      }
-    }
-
     const SB_URL = 'https://lbizlnuzlesrkvsobzqz.supabase.co';
     const SB_KEY = 'sb_publishable_2Rd36YkPvlsQI1BkdY0PrQ_od0d115R';
     const SB_H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
@@ -523,297 +444,6 @@
       } else {
         await sbPost('social_appunti', { chiave, valore });
       }
-    }
-
-    // ── PORTAFOGLIO (Supabase) ──
-    async function caricaPortafoglio() {
-      const props = await sbGet('proprieta?order=created_at.desc');
-      const inPortaleCount = props.filter(p => p.stato === 'Attivo').length;
-      document.getElementById('kpi_immobili').textContent = inPortaleCount;
-      if (props.length===0) return;
-      const stati = { 'Attivo':0, 'Venduto':0, 'Ritirato':0 };
-      let prezzoTot = 0, conPrezzo = 0, mqTot = 0, conMq = 0, eurMqTot = 0, conEurMq = 0;
-      props.forEach(p => {
-        const k = p.stato === 'Attivo' ? 'Attivo' : (stati[p.stato]!==undefined ? p.stato : null);
-        if (k) stati[k]++;
-        if (p.stato === 'Attivo') {
-          const pr = parseFloat(p.prezzo)||0;
-          const mq = parseFloat(p.mq)||0;
-          if (pr>0) { prezzoTot+=pr; conPrezzo++; }
-          if (pr>0 && mq>0) { eurMqTot+=(pr/mq); conEurMq++; }
-        }
-      });
-      const colori = { 'Attivo':'#8e44ad', 'Venduto':'#27ae60', 'Ritirato':'#888' };
-      document.getElementById('portKpi').innerHTML = Object.entries(stati)
-        .filter(([k,v]) => v > 0)
-        .map(([k,v]) => `<div class="kpi-card"><div class="kpi-val" style="color:${colori[k]};font-size:1.4rem">${v}</div><div class="kpi-label">${k}</div></div>`).join('');
-      const prezzoMedio = conPrezzo>0 ? prezzoTot/conPrezzo : 0;
-      const eurMqMedio = conEurMq>0 ? eurMqTot/conEurMq : 0;
-      let ins = `<div class="mara-insight"><div class="mara-insight-label">— Mara 📊</div><div class="mara-insight-text">`;
-      ins += `${stati.Attivo} attivi · prezzo medio ${fmtEur(prezzoMedio)}`;
-      if (eurMqMedio>0) ins += ` · <strong>${Math.round(eurMqMedio).toLocaleString('it-IT')} €/mq</strong>`;
-      ins += `.`;
-      ins += `</div></div>`;
-      document.getElementById('portInsight').innerHTML = ins;
-    }
-
-    // ── SOCIAL (Supabase) ──
-    async function caricaSocial() {
-      const posts = await sbGet('piano_editoriale?order=data.desc&limit=200');
-      if (posts.length===0) return;
-      const rubriche = { nero:{nome:'Proprietà',colore:'#222',count:0}, bianco:{nome:'Personal Brand',colore:'#aaa',count:0}, oro:{nome:'Territorio',colore:'#c9a84c',count:0}, grigio:{nome:'Educativo',colore:'#888',count:0} };
-      posts.forEach(p => {
-        const r = p.rubrica || '';
-        if (rubriche[r]) rubriche[r].count++;
-      });
-      const max = Math.max(...Object.values(rubriche).map(r=>r.count),1);
-      document.getElementById('socialRubriche').innerHTML = Object.entries(rubriche).map(([k,r]) => {
-        const p = Math.round((r.count/max)*100);
-        const pct25 = Math.round((r.count/posts.length)*100);
-        const ok = Math.abs(pct25-25)<=10;
-        return `<div class="rubrica-item"><div class="rubrica-dot" style="background:${r.colore};border:1px solid var(--border)"></div><div class="rubrica-nome">${r.nome}</div><div class="rubrica-bar-wrap"><div class="rubrica-track"><div class="rubrica-fill" style="width:${p}%;background:${r.colore};border:1px solid var(--border)"></div></div></div><div class="rubrica-count">${r.count} (${pct25}%) ${ok?'✅':'⚠️'}</div></div>`;
-      }).join('');
-      const sbilanciati = Object.values(rubriche).filter(r=>Math.abs(Math.round((r.count/posts.length)*100)-25)>10);
-      if (sbilanciati.length>0) {
-        document.getElementById('socialInsightText').textContent = `${sbilanciati.map(r=>r.nome).join(', ')} ${sbilanciati.length>1?'sono sbilanciate':'è sbilanciata'} rispetto al mix 25/25/25/25.`;
-        document.getElementById('socialInsight').style.display='';
-      }
-    }
-
-    // ── METRICHE IG (Supabase) ──
-    async function caricaMetricheIG() {
-      try {
-        const rows = await sbGet('metriche_ig?order=periodo_fine.desc&limit=1');
-        const el = document.getElementById('igMetriche');
-        if (!rows.length) { el.innerHTML = '<div class="placeholder">Nessuna metrica disponibile.</div>'; return; }
-        const m = rows[0];
-        const fmt = d => d ? new Date(d).toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-        document.getElementById('igPeriodo').textContent = `· ${fmt(m.periodo_inizio)} – ${fmt(m.periodo_fine)}`;
-        el.innerHTML = `
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:14px">
-            ${[
-              ['👥 Follower', m.follower],
-              ['▶️ Views reel', m.visualizzazioni_reel],
-              ['❤️ Mi piace', m.mi_piace],
-              ['🔖 Salvataggi', m.salvataggi],
-              ['↗️ Condivisioni', m.condivisioni],
-              ['🔁 Repost', m.repost],
-              ['💬 DM ricevuti', m.dm_ricevuti],
-              ['👁️ Visite profilo', m.visite_profilo],
-            ].map(([label,val]) => `<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center">
-              <div style="font-size:1.1rem;font-weight:700;color:var(--text)">${val ?? '—'}</div>
-              <div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px">${label}</div>
-            </div>`).join('')}
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:0.8rem;color:var(--text-muted)">
-            <span>🎂 <strong>${m.eta_top || '—'}</strong></span>
-            <span>👩 Donne <strong>${m.genere_donne_pct ? m.genere_donne_pct+'%' : '—'}</strong></span>
-            <span>🌍 <strong>${m.paese_top || '—'}</strong></span>
-            <span>📍 <strong>${m.citta_top || '—'}</strong></span>
-          </div>
-          ${m.note ? `<div style="margin-top:10px;font-size:0.72rem;color:var(--text-muted)">📎 ${m.note}</div>` : ''}
-        `;
-
-        // Analisi Mara
-        const insights = [];
-        const engRate = m.visualizzazioni_reel ? ((m.mi_piace + m.salvataggi + m.condivisioni) / m.visualizzazioni_reel * 100) : 0;
-        if (engRate > 0) insights.push(`Engagement rate reel: ${engRate.toFixed(1)}% — ${engRate >= 5 ? 'buono ✅' : engRate >= 2 ? 'nella media ⚠️' : 'basso, lavora sul gancio iniziale 🔴'}.`);
-        if (m.salvataggi && m.visualizzazioni_reel) {
-          const saveRate = (m.salvataggi / m.visualizzazioni_reel * 100).toFixed(1);
-          insights.push(`Salvataggi ${saveRate}% delle views — ${parseFloat(saveRate) >= 5 ? 'contenuto utile percepito, continua su questo formato ✅' : 'lavora su contenuti più "da tenere".'}`);
-        }
-        if (m.genere_donne_pct && m.genere_donne_pct > 50) insights.push(`Pubblico prevalentemente femminile (${m.genere_donne_pct}%). Verifica che il tono dei reel parli anche agli acquirenti internazionali maschi.`);
-        if (m.citta_top) insights.push(`Città top: ${m.citta_top}. Roma è il tuo mercato urbano principale — tienila in mente per targeting e tono.`);
-        if (m.follower < 300) insights.push(`${m.follower} follower — fase early. Priorità: costanza e contenuti che generano salvataggi, non like.`);
-
-        if (insights.length) {
-          document.getElementById('igInsightText').innerHTML = insights.map(i => `<div style="margin-bottom:6px">• ${i}</div>`).join('');
-          document.getElementById('igInsight').style.display = '';
-        }
-
-        // ── ANALISI MARA · CHICCA ──
-        renderMaraChicca(m);
-
-      } catch(e) { document.getElementById('igMetriche').innerHTML = '<div class="placeholder">Errore caricamento metriche.</div>'; }
-    }
-
-    function renderMaraChicca(m) {
-      const engRate = m.visualizzazioni_reel > 0
-        ? ((m.mi_piace + m.salvataggi + m.condivisioni) / m.visualizzazioni_reel * 100)
-        : 0;
-      const saveRate = m.visualizzazioni_reel > 0
-        ? (m.salvataggi / m.visualizzazioni_reel * 100)
-        : 0;
-      const prezzoMq = m.visualizzazioni_reel > 0 ? (m.contatti_generati || 0) : 0;
-
-      // Mara: sintesi numerica
-      const maraLines = [];
-      maraLines.push(`Periodo: ${m.periodo_inizio} → ${m.periodo_fine} · ${m.follower} follower.`);
-      maraLines.push(`Engagement reel: ${engRate.toFixed(1)}% (like+salvataggi+condivisioni / views). Benchmark soglia: 5% buono, 2-5% medio, <2% basso.`);
-      maraLines.push(`Save rate: ${saveRate.toFixed(1)}% — ${saveRate >= 5 ? 'alto: il contenuto viene percepito utile o da rivedere.' : 'basso: i reel non generano abbastanza salvataggi.'}`);
-      maraLines.push(`Pubblico: ${m.eta_top || '—'} · ${m.genere_donne_pct ? m.genere_donne_pct + '% donne' : '—'} · ${m.paese_top || '—'} · città: ${m.citta_top || '—'}.`);
-      if (m.dm_ricevuti !== null && m.dm_ricevuti !== undefined) {
-        maraLines.push(`DM ricevuti: ${m.dm_ricevuti} · Visite profilo: ${m.visite_profilo ?? '—'}.`);
-        if (m.visite_profilo && m.follower) {
-          const convProfilo = (m.follower / m.visite_profilo * 100).toFixed(1);
-          maraLines.push(`Conversione visite → follow: ${convProfilo}% (${m.follower} follower su ${m.visite_profilo} visite profilo).`);
-        }
-      }
-
-      // Chicca: lettura strategica
-      const chiccaLines = [];
-      if (engRate >= 50) {
-        chiccaLines.push(`Engagement sopra il 50%: il formato sta funzionando. Non cambiare la struttura dei reel — varia solo i temi.`);
-      } else if (engRate >= 5) {
-        chiccaLines.push(`Engagement nella fascia buona. Punta su reel con struttura domanda-risposta o "prima/dopo" per aumentare i salvataggi.`);
-      } else {
-        chiccaLines.push(`Engagement basso. Priorità: lavorare sul primo secondo del reel — il gancio visivo decide se si ferma o scorre.`);
-      }
-      if (saveRate >= 5) {
-        chiccaLines.push(`Save rate alto: il pubblico trova valore nei tuoi contenuti educativi o informativi. Continua su questo registro — è la rubrica 🔵 grigia (educativo) che funziona di più.`);
-      } else {
-        chiccaLines.push(`Save rate basso: prova contenuti "lista utile" — es. "5 cose da sapere prima di comprare in Maremma" o "quanto costa ristrutturare un casale". Questi generano salvataggi.`);
-      }
-      if (m.genere_donne_pct > 50) {
-        chiccaLines.push(`Pubblico >50% femminile: tono caldo e lifestyle funzionano. Inserisci più contenuti ⚪ personal brand che mostrano Emanuela nel territorio.`);
-      }
-      if (m.citta_top && m.citta_top.includes('Roma')) {
-        chiccaLines.push(`Roma è il tuo bacino principale: usa caption che parlano di fuga dal caos urbano, ritmo lento, natura. È il trigger d'acquisto di chi cerca in Maremma da città.`);
-      }
-      if (m.follower < 500) {
-        chiccaLines.push(`Fase crescita (< 500 follower): obiettivo ora non è viralità ma consistenza. 3 post/settimana, stesso orario, mix rubriche rispettato.`);
-      }
-      if (m.dm_ricevuti > 0) {
-        chiccaLines.push(`${m.dm_ricevuti} DM ricevuti: ogni DM è un contatto caldo. Rispondi sempre entro 24h — è il touchpoint più prezioso che hai su Instagram.`);
-      } else if (m.dm_ricevuti === 0) {
-        chiccaLines.push(`Nessun DM ricevuto: aggiungi una CTA esplicita in almeno 1 reel a settimana — "scrivimi in DM per info" o "mandami un messaggio se stai cercando in Maremma".`);
-      }
-      if (m.visite_profilo) {
-        const vpp = m.follower ? (m.follower / m.visite_profilo * 100) : 0;
-        if (vpp < 5) {
-          chiccaLines.push(`Conversione visite profilo bassa (${vpp.toFixed(1)}%): chi arriva sul profilo non segue. Controlla la bio — deve dire in 3 secondi chi sei, dove operi e perché seguirti.`);
-        } else {
-          chiccaLines.push(`Conversione visite profilo ${vpp.toFixed(1)}%: il profilo convince. Bio e immagine di copertina funzionano.`);
-        }
-      }
-
-      document.getElementById('mcMaraText').innerHTML = maraLines.map(l => `<div style="margin-bottom:5px">• ${l}</div>`).join('');
-      document.getElementById('mcChiccaText').innerHTML = chiccaLines.map(l => `<div style="margin-bottom:5px">• ${l}</div>`).join('');
-      document.getElementById('bloccoMaraChicca').classList.remove('hidden');
-    }
-
-    // ── MERCATO: import CSV portale ──
-    function parseCSV(text) {
-      const lines = text.trim().split('\n');
-      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-      return lines.slice(1).map(line => {
-        const vals = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || line.split(',');
-        const obj = {};
-        headers.forEach((h, i) => {
-          let v = (vals[i] || '').replace(/^"|"$/g, '').trim();
-          obj[h] = v === '' ? null : v;
-        });
-        return obj;
-      });
-    }
-
-    async function importaCSV() {
-      const file = document.getElementById('csv_file').files[0];
-      const mese = document.getElementById('csv_mese').value;
-      const status = document.getElementById('csv_status');
-      if (!file) { status.textContent = '⚠ Seleziona un file CSV'; return; }
-      if (!mese) { status.textContent = '⚠ Seleziona il mese di riferimento'; return; }
-      status.textContent = 'Lettura file…';
-      const text = await file.text();
-      const rows = parseCSV(text);
-      status.textContent = `Preparazione ${rows.length} righe…`;
-      const records = rows
-        .filter(r => (r.riferimento_interno || '').trim())
-        .map(r => ({
-          ref: (r.riferimento_interno || '').trim(),
-          mese,
-          presente_idealista: r.presente_idealista === '1',
-          presente_immobiliare: r.presente_immobiliare === '1',
-          idealista_codice: r.idealista_codice || null,
-          idealista_visite_liste: parseFloat(r.idealista_visite_liste) || null,
-          idealista_visite_dettaglio: parseFloat(r.idealista_visite_dettaglio) || null,
-          idealista_condiviso: parseFloat(r.idealista_condiviso) || null,
-          idealista_invii_avvisi: parseFloat(r.idealista_invii_avvisi) || null,
-          idealista_preferiti: parseFloat(r.idealista_preferiti) || null,
-          idealista_contatti: parseFloat(r.idealista_contatti) || null,
-          imm_visibilita: r.imm_visibilita || null,
-          imm_posizione: parseFloat(r.imm_posizione) || null,
-          imm_pagina: r.imm_pagina || null,
-          imm_qualita_pct: parseFloat(r.imm_qualita_pct) || null,
-          imm_rank: r.imm_rank || null,
-          imm_variazione: r.imm_variazione || null,
-          imm_visite_dettaglio: parseFloat(r.imm_visite_dettaglio) || null,
-          imm_salvati: parseFloat(r.imm_salvati) || null,
-          imm_nascosti: parseFloat(r.imm_nascosti) || null,
-          imm_messaggi: parseFloat(r.imm_messaggi) || null,
-          imm_match: parseFloat(r.imm_match) || null
-        }));
-      status.textContent = `Importazione ${records.length} righe in batch…`;
-      const res = await fetch(`${SB}/rest/v1/analisi_portale`, {
-        method: 'POST',
-        headers: { ...H, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-        body: JSON.stringify(records)
-      });
-      if (res.ok) {
-        status.textContent = `✅ Importati ${records.length} immobili`;
-      } else {
-        const err = await res.text();
-        status.textContent = `⚠ Errore: ${err}`;
-      }
-      caricaMercato();
-    }
-
-    async function caricaMercato() {
-      const el = document.getElementById('portale_list');
-      el.innerHTML = '<div class="empty-state">Caricamento…</div>';
-      // Carica mesi disponibili
-      const mesiRaw = await sbGet('analisi_portale?select=mese&order=mese.desc');
-      const mesi = [...new Set((mesiRaw||[]).map(r=>r.mese))];
-      const sel = document.getElementById('filtro_mese_portale');
-      const valAttuale = sel.value;
-      sel.innerHTML = '<option value="">Ultimo disponibile</option>' + mesi.map(m=>`<option value="${m}">${m}</option>`).join('');
-      if (valAttuale) sel.value = valAttuale;
-      const meseTarget = sel.value || mesi[0];
-      if (!meseTarget) { el.innerHTML = '<div class="empty-state">Nessun dato importato. Carica il CSV dall\'amministrazione.</div>'; return; }
-      document.getElementById('mercato_mese_label').textContent = meseTarget;
-      // Carica proprietà attive + metriche
-      const [props, portale] = await Promise.all([
-        sbGet('proprieta?stato=eq.Attivo&order=created_at.desc'),
-        sbGet(`analisi_portale?mese=eq.${meseTarget}&order=ref.asc`)
-      ]);
-      const portaleMap = {};
-      portale.forEach(p => portaleMap[p.ref] = p);
-      if (props.length === 0) { el.innerHTML = '<div class="empty-state">Nessun immobile attivo in portale.</div>'; return; }
-      el.innerHTML = props.map(p => {
-        const m = portaleMap[p.ref] || {};
-        const visite = (m.idealista_visite_dettaglio||0) + (m.imm_visite_dettaglio||0);
-        const contatti = (m.idealista_contatti||0) + (m.imm_messaggi||0);
-        const giorni = p.data_incarico ? Math.floor((new Date()-new Date(p.data_incarico))/86400000) : null;
-        const hasDati = Object.keys(m).length > 0;
-        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:700;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.titolo||p.ref}</div>
-            <div style="font-size:0.72rem;color:var(--text-muted)">${p.ref}${giorni!==null?' · '+giorni+' gg sul mercato':''}</div>
-          </div>
-          ${hasDati ? `
-          <div style="text-align:center;min-width:50px"><div style="font-weight:700;font-size:1rem">${visite||'—'}</div><div style="font-size:0.65rem;color:var(--text-muted)">visite</div></div>
-          <div style="text-align:center;min-width:50px"><div style="font-weight:700;font-size:1rem;color:${contatti>0?'#27ae60':'var(--text)'}">${contatti||'—'}</div><div style="font-size:0.65rem;color:var(--text-muted)">contatti</div></div>
-          <div style="text-align:center;min-width:50px"><div style="font-weight:700;font-size:1rem">${m.imm_qualita_pct||'—'}<span style="font-size:0.65rem">%</span></div><div style="font-size:0.65rem;color:var(--text-muted)">qualità</div></div>
-          ` : `<div style="font-size:0.75rem;color:var(--text-muted);flex:0 0 auto">nessun dato portale</div>`}
-          <a href="report-proprieta.html?ref=${encodeURIComponent(p.ref)}&mese=${meseTarget}" target="_blank" class="btn-small" style="white-space:nowrap;text-decoration:none">📄 PDF</a>
-        </div>`;
-      }).join('');
-    }
-
-    async function precaricaEsempio() {
-      const lista = await sbGet('mara_rpt?limit=1');
-      if (lista.length > 0) return;
-      await sbPost('mara_rpt', { codice:'33541050-144', tipo:'Villa bifamiliare · Grosseto', decisione:'monitorare', link:'https://drive.google.com/file/d/1n34jwq4NqNTT_xw0DsGZvGxsQw2vBox7/view', data:'17/06/2026' });
     }
 
     // ── VITA & CASA (Supabase mara_vc) ──
@@ -940,7 +570,8 @@
       const totSpesePuntuali = spese.reduce((s, sp) => s + (sp.importo || 0), 0);
       const totUscitefisse = uscitefisse.reduce((s, x) => s + parseFloat(x.importo || 0), 0);
       const totSpese = totSpesePuntuali + totUscitefisse;
-      const entrateNum = 0; // entrate lavoro: da collegare a Verisure
+      let entrateNum = 0; // entrate lavoro = quanto arriva da Verisure questo mese (minimo garantito compreso)
+      try { entrateNum = VK.calcola(await VK.load()).pagato; } catch(e) {}
 
       document.getElementById('vc_entrate_lavoro').textContent = fmtEur(entrateNum);
       document.getElementById('vc_spese_tot').textContent = fmtEur(totSpese);
@@ -1033,12 +664,18 @@
     }
 
     // ── INIT ──
+    async function caricaVerisure() {
+      const s = await VK.load();
+      const m = s.mese, c = VK.calcola(s);
+      document.getElementById('kpi_app').textContent = m.app_re + m.app_rp + m.app_rpb;
+      document.getElementById('kpi_vend').textContent = m.re + m.rp + m.rpb;
+      document.getElementById('kpi_maturato').textContent = fmtEur(c.maturato);
+      document.getElementById('kpi_pagato').textContent = fmtEur(c.pagato);
+      await VK.montaKPI(document.getElementById('maraVerisure'));
+    }
+
     async function init() {
-      caricaFunnel();
-      caricaPortafoglio();
-      caricaSocial();
-      caricaMetricheIG();
-      caricaMercato();
+      caricaVerisure();
       renderVitaCasa();
     }
     init();
